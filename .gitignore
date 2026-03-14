@@ -1,0 +1,68 @@
+# ======================
+# Python
+# ======================
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.so
+
+# virtual environment
+.venv/
+venv/
+env/
+
+# ======================
+# Environment variables
+# ======================
+.env
+
+# ======================
+# Logs
+# ======================
+*.log
+
+# ======================
+# Database
+# ======================
+*.sqlite3
+*.db
+
+# ======================
+# Vector DB / AI Index
+# ======================
+backend/app/rag/vector_store/
+backend/app/rag/chunks/
+
+# ======================
+# Node / Frontend
+# ======================
+frontend/node_modules/
+
+# ======================
+# Build
+# ======================
+dist/
+build/
+*.tsbuildinfo
+
+# ======================
+# IDE
+# ======================
+.vscode/
+.idea/
+
+# ======================
+# OS
+# ======================
+.DS_Store
+Thumbs.db
+
+# ======================
+# Test cache
+# ======================
+.pytest_cache/
+coverage/
+
+# ======================
+backend/app/rag/data/

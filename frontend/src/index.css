@@ -1,0 +1,229 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    /* FPT University Orange Theme */
+    --background: 0 0% 98%;
+    --foreground: 220 20% 10%;
+
+    --card: 0 0% 100%;
+    --card-foreground: 220 20% 10%;
+
+    --popover: 0 0% 100%;
+    --popover-foreground: 220 20% 10%;
+
+    /* FPT Orange - Primary Brand Color */
+    --primary: 24 91% 54%;
+    --primary-foreground: 0 0% 100%;
+
+    --secondary: 220 14% 96%;
+    --secondary-foreground: 220 20% 20%;
+
+    --muted: 220 14% 96%;
+    --muted-foreground: 220 10% 46%;
+
+    --accent: 24 91% 54%;
+    --accent-foreground: 0 0% 100%;
+
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 0 0% 100%;
+
+    --border: 220 14% 90%;
+    --input: 220 14% 90%;
+    --ring: 24 91% 54%;
+
+    --radius: 0.75rem;
+
+    /* Custom tokens for chatbot */
+    --chat-bg: 220 14% 97%;
+    --chat-user: 24 91% 54%;
+    --chat-bot: 0 0% 100%;
+    --chat-bot-border: 220 14% 92%;
+    
+    /* Voice visualization */
+    --voice-active: 24 91% 54%;
+    --voice-pulse: 24 91% 64%;
+    --voice-wave: 24 80% 70%;
+
+    --sidebar-background: 0 0% 98%;
+    --sidebar-foreground: 240 5.3% 26.1%;
+    --sidebar-primary: 240 5.9% 10%;
+    --sidebar-primary-foreground: 0 0% 98%;
+    --sidebar-accent: 240 4.8% 95.9%;
+    --sidebar-accent-foreground: 240 5.9% 10%;
+    --sidebar-border: 220 13% 91%;
+    --sidebar-ring: 217.2 91.2% 59.8%;
+  }
+
+  .dark {
+    --background: 220 20% 8%;
+    --foreground: 0 0% 95%;
+
+    --card: 220 20% 10%;
+    --card-foreground: 0 0% 95%;
+
+    --popover: 220 20% 10%;
+    --popover-foreground: 0 0% 95%;
+
+    --primary: 24 91% 54%;
+    --primary-foreground: 0 0% 100%;
+
+    --secondary: 220 20% 15%;
+    --secondary-foreground: 0 0% 95%;
+
+    --muted: 220 20% 15%;
+    --muted-foreground: 220 10% 60%;
+
+    --accent: 24 91% 54%;
+    --accent-foreground: 0 0% 100%;
+
+    --destructive: 0 62% 50%;
+    --destructive-foreground: 0 0% 100%;
+
+    --border: 220 20% 18%;
+    --input: 220 20% 18%;
+    --ring: 24 91% 54%;
+
+    --chat-bg: 220 20% 6%;
+    --chat-user: 24 91% 54%;
+    --chat-bot: 220 20% 12%;
+    --chat-bot-border: 220 20% 20%;
+
+    --voice-active: 24 91% 54%;
+    --voice-pulse: 24 91% 64%;
+    --voice-wave: 24 80% 70%;
+
+    --sidebar-background: 240 5.9% 10%;
+    --sidebar-foreground: 240 4.8% 95.9%;
+    --sidebar-primary: 224.3 76.3% 48%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 240 3.7% 15.9%;
+    --sidebar-accent-foreground: 240 4.8% 95.9%;
+    --sidebar-border: 240 3.7% 15.9%;
+    --sidebar-ring: 217.2 91.2% 59.8%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground antialiased;
+    font-feature-settings: "rlig" 1, "calt" 1;
+  }
+}
+
+@layer utilities {
+  /* Voice pulse animation */
+  @keyframes voice-pulse {
+    0%, 100% {
+      transform: scale(1);
+      opacity: 0.8;
+    }
+    50% {
+      transform: scale(1.15);
+      opacity: 1;
+    }
+  }
+
+  @keyframes voice-ring {
+    0% {
+      transform: scale(1);
+      opacity: 0.6;
+    }
+    100% {
+      transform: scale(2);
+      opacity: 0;
+    }
+  }
+
+  @keyframes wave-bar {
+    0%, 100% {
+      height: 8px;
+    }
+    50% {
+      height: 24px;
+    }
+  }
+
+  @keyframes float {
+    0%, 100% {
+      transform: translateY(0);
+    }
+    50% {
+      transform: translateY(-10px);
+    }
+  }
+
+  @keyframes fade-in-up {
+    from {
+      opacity: 0;
+      transform: translateY(10px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  @keyframes typing-dot {
+    0%, 60%, 100% {
+      opacity: 0.3;
+      transform: translateY(0);
+    }
+    30% {
+      opacity: 1;
+      transform: translateY(-4px);
+    }
+  }
+
+  .animate-voice-pulse {
+    animation: voice-pulse 1.5s ease-in-out infinite;
+  }
+
+  .animate-voice-ring {
+    animation: voice-ring 1.5s ease-out infinite;
+  }
+
+  .animate-wave-bar {
+    animation: wave-bar 0.8s ease-in-out infinite;
+  }
+
+  .animate-float {
+    animation: float 3s ease-in-out infinite;
+  }
+
+  .animate-fade-in-up {
+    animation: fade-in-up 0.4s ease-out forwards;
+  }
+
+  .animate-typing-dot {
+    animation: typing-dot 1.4s ease-in-out infinite;
+  }
+
+  /* Gradient text utility */
+  .text-gradient-primary {
+    @apply bg-gradient-to-r from-primary to-orange-400 bg-clip-text text-transparent;
+  }
+
+  /* Chat scrollbar */
+  .chat-scrollbar::-webkit-scrollbar {
+    width: 6px;
+  }
+
+  .chat-scrollbar::-webkit-scrollbar-track {
+    @apply bg-transparent;
+  }
+
+  .chat-scrollbar::-webkit-scrollbar-thumb {
+    @apply bg-border rounded-full;
+  }
+
+  .chat-scrollbar::-webkit-scrollbar-thumb:hover {
+    @apply bg-muted-foreground/30;
+  }
+}
