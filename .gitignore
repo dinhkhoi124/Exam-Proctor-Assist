@@ -66,3 +66,6 @@ coverage/
 
 # ======================
 backend/app/rag/data/
+
+# ======================
+demo.mp4
