@@ -77,6 +77,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 
 import { AuthProvider } from "@/context/AuthContext";
 import { ProtectedRoute } from "@/components/ProtectedRoute";
+import { AdminProtectedRoute } from "@/components/admin/AdminProtectedRoute";
 
 import Index from "./pages/Index";
 import About from "./pages/About";
@@ -87,6 +88,11 @@ import Register from "./pages/Register";
 import ForgotPassword from "./pages/ForgotPassword";
 import ResetPassword from "./pages/ResetPassword";
 import VerifyEmail from "./pages/VerifyEmail";
+
+import AdminDashboard from "./pages/admin/AdminDashboard";
+import UsersManagement from "./pages/admin/UsersManagement";
+import ChatbotData from "./pages/admin/ChatbotData";
+import FeedbackManagement from "./pages/admin/FeedbackManagement";
 
 const queryClient = new QueryClient();
 
@@ -124,6 +130,41 @@ const App = () => {
                   <ProtectedRoute>
                     <About />
                   </ProtectedRoute>
+                }
+              />
+
+              {/* ADMIN ROUTES */}
+
+              <Route
+                path="/admin"
+                element={
+                  <AdminProtectedRoute>
+                    <AdminDashboard />
+                  </AdminProtectedRoute>
+                }
+              />
+              <Route
+                path="/admin/users"
+                element={
+                  <AdminProtectedRoute>
+                    <UsersManagement />
+                  </AdminProtectedRoute>
+                }
+              />
+              <Route
+                path="/admin/data"
+                element={
+                  <AdminProtectedRoute>
+                    <ChatbotData />
+                  </AdminProtectedRoute>
+                }
+              />
+              <Route
+                path="/admin/feedback"
+                element={
+                  <AdminProtectedRoute>
+                    <FeedbackManagement />
+                  </AdminProtectedRoute>
                 }
               />
 

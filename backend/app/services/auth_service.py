@@ -5,7 +5,8 @@ import re
 from jose import jwt
 from passlib.context import CryptContext
 from sqlalchemy.orm import Session
-from fastapi import HTTPException, status
+from fastapi import HTTPException, status, Depends
+from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 
 from app.models.user import User
 from app.core.config import (
@@ -14,6 +15,9 @@ from app.core.config import (
     ACCESS_TOKEN_EXPIRE_MINUTES,
     RESET_TOKEN_EXPIRE_MINUTES
 )
+from sqlalchemy import func
+from app.models.chat_log import ChatLog
+from app.db.deps import get_db
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
@@ -149,6 +153,13 @@ def login_user(db: Session, identifier: str, password: str):
     token = create_access_token({"sub": str(user.id)})
     return token
 
+def get_current_user(db: Session, user_id: str):
+    user = db.query(User).filter(User.id == user_id).first()
+    return user
+
+def require_admin(user: User):
+    if user.role != "admin":
+        raise HTTPException(status_code=403, detail="Admin privileges required")
 
 # =========================
 # RESET TOKEN (DB-BASED)
@@ -213,5 +224,55 @@ def verify_email_token(db: Session, token: str):
     user.verification_expiry = None
 
     db.commit()
+
+    return user
+
+# =========================
+# ADMIN STATISTICS
+# =========================
+
+def get_total_users(db: Session):
+    return db.query(func.count(User.id)).scalar()
+
+
+def get_total_questions(db: Session):
+    return db.query(func.count(ChatLog.id)).scalar()
+
+
+def get_active_users(db: Session):
+    return db.query(func.count(User.id)).filter(User.is_active == True).scalar()
+
+
+def get_user_question_count(db: Session):
+    results = (
+        db.query(User.username, func.count(ChatLog.id))
+        .join(ChatLog, ChatLog.user_id == User.id)
+        .group_by(User.username)
+        .all()
+    )
+
+    return [
+        {"username": username, "total_questions": total}
+        for username, total in results
+    ]
+
+security = HTTPBearer()
+
+def get_current_user_from_token(
+    credentials: HTTPAuthorizationCredentials = Depends(security),
+    db: Session = Depends(get_db)
+):
+    token = credentials.credentials
+
+    try:
+        payload = jwt.decode(token, JWT_SECRET, algorithms=[JWT_ALGORITHM])
+        user_id = payload.get("sub")
+    except:
+        raise HTTPException(status_code=401, detail="Invalid token")
+
+    user = db.query(User).filter(User.id == user_id).first()
+
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")
 
     return user

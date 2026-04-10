@@ -13,9 +13,18 @@ class LoginRequest(BaseModel):
     password: str
 
 
+from typing import Optional
+
+class UserLoginInfo(BaseModel):
+    id: str
+    email: str
+    username: str
+    role: str
+
 class LoginResponse(BaseModel):
     access_token: str
     token_type: str = "bearer"
+    user: Optional[UserLoginInfo] = None
 
 
 class MessageResponse(BaseModel):

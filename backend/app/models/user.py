@@ -1,4 +1,3 @@
-
 import uuid
 from sqlalchemy import Column, String, Boolean, Text, DateTime
 from sqlalchemy.dialects.postgresql import UUID
@@ -33,4 +32,5 @@ class User(Base):
         server_default=func.now(),
         onupdate=func.now()
     )
-
+    role = Column(String(20), default="user")
+    last_active = Column(DateTime)
