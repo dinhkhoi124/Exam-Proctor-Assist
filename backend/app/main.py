@@ -10,6 +10,8 @@ from app.api.v1.speech import router as speech_router
 from app.api.v1.auth import router as auth_router
 from app.api.v1.admin import router as admin_router
 from app.models import user
+from fastapi import WebSocket, WebSocketDisconnect
+from app.core.websocket import manager
 
 
 app = FastAPI(
@@ -39,3 +41,13 @@ app.include_router(chat_router, prefix="/api/v1")
 app.include_router(speech_router, prefix="/api/v1")
 app.include_router(auth_router, prefix="/api/v1")
 app.include_router(admin_router, prefix="/api/v1")
+
+@app.websocket("/ws/admin")
+async def websocket_endpoint(websocket: WebSocket):
+    await manager.connect(websocket)
+    try:
+        while True:
+            # Keep connection alive
+            await websocket.receive_text()
+    except WebSocketDisconnect:
+        manager.disconnect(websocket)

@@ -6,6 +6,7 @@ import { UsersTable } from "@/components/admin/UsersTable";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "@/context/AuthContext";
 import { Button } from "@/components/ui/button";
+import { useRef } from "react";
 
 interface AdminStatsResponse {
   total_users: number;
@@ -30,21 +31,74 @@ export default function AdminDashboard() {
     navigate("/login", { replace: true });
   };
 
+  const fetchStats = async () => {
+    try {
+      const response = await api.get<AdminStatsResponse>("/api/v1/admin/stats");
+      setStats(response.data);
+      setError(null);
+    } catch (err: any) {
+      console.error("Failed to fetch admin stats:", err);
+      setError("Failed to load dashboard data. Please try again later.");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const fetchTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+
   useEffect(() => {
-    const fetchStats = async () => {
-      try {
-        const response = await api.get<AdminStatsResponse>("/api/v1/admin/stats");
-        setStats(response.data);
-        setError(null);
-      } catch (err: any) {
-        console.error("Failed to fetch admin stats:", err);
-        setError("Failed to load dashboard data. Please try again later.");
-      } finally {
-        setIsLoading(false);
-      }
+    fetchStats();
+
+    let ws: WebSocket;
+    let reconnectTimeout: NodeJS.Timeout;
+
+    const connectWs = () => {
+      // Connect to WS
+      const wsUrl = process.env.NODE_ENV === "production"
+        ? `wss://${window.location.host}/ws/admin`
+        : "ws://127.0.0.1:8000/ws/admin";
+
+      ws = new WebSocket(wsUrl);
+
+      ws.onmessage = (event) => {
+        try {
+          const data = JSON.parse(event.data);
+          if (data.type === "STATS_UPDATED") {
+            // Debounce the call (limit to 1 per second)
+            if (!fetchTimeoutRef.current) {
+              fetchTimeoutRef.current = setTimeout(() => {
+                fetchStats();
+                fetchTimeoutRef.current = null;
+              }, 1000);
+            }
+          }
+        } catch (e) {
+          console.error("Failed to parse WS message", e);
+        }
+      };
+
+      ws.onclose = () => {
+        // Automatic reconnection every 2 seconds
+        reconnectTimeout = setTimeout(connectWs, 2000);
+      };
+
+      ws.onerror = (err) => {
+        console.error("WebSocket Error:", err);
+      };
     };
 
-    fetchStats();
+    connectWs();
+
+    return () => {
+      clearTimeout(reconnectTimeout);
+      if (fetchTimeoutRef.current) {
+        clearTimeout(fetchTimeoutRef.current);
+      }
+      if (ws) {
+        ws.onclose = null; // Prevent reconnect loop on unmount
+        ws.close();
+      }
+    };
   }, []);
 
   if (isLoading) {

@@ -17,10 +17,12 @@ from app.services.auth_service import (
     hash_password,
     create_reset_token,
     verify_email_token,
-    verify_reset_token,
     login_user,
-    create_verification_token
+    create_verification_token,
+    get_current_user_from_token
 )
+
+from app.core.websocket import manager
 
 from app.models.user import User
 
@@ -76,6 +78,7 @@ async def register(request: RegisterRequest, db: Session = Depends(get_db), req:
         await send_verification_email(user.email, token)
 
         logger.info(f"REGISTER SUCCESS - {request.email} - IP: {ip}")
+        await manager.broadcast({"type": "STATS_UPDATED"})
 
         return MessageResponse(
             message="Registration successful. Please check your email to verify your account."
@@ -123,14 +126,19 @@ def verify_email(token: str, db: Session = Depends(get_db)):
 # LOGIN
 # =========================
 @router.post("/login", response_model=LoginResponse)
-def login(request: LoginRequest, db: Session = Depends(get_db), req: Request = None):
+async def login(request: LoginRequest, db: Session = Depends(get_db), req: Request = None):
 
     ip = req.client.host if req else "Unknown"
 
     try:
         token, user = login_user(db, request.identifier, request.password)
+        
+        from datetime import datetime
+        user.last_active = datetime.utcnow()
+        db.commit()
 
         logger.info(f"LOGIN SUCCESS - {request.identifier} - IP: {ip}")
+        await manager.broadcast({"type": "STATS_UPDATED"})
 
         user_data = {
             "id": str(user.id),
@@ -160,11 +168,15 @@ def login(request: LoginRequest, db: Session = Depends(get_db), req: Request = N
 # LOGOUT
 # =========================
 @router.post("/logout", response_model=MessageResponse)
-def logout(req: Request):
+async def logout(req: Request, db: Session = Depends(get_db), current_user: User = Depends(get_current_user_from_token)):
 
     ip = req.client.host
+    
+    current_user.last_active = None
+    db.commit()
 
-    logger.info(f"LOGOUT - IP: {ip}")
+    logger.info(f"LOGOUT - User {current_user.email} - IP: {ip}")
+    await manager.broadcast({"type": "STATS_UPDATED"})
 
     return MessageResponse(message="Logout successful")
 

@@ -13,6 +13,7 @@ from app.db.deps import get_db
 from app.models.chat_log import ChatLog
 from app.models.user import User
 from app.services.auth_service import get_current_user_from_token
+from app.core.websocket import manager
 
 router = APIRouter()
 
@@ -149,6 +150,9 @@ Chỉ trích dẫn những trang thực sự cần thiết cho câu trả lời.
 
     db.add(chat_log)
     db.commit()
+
+    # Trigger admin dashboard update
+    await manager.broadcast({"type": "STATS_UPDATED"})
 
     return ChatResponse(
         answer=clean_answer,

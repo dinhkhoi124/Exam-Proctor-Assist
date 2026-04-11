@@ -5,6 +5,7 @@ import {
   useEffect,
   type ReactNode,
 } from "react";
+import { api } from "@/lib/api";
 
 interface AuthUser {
   id?: number;
@@ -55,12 +56,20 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
   };
 
-  const logout = () => {
-    setToken(null);
-    setUser(null);
+  const logout = async () => {
+    try {
+      if (token) {
+        await api.post("/api/v1/auth/logout");
+      }
+    } catch (error) {
+      console.error("Failed to call backend logout", error);
+    } finally {
+      setToken(null);
+      setUser(null);
 
-    localStorage.removeItem("access_token");
-    localStorage.removeItem("auth_user");
+      localStorage.removeItem("access_token");
+      localStorage.removeItem("auth_user");
+    }
   };
 
   return (
