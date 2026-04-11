@@ -128,11 +128,7 @@ def login(request: LoginRequest, db: Session = Depends(get_db), req: Request = N
     ip = req.client.host if req else "Unknown"
 
     try:
-        token = login_user(db, request.identifier, request.password)
-
-        user = db.query(User).filter(
-            (User.email == request.identifier) | (User.username == request.identifier)
-        ).first()
+        token, user = login_user(db, request.identifier, request.password)
 
         logger.info(f"LOGIN SUCCESS - {request.identifier} - IP: {ip}")
 

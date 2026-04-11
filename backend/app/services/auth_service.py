@@ -151,7 +151,7 @@ def login_user(db: Session, identifier: str, password: str):
         )
 
     token = create_access_token({"sub": str(user.id)})
-    return token
+    return token, user
 
 def get_current_user(db: Session, user_id: str):
     user = db.query(User).filter(User.id == user_id).first()
