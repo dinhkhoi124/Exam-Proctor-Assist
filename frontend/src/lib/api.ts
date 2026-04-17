@@ -15,3 +15,19 @@ api.interceptors.request.use((config) => {
   return config;
 });
 
+// Tự động xử lý khi token hết hạn (401)
+api.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    if (error.response && error.response.status === 401) {
+      // Clear expired token
+      localStorage.removeItem("access_token");
+      
+      // Chuyển hướng về trang đăng nhập nếu chưa ở đó
+      if (window.location.pathname !== "/login") {
+        window.location.href = "/login";
+      }
+    }
+    return Promise.reject(error);
+  }
+);

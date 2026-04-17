@@ -2,6 +2,7 @@ from fastapi import APIRouter, Depends
 import re
 from sqlalchemy.orm import Session
 from datetime import datetime
+import time
 
 from app.schemas.chat import ChatRequest, ChatResponse
 from app.rag.rag_service import retrieve_context
@@ -14,6 +15,9 @@ from app.models.chat_log import ChatLog
 from app.models.user import User
 from app.services.auth_service import get_current_user_from_token
 from app.core.websocket import manager
+
+from app.services.logging_service import log_user_activity, save_chat_log
+from app.services.topic_service import classify_topic
 
 router = APIRouter()
 
@@ -103,7 +107,9 @@ Chỉ trích dẫn những trang thực sự cần thiết cho câu trả lời.
     # =========================
     # CALL LLM
     # =========================
+    start_time = time.time()
     answer = generate_answer(final_prompt, image_base64=req.image)
+    latency = int((time.time() - start_time) * 1000)
 
     # =========================
     # CÁC BƯỚC HẬU KỲ & TRÍCH XUẤT ẢNH
@@ -139,17 +145,22 @@ Chỉ trích dẫn những trang thực sự cần thiết cho câu trả lời.
     # Làm sạch chuỗi trả lời
     clean_answer = re.sub(pattern, "", answer, flags=re.IGNORECASE).strip()
 
+    # Determine Top Topic
+    topic_name = classify_topic(req.message if req.message else image_description)
+
     # =========================
     # SAVE CHAT LOG TO DB
     # =========================
-    chat_log = ChatLog(
+    save_chat_log(
+        db=db,
         user_id=current_user.id,
         question=req.message if req.message else image_description,
-        answer=clean_answer
+        answer=clean_answer,
+        topic_name=topic_name,
+        latency=latency
     )
 
-    db.add(chat_log)
-    db.commit()
+    log_user_activity(db, current_user.id, "chat")
 
     # Trigger admin dashboard update
     await manager.broadcast({"type": "STATS_UPDATED"})

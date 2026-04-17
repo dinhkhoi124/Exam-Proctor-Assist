@@ -78,6 +78,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { AuthProvider } from "@/context/AuthContext";
 import { ProtectedRoute } from "@/components/ProtectedRoute";
 import { AdminProtectedRoute } from "@/components/admin/AdminProtectedRoute";
+import { AdminLayout } from "@/components/admin/AdminLayout";
 
 import Index from "./pages/Index";
 import About from "./pages/About";
@@ -139,34 +140,15 @@ const App = () => {
                 path="/admin"
                 element={
                   <AdminProtectedRoute>
-                    <AdminDashboard />
+                    <AdminLayout />
                   </AdminProtectedRoute>
                 }
-              />
-              <Route
-                path="/admin/users"
-                element={
-                  <AdminProtectedRoute>
-                    <UsersManagement />
-                  </AdminProtectedRoute>
-                }
-              />
-              <Route
-                path="/admin/data"
-                element={
-                  <AdminProtectedRoute>
-                    <ChatbotData />
-                  </AdminProtectedRoute>
-                }
-              />
-              <Route
-                path="/admin/feedback"
-                element={
-                  <AdminProtectedRoute>
-                    <FeedbackManagement />
-                  </AdminProtectedRoute>
-                }
-              />
+              >
+                <Route index element={<AdminDashboard />} />
+                <Route path="users" element={<UsersManagement />} />
+                <Route path="data" element={<ChatbotData />} />
+                <Route path="feedback" element={<FeedbackManagement />} />
+              </Route>
 
               {/* 404 */}
 
