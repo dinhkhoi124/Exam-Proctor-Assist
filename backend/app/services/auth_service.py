@@ -162,8 +162,17 @@ def get_current_user(db: Session, user_id: str):
     return user
 
 def require_admin(user: User):
-    if user.role != "admin":
-        raise HTTPException(status_code=403, detail="Admin privileges required")
+    require_roles(user, ["admin"])
+    
+def require_roles(user: User, allowed_roles: list):
+    if user.role not in allowed_roles:
+        raise HTTPException(
+            status_code=403,
+            detail="Insufficient permissions"
+        )
+
+def require_manager_or_admin(user: User):
+    require_roles(user, ["manager", "admin"])
 
 # =========================
 # RESET TOKEN (DB-BASED)

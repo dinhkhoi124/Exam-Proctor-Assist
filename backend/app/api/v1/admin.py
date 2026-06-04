@@ -7,7 +7,8 @@ from app.db.deps import get_db
 from app.models.user import User
 from app.models.chat_log import ChatLog
 from app.models.chat_topic import ChatTopic
-from app.services.auth_service import get_current_user_from_token, require_admin
+from app.services.auth_service import get_current_user_from_token, require_manager_or_admin,require_admin
+from app.schemas.auth import UpdateRoleRequest
 
 router = APIRouter(prefix="/admin", tags=["Admin"])
 # =========================
@@ -19,7 +20,7 @@ def get_stats(
     current_user: User = Depends(get_current_user_from_token)
 ):
     # check admin
-    require_admin(current_user)
+    require_manager_or_admin(current_user)
 
     # TOTAL USERS
     total_users = db.query(func.count(User.id)).filter(User.role == 'user').scalar()
@@ -73,7 +74,7 @@ def get_metrics(
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user_from_token)
 ):
-    require_admin(current_user)
+    require_manager_or_admin(current_user)
 
     if range == "day":
         group = func.date(ChatLog.created_at)
@@ -109,7 +110,7 @@ def get_top_topics(
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user_from_token)
 ):
-    require_admin(current_user)
+    require_manager_or_admin(current_user)
 
     data = (
         db.query(
@@ -130,7 +131,7 @@ def get_user_chats(
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user_from_token)
 ):
-    require_admin(current_user)
+    require_manager_or_admin(current_user)
 
     chats = (
         db.query(ChatLog)
@@ -149,3 +150,54 @@ def get_user_chats(
         }
         for c in chats
     ]
+
+@router.put("/users/{user_id}/role")
+def update_user_role(
+    user_id: str,
+    request: UpdateRoleRequest,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user_from_token)
+):
+    require_admin(current_user)
+
+    user = (
+        db.query(User)
+        .filter(User.id == user_id)
+        .first()
+    )
+
+    if not user:
+        raise HTTPException(
+            status_code=404,
+            detail="User not found"
+        )
+
+    if user.id == current_user.id:
+        raise HTTPException(
+            status_code=400,
+            detail="You cannot change your own role"
+        )
+    
+    current_role = user.role
+    new_role = request.role
+    if current_role == "user" and new_role == "manager":
+        pass
+    elif current_role == "manager" and new_role == "user":
+        pass
+    else:
+        raise HTTPException(
+            status_code=400,
+            detail="Invalid role transition"
+        )
+
+    user.role = request.role
+
+    db.commit()
+    db.refresh(user)
+
+    return {
+        "message": "Role updated successfully",
+        "user_id": str(user.id),
+        "email": user.email,
+        "role": user.role
+    }
