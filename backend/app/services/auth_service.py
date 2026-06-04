@@ -147,7 +147,11 @@ def login_user(db: Session, identifier: str, password: str):
     if not user.is_verified:
         raise HTTPException(
             status_code=403,
-            detail="Please verify your email before logging in"
+            detail={
+                "error": "EMAIL_NOT_VERIFIED",
+                "message": "Account is not verified",
+                "can_resend_verification": True
+            }
         )
 
     token = create_access_token({"sub": str(user.id)})
@@ -214,10 +218,13 @@ def verify_email_token(db: Session, token: str):
     ).first()
 
     if not user:
-        return None
+        return None, "invalid"
+
+    if not user.verification_expiry:
+        return None, "expired"
 
     if datetime.utcnow() > user.verification_expiry:
-        return None
+        return None, "expired"
 
     user.is_verified = True
     user.verification_token = None
@@ -225,7 +232,7 @@ def verify_email_token(db: Session, token: str):
 
     db.commit()
 
-    return user
+    return user, None
 
 # =========================
 # ADMIN STATISTICS
