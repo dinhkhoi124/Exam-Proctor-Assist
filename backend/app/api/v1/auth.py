@@ -19,7 +19,8 @@ from app.services.auth_service import (
     verify_email_token,
     login_user,
     create_verification_token,
-    get_current_user_from_token
+    get_current_user_from_token,
+    verify_reset_token
 )
 
 from app.core.websocket import manager
