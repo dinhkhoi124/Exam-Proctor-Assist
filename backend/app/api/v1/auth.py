@@ -103,7 +103,7 @@ async def register(request: RegisterRequest, db: Session = Depends(get_db), req:
         token = create_verification_token(db, user)
 
         # Send verification email
-        await send_verification_email(user.email, token)
+        await send_verification_email(db, user.email, token)
 
         logger.info(f"REGISTER SUCCESS - {request.email} - IP: {ip}")
         await manager.broadcast({"type": "STATS_UPDATED"})
@@ -175,7 +175,7 @@ async def resend_verification(
 
     if user and not user.is_verified:
         token = create_verification_token(db, user)
-        await send_verification_email(user.email, token)
+        await send_verification_email(db,user.email, token)
         logger.info(f"VERIFICATION EMAIL RESENT - {user.email} - IP: {ip}")
 
     return MessageResponse(message=RESEND_VERIFICATION_MESSAGE)
@@ -273,7 +273,7 @@ async def forgot_password(
 
     # Email tồn tại → gửi reset mail
     token = create_reset_token(db, user)
-    await send_reset_email(user.email, token)
+    await send_reset_email(db=db, email=user.email, token=token)
 
     logger.info(f"RESET EMAIL SENT - {request.email} - IP: {ip}")
 
