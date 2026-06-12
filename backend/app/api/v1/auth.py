@@ -1,5 +1,8 @@
 
+from datetime import datetime, timedelta
+
 from fastapi import APIRouter, HTTPException, status, Depends, Request
+from fastapi.responses import JSONResponse
 from sqlalchemy.orm import Session
 
 from app.schemas.auth import (
@@ -8,7 +11,8 @@ from app.schemas.auth import (
     MessageResponse,
     ForgotPasswordRequest,
     ResetPasswordRequest,
-    RegisterRequest
+    RegisterRequest,
+    ResendVerificationRequest
 )
 
 from app.services.auth_service import (
@@ -19,7 +23,8 @@ from app.services.auth_service import (
     verify_email_token,
     login_user,
     create_verification_token,
-    get_current_user_from_token
+    get_current_user_from_token,
+    verify_reset_token
 )
 
 from app.core.websocket import manager
@@ -33,6 +38,12 @@ from app.core.logger import logger
 
 router = APIRouter(prefix="/auth", tags=["Auth"])
 
+RESEND_VERIFICATION_MESSAGE = (
+    "If the account exists and is not verified, a verification email has been sent."
+)
+RESEND_VERIFICATION_RATE_LIMIT_SECONDS = 60
+_resend_verification_attempts = {}
+
 
 # =========================
 # PASSWORD VALIDATION
@@ -44,6 +55,22 @@ def validate_password(password: str):
             status_code=400,
             detail="Password must be at least 6 characters"
         )
+
+
+def enforce_resend_verification_rate_limit(email: str):
+    normalized_email = email.lower()
+    now = datetime.utcnow()
+    last_attempt = _resend_verification_attempts.get(normalized_email)
+
+    if last_attempt:
+        elapsed = now - last_attempt
+        if elapsed < timedelta(seconds=RESEND_VERIFICATION_RATE_LIMIT_SECONDS):
+            raise HTTPException(
+                status_code=429,
+                detail="Please wait before requesting another verification email."
+            )
+
+    _resend_verification_attempts[normalized_email] = now
 
 
 # =========================
@@ -76,7 +103,7 @@ async def register(request: RegisterRequest, db: Session = Depends(get_db), req:
         token = create_verification_token(db, user)
 
         # Send verification email
-        await send_verification_email(user.email, token)
+        await send_verification_email(db, user.email, token)
 
         logger.info(f"REGISTER SUCCESS - {request.email} - IP: {ip}")
         await manager.broadcast({"type": "STATS_UPDATED"})
@@ -109,12 +136,20 @@ async def register(request: RegisterRequest, db: Session = Depends(get_db), req:
 @router.get("/verify-email")
 def verify_email(token: str, db: Session = Depends(get_db)):
 
-    user = verify_email_token(db, token)
+    user, error = verify_email_token(db, token)
 
-    if not user:
-        raise HTTPException(
+    if error == "invalid":
+        return JSONResponse(
             status_code=400,
-            detail="Invalid or expired verification token"
+            content={
+                "message": "Verification link is no longer valid. Please use the latest verification email."
+            }
+        )
+
+    if error == "expired":
+        return JSONResponse(
+            status_code=400,
+            content={"message": "Verification link expired"}
         )
 
     return {
@@ -122,6 +157,28 @@ def verify_email(token: str, db: Session = Depends(get_db)):
         "username": user.username,
         "email": user.email
     }
+
+# =========================
+# RESEND VERIFICATION EMAIL
+# =========================
+@router.post("/resend-verification", response_model=MessageResponse)
+async def resend_verification(
+    request: ResendVerificationRequest,
+    db: Session = Depends(get_db),
+    req: Request = None
+):
+    ip = req.client.host if req else "Unknown"
+
+    enforce_resend_verification_rate_limit(request.email)
+
+    user = get_user_by_email(db, request.email)
+
+    if user and not user.is_verified:
+        token = create_verification_token(db, user)
+        await send_verification_email(db,user.email, token)
+        logger.info(f"VERIFICATION EMAIL RESENT - {user.email} - IP: {ip}")
+
+    return MessageResponse(message=RESEND_VERIFICATION_MESSAGE)
 
 # =========================
 # LOGIN
@@ -134,7 +191,6 @@ async def login(request: LoginRequest, db: Session = Depends(get_db), req: Reque
     try:
         token, user = login_user(db, request.identifier, request.password)
         
-        from datetime import datetime
         user.last_active = datetime.utcnow()
         db.commit()
 
@@ -156,6 +212,16 @@ async def login(request: LoginRequest, db: Session = Depends(get_db), req: Reque
             f"LOGIN FAILED - {request.identifier} - "
             f"Reason: {e.detail} - IP: {ip}"
         )
+
+        if (
+            isinstance(e.detail, dict)
+            and e.detail.get("error") == "EMAIL_NOT_VERIFIED"
+        ):
+            return JSONResponse(
+                status_code=e.status_code,
+                content=e.detail
+            )
+
         raise e
 
     except Exception as e:
@@ -207,7 +273,7 @@ async def forgot_password(
 
     # Email tồn tại → gửi reset mail
     token = create_reset_token(db, user)
-    await send_reset_email(user.email, token)
+    await send_reset_email(db=db, email=user.email, token=token)
 
     logger.info(f"RESET EMAIL SENT - {request.email} - IP: {ip}")
 

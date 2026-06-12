@@ -15,6 +15,26 @@ type VerifyResponse = {
   email: string;
 };
 
+const EXPIRED_VERIFICATION_MESSAGE =
+  "Email verification link has expired and verification failed. Please verify using the latest email.";
+
+const getVerificationErrorMessage = (error: any) => {
+  const message =
+    error?.response?.data?.message ||
+    error?.response?.data?.detail ||
+    "Verification failed or token expired";
+
+  if (
+    typeof message === "string" &&
+    (message.toLowerCase().includes("expired") ||
+      message.toLowerCase().includes("no longer valid"))
+  ) {
+    return EXPIRED_VERIFICATION_MESSAGE;
+  }
+
+  return message;
+};
+
 export default function VerifyEmail() {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
@@ -39,8 +59,7 @@ export default function VerifyEmail() {
         toast.success("Email verified successfully!");
       })
       .catch((err) => {
-        const msg =
-          err.response?.data?.detail || "Verification failed or token expired";
+        const msg = getVerificationErrorMessage(err);
 
         setError(msg);
         toast.error(msg);

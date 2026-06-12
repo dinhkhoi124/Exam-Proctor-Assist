@@ -2,6 +2,7 @@ import uuid
 from sqlalchemy import Column, String, Boolean, Text, DateTime
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.sql import func
+from sqlalchemy.orm import relationship
 from app.db.session import Base
 
 
@@ -34,3 +35,7 @@ class User(Base):
     )
     role = Column(String(20), default="user")
     last_active = Column(DateTime)
+
+    # Relationships
+    feedbacks = relationship("FeedbackLog", back_populates="user", foreign_keys="[FeedbackLog.user_id]", cascade="all, delete-orphan")
+    resolved_feedbacks = relationship("FeedbackLog", back_populates="resolver", foreign_keys="[FeedbackLog.resolved_by]")
