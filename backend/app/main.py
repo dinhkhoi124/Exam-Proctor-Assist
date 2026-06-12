@@ -12,6 +12,7 @@ from app.api.v1.email_setting import router as email_setting_router
 from app.api.v1.chat_session import router as chat_session_router
 from app.api.v1.feedback import router as feedback_router
 from app.api.v1.rag_documents import router as rag_documents_router
+from app.api.v1.reports import router as reports_router
 from app.models import user
 from fastapi import WebSocket, WebSocketDisconnect
 from app.core.websocket import manager
@@ -51,6 +52,7 @@ app.include_router(email_setting_router, prefix="/api/v1")
 app.include_router(chat_session_router, prefix="/api/v1")
 app.include_router(feedback_router, prefix="/api/v1")
 app.include_router(rag_documents_router, prefix="/api/v1")
+app.include_router(reports_router, prefix="/api/v1")
 
 @app.websocket("/ws/admin")
 async def websocket_endpoint(websocket: WebSocket):

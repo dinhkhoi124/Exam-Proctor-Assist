@@ -95,6 +95,7 @@ import UsersManagement from "./pages/admin/UsersManagement";
 import ChatbotData from "./pages/admin/ChatbotData";
 import FeedbackManagement from "./pages/admin/FeedbackManagement";
 import AdminSettings from "./pages/admin/AdminSettings";
+import Reports from "./pages/admin/Reports";
 
 const queryClient = new QueryClient();
 
@@ -156,6 +157,7 @@ const App = () => {
                 />
                 <Route path="data" element={<ChatbotData />} />
                 <Route path="feedback" element={<FeedbackManagement />} />
+                <Route path="reports" element={<Reports />} />
                 <Route
                   path="settings"
                   element={

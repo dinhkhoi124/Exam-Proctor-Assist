@@ -10,7 +10,8 @@ import {
   ArrowLeft,
   Settings,
   FileText,
-  FolderSync
+  FolderSync,
+  BarChart3
 } from "lucide-react";
 
 export function AdminLayout() {
@@ -52,11 +53,13 @@ export function AdminLayout() {
         { label: "Dashboard", href: "/admin", icon: <LayoutDashboard className="h-5 w-5" /> },
         { label: "Quản lý người dùng", href: "/admin/users", icon: <Users className="h-5 w-5" /> },
         { label: "Cài đặt hệ thống", href: "/admin/settings", icon: <Settings className="h-5 w-5" /> },
+        { label: "Báo cáo", href: "/admin/reports", icon: <BarChart3 className="h-5 w-5" /> },
       ]
     : [
         { label: "Dashboard", href: "/admin", icon: <LayoutDashboard className="h-5 w-5" /> },
         { label: "Tài liệu", href: "/admin/data", icon: <FileText className="h-5 w-5" /> },
         { label: "Phản hồi", href: "/admin/feedback", icon: <MessageSquare className="h-5 w-5" /> },
+        { label: "Báo cáo", href: "/admin/reports", icon: <BarChart3 className="h-5 w-5" /> },
       ];
 
   const sidebarTitle = viewMode === "admin" ? "FPT Admin" : "FPT Management";
