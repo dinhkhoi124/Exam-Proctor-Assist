@@ -103,8 +103,8 @@ export function Header() {
             <GraduationCap className="h-5 w-5 text-primary-foreground" />
           </div>
 
-          <div className="flex flex-col">
-            <span className="text-lg font-bold leading-tight text-foreground">
+          <div className="hidden flex-col sm:flex">
+            <span className="text-base font-bold leading-tight text-foreground sm:text-lg">
               FPT Exam Support
             </span>
             <span className="text-xs text-muted-foreground">
@@ -124,7 +124,7 @@ export function Header() {
                 key={item.path}
                 to={item.path}
                 className={cn(
-                  "flex items-center gap-2 rounded-lg px-4 py-2 text-sm font-medium transition-colors",
+                  "flex items-center gap-2 rounded-lg px-2.5 py-2 text-sm font-medium transition-colors sm:px-4",
                   isActive
                     ? "bg-primary text-primary-foreground"
                     : "text-muted-foreground hover:bg-secondary hover:text-foreground",
@@ -140,7 +140,7 @@ export function Header() {
             <Link
               to="/admin"
               className={cn(
-                "flex items-center gap-2 rounded-lg px-4 py-2 text-sm font-medium transition-colors",
+                "flex items-center gap-2 rounded-lg px-2.5 py-2 text-sm font-medium transition-colors sm:px-4",
                 location.pathname.startsWith("/admin")
                   ? "bg-primary text-primary-foreground"
                   : "text-muted-foreground hover:bg-secondary hover:text-foreground",
@@ -159,7 +159,7 @@ export function Header() {
               variant="ghost"
               size="sm"
               onClick={logout}
-              className="ml-2 text-muted-foreground hover:text-foreground"
+              className="ml-0 px-2 text-muted-foreground hover:text-foreground sm:ml-2 sm:px-3"
             >
               <LogOut className="h-4 w-4" />
               <span className="hidden sm:inline">Sign Out</span>

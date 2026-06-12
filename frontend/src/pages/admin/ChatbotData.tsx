@@ -7,7 +7,7 @@ export default function ChatbotData() {
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
           <div className="flex items-center gap-2">
-            <h1 className="text-3xl font-bold tracking-tight text-slate-900">Quản lý tài liệu</h1>
+            <h1 className="text-2xl font-bold tracking-tight text-slate-900 sm:text-3xl">Quản lý tài liệu</h1>
             <span className="text-xxs font-bold px-2 py-0.5 bg-yellow-100 text-yellow-800 rounded-md">
               Backend Pending
             </span>
@@ -26,7 +26,7 @@ export default function ChatbotData() {
       {/* Empty State Table Container */}
       <div className="bg-white rounded-xl border shadow-sm overflow-hidden">
         <div className="overflow-x-auto">
-          <table className="w-full text-sm text-left">
+          <table className="min-w-[900px] w-full text-sm text-left">
             <thead className="bg-slate-50 text-slate-500 border-b">
               <tr>
                 <th className="px-6 py-4 font-semibold">Tên tài liệu</th>

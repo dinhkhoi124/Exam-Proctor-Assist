@@ -113,17 +113,17 @@ export default function AdminSettings() {
   return (
     <div className="space-y-6 animate-in fade-in duration-500 pb-10">
       <div>
-        <h1 className="text-3xl font-bold tracking-tight text-slate-900">Cài đặt hệ thống</h1>
+        <h1 className="text-2xl font-bold tracking-tight text-slate-900 sm:text-3xl">Cài đặt hệ thống</h1>
         <p className="text-slate-500 mt-1">Cập nhật email gửi và App Password dùng để gửi mã xác thực OTP.</p>
       </div>
 
       <div className="max-w-2xl bg-white rounded-xl border shadow-sm overflow-hidden">
-        <div className="p-6 border-b bg-slate-50/50">
+        <div className="p-4 border-b bg-slate-50/50 sm:p-6">
           <h3 className="font-semibold text-lg text-slate-800">Cấu hình email gửi</h3>
           <p className="text-xs text-slate-500 mt-0.5">Vui lòng cung cấp cấu hình máy chủ SMTP chính xác.</p>
         </div>
 
-        <form onSubmit={handleSave} className="p-6 space-y-4">
+        <form onSubmit={handleSave} className="p-4 space-y-4 sm:p-6">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="space-y-1.5">
               <label className="text-sm font-semibold text-slate-700 block">SMTP Server *</label>
@@ -219,13 +219,13 @@ export default function AdminSettings() {
             </label>
           </div>
 
-          <div className="pt-4 border-t flex items-center justify-between gap-4">
+          <div className="flex flex-col gap-3 border-t pt-4 sm:flex-row sm:items-center sm:justify-between">
             <Button
               type="button"
               variant="outline"
               disabled={!hasPassword}
               onClick={() => setShowTestModal(true)}
-              className="flex items-center gap-2 hover:bg-slate-50 text-slate-700 border-slate-300"
+              className="flex w-full items-center gap-2 hover:bg-slate-50 text-slate-700 border-slate-300 sm:w-auto"
             >
               <Send className="h-4 w-4" />
               Kiểm tra kết nối
@@ -234,7 +234,7 @@ export default function AdminSettings() {
             <Button
               type="submit"
               disabled={isSaving}
-              className="bg-orange-600 hover:bg-orange-700 text-white flex items-center gap-2 px-6"
+              className="flex w-full items-center gap-2 bg-orange-600 px-6 text-white hover:bg-orange-700 sm:w-auto"
             >
               <Save className="h-4 w-4" />
               {isSaving ? "Đang lưu..." : "Lưu thay đổi"}
@@ -245,8 +245,8 @@ export default function AdminSettings() {
 
       {/* TEST CONNECTION DIALOG MODAL */}
       {showTestModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/40 backdrop-blur-sm">
-          <div className="w-full max-w-md bg-white rounded-xl border shadow-xl p-6 space-y-4 animate-in zoom-in-95 duration-200">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/40 p-4 backdrop-blur-sm">
+          <div className="max-h-[90dvh] w-full max-w-md overflow-y-auto bg-white rounded-xl border shadow-xl p-5 sm:p-6 space-y-4 animate-in zoom-in-95 duration-200">
             <div>
               <h3 className="font-semibold text-lg text-slate-800 flex items-center gap-2">
                 <Send className="text-orange-500 h-5 w-5" />

@@ -1,7 +1,27 @@
 import axios from "axios";
 
+const configuredApiUrl = import.meta.env.VITE_API_URL?.trim();
+
+export const API_BASE_URL = (
+  configuredApiUrl || "http://127.0.0.1:8000"
+).replace(/\/+$/, "");
+
+export function buildApiUrl(path: string) {
+  const normalizedPath = path.startsWith("/") ? path : `/${path}`;
+  return `${API_BASE_URL}${normalizedPath}`;
+}
+
+export function getAdminWebSocketUrl() {
+  const url = new URL(API_BASE_URL, window.location.origin);
+  url.protocol = url.protocol === "https:" ? "wss:" : "ws:";
+  url.pathname = "/ws/admin";
+  url.search = "";
+  url.hash = "";
+  return url.toString();
+}
+
 export const api = axios.create({
-  baseURL: "http://127.0.0.1:8000", // backend fastapi
+  baseURL: API_BASE_URL,
 });
 
 // Tự động gắn token vào header

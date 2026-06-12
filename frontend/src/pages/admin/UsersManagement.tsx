@@ -1,5 +1,5 @@
 import { useEffect, useState, useRef } from "react";
-import { api } from "@/lib/api";
+import { api, getAdminWebSocketUrl } from "@/lib/api";
 import { format } from "date-fns";
 import { Clock, MessageSquare, Search, Filter, ShieldAlert, ArrowLeftRight, UserCheck, ChevronDown, ChevronUp } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -197,11 +197,7 @@ export default function UsersManagement() {
     let reconnectTimeout: NodeJS.Timeout;
 
     const connectWs = () => {
-      const wsUrl = process.env.NODE_ENV === "production"
-        ? `wss://${window.location.host}/ws/admin`
-        : "ws://127.0.0.1:8000/ws/admin";
-
-      ws = new WebSocket(wsUrl);
+      ws = new WebSocket(getAdminWebSocketUrl());
 
       ws.onmessage = (event) => {
         try {
@@ -262,12 +258,12 @@ export default function UsersManagement() {
   return (
     <div className="space-y-6 animate-in fade-in duration-500 pb-10">
       <div>
-        <h1 className="text-3xl font-bold tracking-tight text-slate-900">Quản lý người dùng</h1>
+        <h1 className="text-2xl font-bold tracking-tight text-slate-900 sm:text-3xl">Quản lý người dùng</h1>
         <p className="text-slate-500 mt-1">Phân quyền, thăng cấp/hạ cấp người dùng và xem nhật ký hoạt động.</p>
       </div>
 
       {/* TABS CONTAINER */}
-      <div className="flex border-b border-slate-200">
+      <div className="flex overflow-x-auto border-b border-slate-200">
         <button
           onClick={() => setActiveTab("users")}
           className={`px-5 py-3 font-semibold text-sm transition-all border-b-2 -mb-[2px] flex items-center gap-2 ${
@@ -295,8 +291,8 @@ export default function UsersManagement() {
       {/* USER LIST TAB */}
       {activeTab === "users" && (
         <div className="space-y-4">
-          <div className="flex items-center justify-between">
-            <div className="relative w-72">
+          <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+            <div className="relative w-full sm:w-72">
               <Search className="absolute left-3 top-2.5 h-4 w-4 text-slate-400" />
               <input
                 type="text"
@@ -313,7 +309,7 @@ export default function UsersManagement() {
 
           <div className="bg-white rounded-xl border shadow-sm overflow-hidden">
             <div className="overflow-x-auto">
-              <table className="w-full text-sm text-left">
+              <table className="min-w-[1000px] w-full text-sm text-left">
                 <thead className="bg-slate-50 text-slate-500 border-b">
                   <tr>
                     <th className="px-6 py-4 font-semibold">Họ tên</th>
@@ -503,7 +499,7 @@ export default function UsersManagement() {
                       {/* Summary Row */}
                       <div 
                         onClick={() => setExpandedLogId(isExpanded ? null : log.id)}
-                        className="px-5 py-3.5 flex items-center justify-between cursor-pointer hover:bg-slate-50/70 transition-colors select-none flex-wrap gap-4 text-xs"
+                        className="px-4 py-3.5 sm:px-5 flex items-center justify-between cursor-pointer hover:bg-slate-50/70 transition-colors select-none flex-wrap gap-3 sm:gap-4 text-xs"
                       >
                         <div className="flex items-center gap-2.5 min-w-[180px]">
                           <div className="h-6 w-6 rounded-full bg-orange-100 flex items-center justify-center font-bold text-orange-600 text-xxs">
@@ -516,13 +512,13 @@ export default function UsersManagement() {
                         </div>
 
                         {/* Session & Question Preview */}
-                        <div className="flex-1 min-w-[240px] px-2 text-slate-500 font-medium truncate">
+                        <div className="w-full min-w-0 px-0 text-slate-500 font-medium sm:flex-1 sm:min-w-[240px] sm:px-2 sm:truncate">
                           <span className="text-slate-800 font-semibold mr-1.5">{sessionName}</span>
                           <span className="italic text-xs font-normal">"{questionPreview}"</span>
                         </div>
 
                         {/* Badges & Actions */}
-                        <div className="flex items-center gap-3 shrink-0 ml-auto font-medium">
+                        <div className="flex w-full flex-wrap items-center gap-2 font-medium sm:ml-auto sm:w-auto sm:shrink-0 sm:gap-3">
                           <span className="px-2 py-0.5 bg-orange-50 text-orange-700 font-bold rounded text-[10px] uppercase tracking-wider">
                             {log.topic || "General Guidance"}
                           </span>
@@ -541,7 +537,7 @@ export default function UsersManagement() {
                       {isExpanded && (
                         <div className="px-6 pb-6 pt-3 border-t bg-slate-50/20 space-y-4 animate-in slide-in-from-top-2 duration-200">
                           {/* Question Bubble */}
-                          <div className="flex gap-3 items-start max-w-[85%]">
+                          <div className="flex gap-3 items-start max-w-full sm:max-w-[85%]">
                             <div className="h-7 w-7 rounded-full bg-slate-100 flex items-center justify-center font-bold text-slate-500 text-[10px] shrink-0 border">
                               US
                             </div>
@@ -554,7 +550,7 @@ export default function UsersManagement() {
                           </div>
 
                           {/* Answer Bubble */}
-                          <div className="flex gap-3 items-start max-w-[85%] self-end ml-auto flex-row-reverse">
+                          <div className="flex gap-3 items-start max-w-full self-end ml-auto flex-row-reverse sm:max-w-[85%]">
                             <div className="h-7 w-7 rounded-full bg-orange-100 flex items-center justify-center font-bold text-orange-600 text-[10px] shrink-0 border border-orange-200">
                               AI
                             </div>
@@ -576,7 +572,7 @@ export default function UsersManagement() {
 
           {/* Pagination controls */}
           {chatLogs.length > 0 && (
-            <div className="flex items-center justify-between pt-4 border-t border-slate-100">
+            <div className="flex flex-col gap-3 border-t border-slate-100 pt-4 sm:flex-row sm:items-center sm:justify-between">
               <span className="text-xs font-semibold text-slate-500 bg-slate-50 border px-3 py-1.5 rounded-lg">
                 Tổng số log: {totalLogs} | Trang {page}
               </span>
@@ -605,8 +601,8 @@ export default function UsersManagement() {
 
       {/* Role Change Confirmation Modal */}
       {showRoleModal && roleChangeUser && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/50 backdrop-blur-xs animate-in fade-in duration-200">
-          <div className="bg-white rounded-xl border shadow-lg max-w-md w-full p-6 space-y-4 animate-in zoom-in-95 duration-200 text-left">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/50 p-4 backdrop-blur-xs animate-in fade-in duration-200">
+          <div className="max-h-[90dvh] w-full max-w-md overflow-y-auto rounded-xl border bg-white p-5 shadow-lg sm:p-6 space-y-4 animate-in zoom-in-95 duration-200 text-left">
             <h3 className="text-lg font-bold text-slate-900 border-b pb-2">Xác nhận thay đổi phân quyền</h3>
             
             <div className="space-y-3 text-sm">

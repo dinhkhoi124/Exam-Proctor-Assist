@@ -1,6 +1,6 @@
 import { useEffect, useState, useRef } from "react";
 import { Users, Activity, MessageSquare, FileText, AlertCircle } from "lucide-react";
-import { api } from "@/lib/api";
+import { api, getAdminWebSocketUrl } from "@/lib/api";
 import { StatCard } from "@/components/admin/StatCard";
 import { Button } from "@/components/ui/button";
 import {
@@ -83,11 +83,7 @@ export default function AdminDashboard() {
     let reconnectTimeout: NodeJS.Timeout;
 
     const connectWs = () => {
-      const wsUrl = process.env.NODE_ENV === "production"
-        ? `wss://${window.location.host}/ws/admin`
-        : "ws://127.0.0.1:8000/ws/admin";
-
-      ws = new WebSocket(wsUrl);
+      ws = new WebSocket(getAdminWebSocketUrl());
 
       ws.onmessage = (event) => {
         try {
@@ -163,7 +159,7 @@ export default function AdminDashboard() {
   return (
     <div className="space-y-6 animate-in fade-in duration-500 pb-10">
       <div>
-        <h1 className="text-3xl font-bold tracking-tight text-slate-900">Bảng điều khiển</h1>
+        <h1 className="text-2xl font-bold tracking-tight text-slate-900 sm:text-3xl">Bảng điều khiển</h1>
         <p className="text-slate-500 mt-1">Tổng quan hệ thống AI Proctor.</p>
       </div>
 
@@ -179,7 +175,7 @@ export default function AdminDashboard() {
           value={stats.total_questions}
           icon={<Activity className="text-orange-500 h-5 w-5" />}
         />
-        <div className="bg-white p-6 rounded-xl border shadow-sm relative overflow-hidden flex flex-col justify-between">
+        <div className="bg-white p-4 sm:p-6 rounded-xl border shadow-sm relative overflow-hidden flex flex-col justify-between">
           <div className="flex items-center justify-between">
             <span className="text-sm font-medium text-slate-500">Tài liệu</span>
             <FileText className="text-orange-500 h-5 w-5" />
@@ -201,7 +197,7 @@ export default function AdminDashboard() {
       {/* CHARTS GRID */}
       <div className="grid gap-6 lg:grid-cols-2">
         {/* LINE CHART */}
-        <div className="bg-white p-6 rounded-xl border shadow-sm flex flex-col">
+        <div className="bg-white p-4 sm:p-6 rounded-xl border shadow-sm flex flex-col">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
             <div>
               <h3 className="font-semibold text-lg text-slate-800">
@@ -211,7 +207,7 @@ export default function AdminDashboard() {
             </div>
             
             {/* Range Toggle */}
-            <div className="flex items-center gap-1 bg-slate-100 p-1 rounded-lg shrink-0">
+            <div className="flex w-full items-center gap-1 overflow-x-auto bg-slate-100 p-1 rounded-lg sm:w-auto sm:shrink-0">
               <Button 
                 size="sm" 
                 variant="ghost" 
@@ -266,7 +262,7 @@ export default function AdminDashboard() {
         </div>
 
         {/* BAR CHART (FEEDBACK RATING) */}
-        <div className="bg-white p-6 rounded-xl border shadow-sm flex flex-col">
+        <div className="bg-white p-4 sm:p-6 rounded-xl border shadow-sm flex flex-col">
           <div className="mb-4">
             <h3 className="font-semibold text-lg text-slate-800">
               Phân bố đánh giá

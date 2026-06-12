@@ -3,7 +3,7 @@ import {
   MessageSquare, AlertCircle, ThumbsUp, ThumbsDown, CheckCircle2, 
   Trash2, Search, ChevronDown, ChevronUp, RefreshCw, Clock, UserCheck
 } from "lucide-react";
-import { api } from "@/lib/api";
+import { api, getAdminWebSocketUrl } from "@/lib/api";
 import { toast } from "sonner";
 import { format } from "date-fns";
 import { useAuth } from "@/context/AuthContext";
@@ -97,11 +97,7 @@ export default function FeedbackManagement() {
     let reconnectTimeout: NodeJS.Timeout;
 
     const connectWs = () => {
-      const wsUrl = process.env.NODE_ENV === "production"
-        ? `wss://${window.location.host}/ws/admin`
-        : "ws://127.0.0.1:8000/ws/admin";
-
-      ws = new WebSocket(wsUrl);
+      ws = new WebSocket(getAdminWebSocketUrl());
 
       ws.onmessage = (event) => {
         try {
@@ -228,7 +224,7 @@ export default function FeedbackManagement() {
     <div className="space-y-6 animate-in fade-in duration-500 pb-10">
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight text-slate-900">Phản hồi người dùng</h1>
+          <h1 className="text-2xl font-bold tracking-tight text-slate-900 sm:text-3xl">Phản hồi người dùng</h1>
           <p className="text-slate-500 mt-1">Xem và xử lý ý kiến đóng góp, mức độ hài lòng từ Giám thị (Proctor) đối với chatbot.</p>
         </div>
         <button
@@ -326,7 +322,7 @@ export default function FeedbackManagement() {
       ) : (
         <div className="bg-white rounded-xl border shadow-sm overflow-hidden">
           <div className="overflow-x-auto">
-            <table className="w-full border-collapse text-left">
+            <table className="min-w-[1000px] w-full border-collapse text-left">
               <thead>
                 <tr className="bg-slate-50 border-b text-xs font-semibold text-slate-500 uppercase tracking-wider">
                   <th className="px-6 py-3.5">Người gửi</th>
