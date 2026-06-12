@@ -10,7 +10,11 @@ class PageImage(BaseModel):
 class ChatRequest(BaseModel):
     message: str
     image: Optional[str] = None 
+    session_id: Optional[str] = None
 
 class ChatResponse(BaseModel):
     answer: str
     page_images: Optional[List[PageImage]] = []
+    session_id: Optional[str] = None
+    session_title: Optional[str] = None
+    chat_log_id: Optional[str] = None

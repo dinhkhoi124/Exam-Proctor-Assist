@@ -6,13 +6,13 @@ interface QuickActionsProps {
 }
 
 const quickActions = [
-  { icon: Wifi, label: "WiFi Issues", query: "Student cannot connect to exam WiFi" },
-  { icon: LogIn, label: "Login Problems", query: "Student cannot log in to exam portal" },
-  { icon: Globe, label: "Browser Issues", query: "Exam page not loading in browser" },
-  { icon: Clock, label: "Timer Issues", query: "Exam timer is not showing" },
-  { icon: Upload, label: "Submit Problems", query: "Cannot submit exam answers" },
-  { icon: Laptop, label: "Hardware Issues", query: "Student laptop is not working" },
-  { icon: Phone, label: "Contact Support", query: "Who should I contact for help?" },
+  { icon: Wifi, label: "Sự cố WiFi phòng thi", query: "Thí sinh không kết nối được WiFi phòng thi" },
+  { icon: LogIn, label: "Lỗi đăng nhập portal", query: "Thí sinh không đăng nhập được cổng thi portal" },
+  { icon: Globe, label: "Lỗi trình duyệt", query: "Trang thi không tải được hoặc hiển thị sai trên trình duyệt" },
+  { icon: Clock, label: "Lỗi đồng hồ đếm", query: "Đồng hồ tính giờ thi không hiển thị hoặc bị đóng băng" },
+  { icon: Upload, label: "Lỗi nộp bài thi", query: "Thí sinh không bấm nộp được bài thi EOS/PEA" },
+  { icon: Laptop, label: "Sự cố thiết bị", query: "Máy tính của thí sinh bị sập nguồn hoặc hỏng phần cứng" },
+  { icon: Phone, label: "Liên hệ hỗ trợ", query: "Cần liên hệ bộ phận hỗ trợ kỹ thuật hoặc trưởng ban coi thi như thế nào?" },
 ];
 
 export function QuickActions({ onSelect }: QuickActionsProps) {
