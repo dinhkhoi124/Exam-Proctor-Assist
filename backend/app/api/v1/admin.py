@@ -8,6 +8,7 @@ from app.models.user import User
 from app.models.chat_log import ChatLog
 from app.models.chat_topic import ChatTopic
 from app.models.chat_session import ChatSession
+from app.models.rag_document import RagDocument
 from app.services.auth_service import get_current_user_from_token, require_manager_or_admin,require_admin
 from app.schemas.auth import UpdateRoleRequest
 
@@ -56,6 +57,18 @@ def get_stats(
         if rating_val:
             feedback_distribution[rating_val] = count_val
 
+    document_status_rows = (
+        db.query(RagDocument.status, func.count(RagDocument.id))
+        .filter(RagDocument.status != "deleted")
+        .group_by(RagDocument.status)
+        .all()
+    )
+    document_statuses = {"ready": 0, "indexing": 0, "failed": 0}
+    for document_status, count in document_status_rows:
+        if document_status in document_statuses:
+            document_statuses[document_status] = count
+    total_documents = sum(document_statuses.values())
+
     # QUESTIONS PER USER
     users_data = (
         db.query(
@@ -86,7 +99,9 @@ def get_stats(
         "online_users": online_users,
         "users": result,
         "total_feedbacks": total_feedbacks,
-        "feedback_distribution": feedback_distribution
+        "feedback_distribution": feedback_distribution,
+        "total_documents": total_documents,
+        "document_statuses": document_statuses,
     }
 
 @router.get("/metrics")

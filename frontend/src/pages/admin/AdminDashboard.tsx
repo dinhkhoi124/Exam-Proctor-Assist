@@ -17,6 +17,12 @@ interface AdminStatsResponse {
     like: number;
     dislike: number;
   };
+  total_documents: number;
+  document_statuses: {
+    ready: number;
+    indexing: number;
+    failed: number;
+  };
 }
 
 interface MetricItem {
@@ -181,10 +187,20 @@ export default function AdminDashboard() {
             <FileText className="text-orange-500 h-5 w-5" />
           </div>
           <div className="mt-2 flex items-baseline gap-2">
-            <span className="text-2xl font-semibold tracking-tight text-slate-900">0</span>
-            <span className="text-xxs font-bold px-2 py-0.5 bg-yellow-100 text-yellow-800 rounded-md">
-              Pending
-            </span>
+            <span className="text-2xl font-semibold tracking-tight text-slate-900">{stats.total_documents}</span>
+            {stats.document_statuses.indexing > 0 ? (
+              <span className="text-xxs font-bold px-2 py-0.5 bg-amber-100 text-amber-800 rounded-md">
+                {stats.document_statuses.indexing} đang xử lý
+              </span>
+            ) : stats.document_statuses.failed > 0 ? (
+              <span className="text-xxs font-bold px-2 py-0.5 bg-red-100 text-red-800 rounded-md">
+                {stats.document_statuses.failed} lỗi
+              </span>
+            ) : (
+              <span className="text-xxs font-bold px-2 py-0.5 bg-emerald-100 text-emerald-800 rounded-md">
+                Đồng bộ
+              </span>
+            )}
           </div>
         </div>
         <StatCard

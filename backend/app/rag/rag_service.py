@@ -1,53 +1,118 @@
 import os
 from collections import Counter
 from app.core.config import VECTOR_STORE_DIR
-from app.rag.embedder import VectorStore 
+from app.rag.embedder import VectorStore, BM25Retriever, CrossEncoderReranker
 from app.rag.retriever import get_unique_pages 
 
-_store = VectorStore(dim=768)
+_resources = None
+_reranker = CrossEncoderReranker()
+
+
+def activate_resources(vector_store: VectorStore, bm25_retriever: BM25Retriever):
+    global _resources
+    _resources = (vector_store, bm25_retriever)
+
 
 def load_resources():
-    global _store
+    new_vector_store = VectorStore(dim=768)
+    new_bm25_retriever = BM25Retriever()
+
     if os.path.exists(os.path.join(VECTOR_STORE_DIR, "index.faiss")):
-        _store.load(VECTOR_STORE_DIR)
+        new_vector_store.load(VECTOR_STORE_DIR)
+    try:
+        new_bm25_retriever.load(VECTOR_STORE_DIR)
+    except Exception:
+        pass
+
+    activate_resources(new_vector_store, new_bm25_retriever)
 
 load_resources()
 
-def retrieve_context(query: str, top_k: int = 15): # Tăng top_k thô lên cao để bao quát nhiều file
-    if not _store.metadata:
-        return "Hệ thống đang cập nhật...", []
 
-    # 1. Search lấy danh sách thô rộng
-    raw_results = _store.search(query, top_k=top_k)
+def _normalize_score(score: float, max_score: float = 1.0) -> float:
+    if max_score == 0:
+        return 0
+    return min(score / max_score, 1.0)
+
+
+def _combine_hybrid_results(dense_results: list, sparse_results: list, alpha: float = 0.6) -> list:
+    combined_scores = {}
     
-    # 2. PHÂN TÍCH NGUỒN (Source Analysis)
-    # Tìm xem file nào xuất hiện nhiều nhất và có điểm tương đồng cao nhất
-    source_counts = Counter([res.get('source') for res in raw_results if res.get('source')])
+    for i, res in enumerate(dense_results):
+        idx = i
+        score = _normalize_score(1.0 / (i + 1), 1.0)
+        combined_scores[idx] = alpha * score
+    
+    if sparse_results:
+        max_bm25_score = max([score for _, score in sparse_results]) if sparse_results else 1.0
+        for idx, bm25_score in sparse_results:
+            norm_score = _normalize_score(bm25_score, max_bm25_score)
+            if idx in combined_scores:
+                combined_scores[idx] += (1 - alpha) * norm_score
+            else:
+                combined_scores[idx] = (1 - alpha) * norm_score
+    
+    sorted_indices = sorted(combined_scores.items(), key=lambda x: x[1], reverse=True)
+    
+    combined = []
+    for idx, score in sorted_indices:
+        if idx < len(dense_results):
+            res = dense_results[idx].copy()
+            res['combined_score'] = score
+            combined.append(res)
+    
+    return combined
+
+
+def retrieve_context(query: str, top_k: int = 15, use_rerank: bool = False):
+    # Keep a stable resource pair while another thread may reload a new index.
+    vector_store, bm25_retriever = _resources
+
+    if not vector_store.metadata and not bm25_retriever.corpus:
+        return "No documents found. Please build index first.", []
+    
+    # Dense search
+    dense_results = vector_store.search(query, top_k=top_k)
+    
+    # BM25 search
+    sparse_results = bm25_retriever.search(query, top_k=top_k)
+    
+    # Combine
+    combined_results = _combine_hybrid_results(dense_results, sparse_results, alpha=0.65)
+    
+    if not combined_results:
+        return "No relevant documents found.", []
+    
+    candidates = combined_results[:top_k]
+    
+    # Rerank if needed
+    if use_rerank and len(candidates) > 5:
+        candidates = _reranker.rerank(query, candidates, top_k=top_k)
+    
+    # Source analysis
+    source_counts = Counter([res.get('source') for res in candidates if res.get('source')])
     if not source_counts:
-        return "Không tìm thấy tài liệu phù hợp.", []
+        return "No documents found.", []
     
-    # Lấy file "chuyên biệt" nhất (xuất hiện nhiều nhất trong top results)
     best_source = source_counts.most_common(1)[0][0]
     
-    # 3. LỌC CỨNG (Strict Filtering): Chỉ giữ lại kết quả từ file tốt nhất 
-    # Nếu file tốt nhất chiếm ưu thế (ví dụ > 30% kết quả search)
+    # Filter by source
     filtered_results = []
-    for res in raw_results:
+    for res in candidates:
         if res.get('source') == best_source:
             filtered_results.append(res)
     
-    # Nếu file chuyên biệt quá ít thông tin, mới bổ sung từ file khác (optional)
     if len(filtered_results) < 3:
-        for res in raw_results:
+        for res in candidates:
             if res.get('source') != best_source:
                 filtered_results.append(res)
-            if len(filtered_results) >= 6: break
-
-    # 4. SẮP XẾP THEO THỨ TỰ TRANG (Tránh mất bước)
-    # Cực kỳ quan trọng cho "hướng dẫn": Sắp xếp lại để Bước 1 đến trước Bước 2
-    filtered_results.sort(key=lambda x: x.get('page', 0))
-
-    # 5. Lọc trùng ID trang và Hình ảnh như trước
+            if len(filtered_results) >= 6:
+                break
+    
+    # Sort by page
+    filtered_results.sort(key=lambda x: (x.get('source'), x.get('page', 0)))
+    
+    # Dedup by page
     seen_page_ids = set()
     final_to_process = []
     for res in filtered_results:
@@ -59,13 +124,24 @@ def retrieve_context(query: str, top_k: int = 15): # Tăng top_k thô lên cao �
                 "content": res.get('text', '')
             })
             seen_page_ids.add(page_id)
-
-    # 6. Lọc trùng ảnh bằng Hash (threshold 15)
+    
+    # Dedup images
     unique_pages = get_unique_pages(final_to_process)
-
-    # 7. Trả về context (giới hạn 5 trang để đủ các bước hướng dẫn)
-    final_pages = unique_pages[:5] 
+    
+    # Final output
+    final_pages = unique_pages[:5]
     context_parts = []
+    source_documents = []
+    
+    for item in final_pages:
+        context_parts.append(f"--- Source: {item['source']} (Page {item['page']}) ---\n{item['content']}")
+        source_documents.append({
+            "file_name": item['source'],
+            "page": item['page'],
+            "image_base64": item.get('image_base64')
+        })
+    
+    return "\n\n".join(context_parts), source_documents
     source_documents = []
 
     for item in final_pages:
