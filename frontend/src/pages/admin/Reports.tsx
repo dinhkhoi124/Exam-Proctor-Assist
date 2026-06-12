@@ -197,7 +197,7 @@ export default function Reports() {
 
           <div className="grid gap-6 lg:grid-cols-2">
             <ChartCard title="Hoạt động theo thời gian">
-              <ResponsiveContainer width="100%" height="100%">
+              <ResponsiveContainer width="100%" height="100%" minWidth={0} minHeight={300}>
                 <LineChart data={preview.timeline}>
                   <CartesianGrid strokeDasharray="3 3" vertical={false} />
                   <XAxis dataKey="label" tick={{ fontSize: 11 }} />
@@ -211,7 +211,7 @@ export default function Reports() {
             </ChartCard>
 
             <ChartCard title="Câu hỏi theo chủ đề">
-              <ResponsiveContainer width="100%" height="100%">
+              <ResponsiveContainer width="100%" height="100%" minWidth={0} minHeight={300}>
                 <BarChart data={preview.topics.slice(0, 10)} layout="vertical" margin={{ left: 30 }}>
                   <CartesianGrid strokeDasharray="3 3" horizontal={false} />
                   <XAxis type="number" allowDecimals={false} />
@@ -242,9 +242,9 @@ function SummaryCard({ label, value, icon }: { label: string; value: string; ico
 
 function ChartCard({ title, children }: { title: string; children: React.ReactNode }) {
   return (
-    <div className="rounded-xl border bg-white p-5 shadow-sm">
+    <div className="min-w-0 rounded-xl border bg-white p-5 shadow-sm">
       <h2 className="mb-4 font-semibold text-slate-800">{title}</h2>
-      <div className="h-[330px]">{children}</div>
+      <div style={{ width: "100%", height: 330, minHeight: 330 }}>{children}</div>
     </div>
   );
 }
