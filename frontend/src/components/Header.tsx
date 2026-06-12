@@ -136,7 +136,7 @@ export function Header() {
             );
           })}
 
-          {user?.role === "admin" && (
+          {(user?.role === "admin" || user?.role === "manager") && (
             <Link
               to="/admin"
               className={cn(
@@ -147,7 +147,9 @@ export function Header() {
               )}
             >
               <Shield className="h-4 w-4" />
-              <span className="hidden sm:inline">Admin</span>
+              <span className="hidden sm:inline">
+                {user.role === "admin" ? "Admin" : "Management"}
+              </span>
             </Link>
           )}
 

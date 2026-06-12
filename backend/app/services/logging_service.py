@@ -23,7 +23,8 @@ def save_chat_log(
     question,
     answer,
     topic_name,
-    latency
+    latency,
+    session_id=None
 ):
     topic_id = get_topic_id(db, topic_name)
 
@@ -33,7 +34,10 @@ def save_chat_log(
         answer=answer,
         topic_id=topic_id,   
         latency_ms=latency,
-        status="success"
+        status="success",
+        session_id=session_id
     )
     db.add(chat)
     db.commit()
+    db.refresh(chat)
+    return chat

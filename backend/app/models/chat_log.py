@@ -19,6 +19,9 @@ class ChatLog(Base):
     topic_id = Column(Integer, ForeignKey("chat_topics.id"))
     latency_ms = Column(Integer)
     status = Column(String(20), default="success")
+    session_id = Column(UUID(as_uuid=True), ForeignKey("chat_sessions.id", ondelete="SET NULL"), nullable=True)
 
-    # Relationship to cleanly map topic_id -> ChatTopic model
+    # Relationships
     topic = relationship("ChatTopic")
+    session = relationship("ChatSession", back_populates="logs")
+    feedbacks = relationship("FeedbackLog", back_populates="chat_log")

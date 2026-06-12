@@ -94,6 +94,7 @@ import AdminDashboard from "./pages/admin/AdminDashboard";
 import UsersManagement from "./pages/admin/UsersManagement";
 import ChatbotData from "./pages/admin/ChatbotData";
 import FeedbackManagement from "./pages/admin/FeedbackManagement";
+import AdminSettings from "./pages/admin/AdminSettings";
 
 const queryClient = new QueryClient();
 
@@ -139,15 +140,30 @@ const App = () => {
               <Route
                 path="/admin"
                 element={
-                  <AdminProtectedRoute>
+                  <AdminProtectedRoute allowedRoles={["admin", "manager"]}>
                     <AdminLayout />
                   </AdminProtectedRoute>
                 }
               >
                 <Route index element={<AdminDashboard />} />
-                <Route path="users" element={<UsersManagement />} />
+                <Route
+                  path="users"
+                  element={
+                    <AdminProtectedRoute allowedRoles={["admin"]}>
+                      <UsersManagement />
+                    </AdminProtectedRoute>
+                  }
+                />
                 <Route path="data" element={<ChatbotData />} />
                 <Route path="feedback" element={<FeedbackManagement />} />
+                <Route
+                  path="settings"
+                  element={
+                    <AdminProtectedRoute allowedRoles={["admin"]}>
+                      <AdminSettings />
+                    </AdminProtectedRoute>
+                  }
+                />
               </Route>
 
               {/* 404 */}
