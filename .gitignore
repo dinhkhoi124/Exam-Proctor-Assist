@@ -75,3 +75,40 @@ demo.mp4
 *_v5.py
 *_v6.py
 tai lieu/
+/auth_v6
+/chat_v6
+/email_service_v1
+*_tri.py
+*_tri.tsx
+
+
+# =====================
+document-antigravity/
+
+# ==========
+DB_Full_Update.csv
+backend/app/api/v1/admin_tri.py
+backend/app/api/v1/auth_tri.py
+
+backend/app/main_tri.py
+
+backend/app/schemas/auth_tri.py
+
+
+backend/app/services/auth_service_tri.py
+backend/app/services/email_service_tri.py
+
+document-antigravity/
+frontend/src/pages/Login_tri.tsx
+frontend/src/pages/Register_tri.tsx
+frontend/src/pages/VerifyEmail_tri.tsx
+
+update database.txt
+update_database_chat_session.txt
+update_database_feedback_logs.txt
+
+
+# ========
+
+backend/app/services/email_service_v1.py
+

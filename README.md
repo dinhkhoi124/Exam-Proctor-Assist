@@ -1,10 +1,10 @@
 # FPT Exam Assistant
 
-AI-powered chatbot designed to support **exam proctors and students** in quickly accessing **exam regulations and academic policies**.  
+AI-powered chatbot designed to support **exam proctors (invigilators)** in quickly accessing **exam regulations and technical troubleshooting procedures**.  
 
 The system leverages **Retrieval-Augmented Generation (RAG)** to provide accurate answers from official university documents, combined with **speech capabilities** for voice interaction.
 
-This project demonstrates how modern AI systems integrate **LLMs, vector search, and web applications** to build intelligent assistants for educational environments.
+This project demonstrates how modern AI systems integrate **LLMs, vector search, and web applications** to build intelligent assistants for invigilation environments.
 
 ---
 
@@ -12,14 +12,14 @@ This project demonstrates how modern AI systems integrate **LLMs, vector search,
 
 DEMO LINK: ``` https://drive.google.com/drive/folders/1qb7H7sxLXqCxdXK33WfDRCM7p0oMOvCr?usp=sharing ```
 
-**FPT Exam Assistant** is an AI chatbot designed to assist **exam proctors and students** by providing instant access to university exam regulations and academic policies.
+**FPT Exam Assistant** is an AI chatbot designed to assist **exam proctors** by providing instant access to university exam regulations and troubleshooting guides.
 
-Instead of manually searching through lengthy PDF documents, users can simply **ask questions via text or voice**, and the chatbot will retrieve relevant information from official documents using **Retrieval-Augmented Generation (RAG)**.
+Instead of manually searching through lengthy PDF documents, proctors can simply **ask questions via text or voice**, and the chatbot will retrieve relevant information from official documents using **Retrieval-Augmented Generation (RAG)**.
 
 The system supports:
 
 - Exam regulation Q&A
-- Academic policy lookup
+- Technical troubleshooting lookup
 - Voice-based interaction
 - Secure authentication
 - Retrieval from official documents
@@ -32,12 +32,12 @@ This project serves as a **prototype for an AI-powered university exam support s
 
 ## AI Question Answering
 
-Users can ask questions related to:
+Proctors can ask questions related to:
 
 - exam regulations
-- academic rules
+- technical troubleshooting rules
 - exam procedures
-- student policies
+- invigilation policies
 
 The chatbot retrieves relevant document chunks and generates answers using **GPT-4o**.
 
