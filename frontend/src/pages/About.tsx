@@ -63,15 +63,15 @@ const About = () => {
       <main className="flex-1">
         {/* Hero Section */}
         <section className="border-b border-border bg-gradient-to-b from-primary/5 to-background">
-          <div className="container px-4 py-16 md:py-24">
+          <div className="container px-4 py-10 sm:py-16 md:py-24">
             <div className="mx-auto max-w-3xl text-center">
               <div className="mb-6 inline-flex h-16 w-16 items-center justify-center rounded-2xl bg-primary shadow-lg">
                 <GraduationCap className="h-8 w-8 text-primary-foreground" />
               </div>
-              <h1 className="mb-4 text-4xl font-bold tracking-tight text-foreground md:text-5xl">
+              <h1 className="mb-4 text-3xl font-bold tracking-tight text-foreground sm:text-4xl md:text-5xl">
                 FPT Exam Proctor Support
               </h1>
-              <p className="text-xl text-muted-foreground">
+              <p className="text-base text-muted-foreground sm:text-xl">
                 Intelligent chatbot assistance for final exam technical support
               </p>
             </div>
@@ -79,7 +79,7 @@ const About = () => {
         </section>
 
         {/* Problem & Solution */}
-        <section className="py-16">
+        <section className="py-10 sm:py-16">
           <div className="container px-4">
             <div className="mx-auto max-w-3xl">
               <div className="grid gap-8 md:grid-cols-2">
@@ -122,7 +122,7 @@ const About = () => {
         </section>
 
         {/* Features */}
-        <section className="border-t border-border bg-secondary/30 py-16">
+        <section className="border-t border-border bg-secondary/30 py-10 sm:py-16">
           <div className="container px-4">
             <div className="mx-auto max-w-4xl">
               <h2 className="mb-12 text-center text-2xl font-bold text-foreground">
@@ -156,7 +156,7 @@ const About = () => {
         </section>
 
         {/* Stakeholders */}
-        <section className="py-16">
+        <section className="py-10 sm:py-16">
           <div className="container px-4">
             <div className="mx-auto max-w-4xl">
               <h2 className="mb-12 text-center text-2xl font-bold text-foreground">

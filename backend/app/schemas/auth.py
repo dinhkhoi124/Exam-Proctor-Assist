@@ -48,5 +48,6 @@ class ResetPasswordRequest(BaseModel):
 class UpdateRoleRequest(BaseModel):
     role: Literal[
         "user",
-        "manager"
+        "manager",
+        "admin"
     ]

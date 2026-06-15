@@ -106,11 +106,13 @@ export default function Login() {
 
       toast.success("Login successful!");
 
+      const redirectPath = (user?.role === "admin" || user?.role === "manager") ? "/admin" : "/";
+
       setTimeout(() => {
-        navigate("/", { replace: true });
+        navigate(redirectPath, { replace: true });
       }, 50);
 
-      navigate("/", { replace: true });
+      navigate(redirectPath, { replace: true });
     } catch (error: any) {
       const errorData = error?.response?.data;
       const emailNotVerified =

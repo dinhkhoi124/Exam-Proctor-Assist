@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, HTTPException
 import re
 from sqlalchemy.orm import Session
 from datetime import datetime
@@ -12,6 +12,7 @@ from app.rag.retriever import get_page_image
 
 from app.db.deps import get_db
 from app.models.chat_log import ChatLog
+from app.models.chat_session import ChatSession
 from app.models.user import User
 from app.services.auth_service import get_current_user_from_token
 from app.core.websocket import manager
@@ -34,6 +35,38 @@ async def chat(
     # UPDATE LAST ACTIVE
     # =========================
     current_user.last_active = datetime.utcnow()
+
+    # =========================
+    # RESOLVE CHAT SESSION
+    # =========================
+    session_id = None
+    session_title = None
+
+    if req.session_id:
+        session = db.query(ChatSession).filter(
+            ChatSession.id == req.session_id,
+            ChatSession.user_id == current_user.id,
+            ChatSession.is_deleted == False
+        ).first()
+        if not session:
+            raise HTTPException(status_code=400, detail="Invalid session ID")
+        session_id = session.id
+        session_title = session.title
+        session.updated_at = datetime.utcnow()
+        db.commit()
+    else:
+        # Auto-create session on the first message
+        title_text = req.message if req.message else "Ảnh lỗi kỹ thuật"
+        title = title_text[:40] + "..." if len(title_text) > 40 else title_text
+        session = ChatSession(
+            user_id=current_user.id,
+            title=title
+        )
+        db.add(session)
+        db.commit()
+        db.refresh(session)
+        session_id = session.id
+        session_title = session.title
 
     # =========================
     # XỬ LÝ HÌNH ẢNH (VISION OCR)
@@ -92,7 +125,7 @@ async def chat(
 
 [DỮ LIỆU ĐẦU VÀO]
 - Mô tả lỗi từ ảnh (OCR): {image_description if image_description else "Không có"}
-- Câu hỏi gốc của sinh viên: {req.message if req.message else "Sinh viên gửi ảnh lỗi."}
+- Câu hỏi gốc của Giám thị: {req.message if req.message else "Giám thị gửi ảnh lỗi."}
 
 [TÀI LIỆU HƯỚNG DẪN LIÊN QUAN]
 {context}
@@ -151,21 +184,26 @@ Chỉ trích dẫn những trang thực sự cần thiết cho câu trả lời.
     # =========================
     # SAVE CHAT LOG TO DB
     # =========================
-    save_chat_log(
+    chat_log = save_chat_log(
         db=db,
         user_id=current_user.id,
         question=req.message if req.message else image_description,
         answer=clean_answer,
         topic_name=topic_name,
-        latency=latency
+        latency=latency,
+        session_id=session_id
     )
 
     log_user_activity(db, current_user.id, "chat")
 
     # Trigger admin dashboard update
     await manager.broadcast({"type": "STATS_UPDATED"})
+    await manager.broadcast({"type": "CHAT_LOG_CREATED"})
 
     return ChatResponse(
         answer=clean_answer,
-        page_images=page_images_data
+        page_images=page_images_data,
+        session_id=str(session_id),
+        session_title=session_title,
+        chat_log_id=str(chat_log.id) if chat_log else None
     )

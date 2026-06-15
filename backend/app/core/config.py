@@ -3,6 +3,13 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
+FRONTEND_URL = os.getenv("FRONTEND_URL", "http://localhost:8080").rstrip("/")
+FRONTEND_ORIGINS = [
+    origin.strip().rstrip("/")
+    for origin in os.getenv("FRONTEND_ORIGINS", FRONTEND_URL).split(",")
+    if origin.strip()
+]
+
 # =========================
 # OPENAI (RAG)
 # =========================

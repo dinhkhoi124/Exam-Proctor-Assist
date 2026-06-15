@@ -9,6 +9,8 @@ import {
 } from "@/components/ui/tooltip";
 import { AudioVisualizer } from "./AudioVisualizer";
 import { cn } from "@/lib/utils";
+import { buildApiUrl } from "@/lib/api";
+import { toast } from "sonner";
 
 interface ChatInputProps {
   onSendMessage: (
@@ -27,12 +29,20 @@ export function ChatInput({
 }: ChatInputProps) {
   const [message, setMessage] = useState("");
   const [isRecording, setIsRecording] = useState(false);
+  const [isTranscribing, setIsTranscribing] = useState(false);
   const [attachedImage, setAttachedImage] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
   const audioChunksRef = useRef<Blob[]>([]);
+
+  const getAudioFileName = (mimeType: string) => {
+    if (mimeType.includes("ogg")) return "recording.ogg";
+    if (mimeType.includes("mp4")) return "recording.m4a";
+    if (mimeType.includes("wav")) return "recording.wav";
+    return "recording.webm";
+  };
 
   const handleSend = () => {
     if (message.trim() || attachedImage) {
@@ -80,45 +90,56 @@ export function ChatInput({
         };
 
         mediaRecorder.onstop = async () => {
+          stream.getTracks().forEach((track) => track.stop());
+          mediaRecorderRef.current = null;
+
+          const mimeType =
+            mediaRecorder.mimeType ||
+            audioChunksRef.current[0]?.type ||
+            "audio/webm";
           const audioBlob = new Blob(audioChunksRef.current, {
-            type: "audio/wav",
+            type: mimeType,
           });
           const formData = new FormData();
-          formData.append("file", audioBlob, "recording.wav");
+          formData.append("file", audioBlob, getAudioFileName(mimeType));
+          setIsTranscribing(true);
 
           try {
-            const response = await fetch(
-              "http://localhost:8000/api/v1/speech/stt",
-              {
-                method: "POST",
-                body: formData,
-              },
-            );
+            const response = await fetch(buildApiUrl("/api/v1/speech/stt"), {
+              method: "POST",
+              body: formData,
+            });
 
             if (response.ok) {
               const data = await response.json();
               if (data.text && data.text.trim() !== "") {
                 onSendMessage(data.text, "voice");
+              } else {
+                toast.error("Không nhận dạng được giọng nói. Vui lòng thử lại.");
               }
             } else {
               console.error("Lỗi Backend:", response.status);
+              toast.error("Không thể nhận dạng giọng nói.");
             }
           } catch (error) {
             console.error("Lỗi kết nối:", error);
+            toast.error("Không thể kết nối dịch vụ nhận dạng giọng nói.");
+          } finally {
+            setIsTranscribing(false);
           }
-          stream.getTracks().forEach((track) => track.stop());
         };
 
         mediaRecorder.start();
         setIsRecording(true);
       } catch (err) {
         console.error("Lỗi Micro:", err);
+        toast.error("Không thể truy cập microphone. Vui lòng kiểm tra quyền trình duyệt.");
       }
     }
   };
 
   return (
-    <div className="border-t border-border bg-card p-4">
+    <div className="border-t border-border bg-card p-2 sm:p-4">
       <div className="mx-auto max-w-3xl">
         {attachedImage && (
           <div className="mb-3 flex items-start gap-2 rounded-lg bg-secondary/50 p-2">
@@ -161,19 +182,28 @@ export function ChatInput({
               }}
               className="text-destructive"
             >
-              Cancel
+              Stop &amp; send
             </Button>
           </div>
         )}
 
-        <div className="flex items-end gap-2">
-          <div className="flex gap-1">
+        {isTranscribing && (
+          <div className="mb-3 flex items-center gap-3 rounded-lg bg-primary/10 p-3">
+            <Loader2 className="h-4 w-4 animate-spin text-primary" />
+            <span className="text-sm font-medium text-foreground">
+              Converting voice to text...
+            </span>
+          </div>
+        )}
+
+        <div className="flex items-end gap-1.5 sm:gap-2">
+          <div className="flex shrink-0 gap-0 sm:gap-1">
             <Button
               variant="ghost"
               size="icon"
-              className="h-10 w-10 text-muted-foreground"
+              className="h-10 w-8 text-muted-foreground sm:w-10"
               onClick={() => fileInputRef.current?.click()}
-              disabled={isLoading}
+              disabled={isLoading || isTranscribing}
             >
               <ImageIcon className="h-5 w-5" />
             </Button>
@@ -184,11 +214,11 @@ export function ChatInput({
                   variant="ghost"
                   size="icon"
                   className={cn(
-                    "h-10 w-10",
+                    "h-10 w-8 sm:w-10",
                     isRecording ? "text-destructive" : "text-muted-foreground",
                   )}
                   onClick={handleVoiceRecord}
-                  disabled={isLoading}
+                  disabled={isLoading || isTranscribing}
                 >
                   <Mic className="h-5 w-5" />
                 </Button>
@@ -199,7 +229,7 @@ export function ChatInput({
             </Tooltip>
           </div>
 
-          <div className="relative flex-1">
+          <div className="relative min-w-0 flex-1">
             <Textarea
               ref={textareaRef}
               value={message}
@@ -207,17 +237,20 @@ export function ChatInput({
               onKeyDown={handleKeyDown}
               placeholder="Describe the issue..."
               className="min-h-[44px] max-h-32 resize-none rounded-xl border-border bg-background text-sm"
-              disabled={isLoading || isRecording}
+              disabled={isLoading || isRecording || isTranscribing}
               rows={1}
             />
           </div>
 
           <Button
             size="icon"
-            className="h-10 w-10 rounded-xl"
+            className="h-10 w-10 shrink-0 rounded-xl"
             onClick={handleSend}
             disabled={
-              isLoading || isRecording || (!message.trim() && !attachedImage)
+              isLoading ||
+              isRecording ||
+              isTranscribing ||
+              (!message.trim() && !attachedImage)
             }
           >
             {isLoading ? (
