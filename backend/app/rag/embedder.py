@@ -52,18 +52,32 @@ class VectorStore:
         else:
             print(f"⚠ Không tìm thấy dữ liệu tại {folder_path}")
 
-    def search(self, query, top_k=6): # Tăng top_k để có không gian cho retriever lọc trùng
-        # Câu hỏi phải có prefix "query: "
+    def search(self, query, top_k=6):
         q_emb = self.model.encode(
             ["query: " + query],
             normalize_embeddings=True
         )
-        scores, idxs = self.index.search(np.array(q_emb).astype("float32"), top_k)
+
+        scores, idxs = self.index.search(
+            np.array(q_emb).astype("float32"),
+            top_k
+        )
 
         results = []
-        for i in idxs[0]:
-            if i != -1 and i < len(self.metadata):
-                results.append(self.metadata[i])
+
+        for score, idx in zip(scores[0], idxs[0]):
+            if idx == -1:
+                continue
+
+            if idx >= len(self.metadata):
+                continue
+
+            item = self.metadata[idx].copy()
+
+            item["vector_idx"] = int(idx)
+            item["dense_score"] = float(score)
+
+            results.append(item)
 
         return results
 

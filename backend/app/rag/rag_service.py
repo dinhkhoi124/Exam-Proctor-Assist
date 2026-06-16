@@ -35,121 +35,152 @@ def _normalize_score(score: float, max_score: float = 1.0) -> float:
     return min(score / max_score, 1.0)
 
 
-def _combine_hybrid_results(dense_results: list, sparse_results: list, alpha: float = 0.6) -> list:
-    combined_scores = {}
-    
-    for i, res in enumerate(dense_results):
-        idx = i
-        score = _normalize_score(1.0 / (i + 1), 1.0)
-        combined_scores[idx] = alpha * score
-    
-    if sparse_results:
-        max_bm25_score = max([score for _, score in sparse_results]) if sparse_results else 1.0
-        for idx, bm25_score in sparse_results:
-            norm_score = _normalize_score(bm25_score, max_bm25_score)
-            if idx in combined_scores:
-                combined_scores[idx] += (1 - alpha) * norm_score
-            else:
-                combined_scores[idx] = (1 - alpha) * norm_score
-    
-    sorted_indices = sorted(combined_scores.items(), key=lambda x: x[1], reverse=True)
-    
-    combined = []
-    for idx, score in sorted_indices:
-        if idx < len(dense_results):
-            res = dense_results[idx].copy()
-            res['combined_score'] = score
-            combined.append(res)
-    
-    return combined
+def _combine_hybrid_results(dense_results, sparse_results, alpha=0.65):
+    combined = {}
+
+    # Dense
+    for res in dense_results:
+        idx = res["vector_idx"]
+
+        combined[idx] = {
+            "result": res,
+            "score": alpha * res["dense_score"]
+        }
+
+    # BM25
+    max_bm25 = max(
+        [score for _, score in sparse_results],
+        default=1.0
+    )
+
+    for idx, bm25_score in sparse_results:
+
+        normalized = bm25_score / max_bm25
+
+        if idx in combined:
+            combined[idx]["score"] += (
+                (1 - alpha) * normalized
+            )
+        else:
+
+            item = _resources[0].metadata[idx].copy()
+
+            item["vector_idx"] = idx
+
+            combined[idx] = {
+                "result": item,
+                "score": (1 - alpha) * normalized
+            }
+
+    ranked = sorted(
+        combined.values(),
+        key=lambda x: x["score"],
+        reverse=True
+    )
+
+    return [x["result"] for x in ranked]
 
 
-def retrieve_context(query: str, top_k: int = 15, use_rerank: bool = False):
+def retrieve_context(query: str, top_k: int = 15, use_rerank: bool = True):
     # Keep a stable resource pair while another thread may reload a new index.
     vector_store, bm25_retriever = _resources
 
     if not vector_store.metadata and not bm25_retriever.corpus:
         return "No documents found. Please build index first.", []
-    
-    # Dense search
+
+    # =========================
+    # Dense Search
+    # =========================
     dense_results = vector_store.search(query, top_k=top_k)
-    
-    # BM25 search
+
+    # =========================
+    # BM25 Search
+    # =========================
     sparse_results = bm25_retriever.search(query, top_k=top_k)
-    
-    # Combine
-    combined_results = _combine_hybrid_results(dense_results, sparse_results, alpha=0.65)
-    
+
+    # =========================
+    # Hybrid Combine
+    # =========================
+    combined_results = _combine_hybrid_results(
+        dense_results,
+        sparse_results,
+        alpha=0.65
+    )
+
     if not combined_results:
         return "No relevant documents found.", []
-    
+
     candidates = combined_results[:top_k]
-    
-    # Rerank if needed
+
+    # =========================
+    # Rerank
+    # =========================
     if use_rerank and len(candidates) > 5:
-        candidates = _reranker.rerank(query, candidates, top_k=top_k)
-    
-    # Source analysis
-    source_counts = Counter([res.get('source') for res in candidates if res.get('source')])
-    if not source_counts:
-        return "No documents found.", []
-    
-    best_source = source_counts.most_common(1)[0][0]
-    
-    # Filter by source
-    filtered_results = []
-    for res in candidates:
-        if res.get('source') == best_source:
-            filtered_results.append(res)
-    
-    if len(filtered_results) < 3:
-        for res in candidates:
-            if res.get('source') != best_source:
-                filtered_results.append(res)
-            if len(filtered_results) >= 6:
-                break
-    
-    # Sort by page
-    filtered_results.sort(key=lambda x: (x.get('source'), x.get('page', 0)))
-    
-    # Dedup by page
+        candidates = _reranker.rerank(
+            query,
+            candidates,
+            top_k=top_k
+        )
+
+    # =========================
+    # KHÔNG lọc theo best_source nữa
+    # Giữ top chunk sau rerank
+    # =========================
+    filtered_results = candidates[:8]
+
+    # =========================
+    # Sort theo source + page
+    # =========================
+    filtered_results.sort(
+        key=lambda x: (
+            x.get("source", ""),
+            x.get("page", 0)
+        )
+    )
+
+    # =========================
+    # Deduplicate page
+    # =========================
     seen_page_ids = set()
     final_to_process = []
+
     for res in filtered_results:
         page_id = f"{res.get('source')}_{res.get('page')}"
-        if page_id not in seen_page_ids:
-            final_to_process.append({
-                "source": res.get('source'),
-                "page": res.get('page'),
-                "content": res.get('text', '')
-            })
-            seen_page_ids.add(page_id)
-    
-    # Dedup images
-    unique_pages = get_unique_pages(final_to_process)
-    
-    # Final output
-    final_pages = unique_pages[:5]
-    context_parts = []
-    source_documents = []
-    
-    for item in final_pages:
-        context_parts.append(f"--- Source: {item['source']} (Page {item['page']}) ---\n{item['content']}")
-        source_documents.append({
-            "file_name": item['source'],
-            "page": item['page'],
-            "image_base64": item.get('image_base64')
+
+        if page_id in seen_page_ids:
+            continue
+
+        final_to_process.append({
+            "source": res.get("source"),
+            "page": res.get("page"),
+            "content": res.get("text", "")
         })
-    
-    return "\n\n".join(context_parts), source_documents
+
+        seen_page_ids.add(page_id)
+
+    # =========================
+    # Deduplicate image
+    # =========================
+    unique_pages = get_unique_pages(final_to_process)
+
+    # =========================
+    # Final pages
+    # =========================
+    final_pages = unique_pages[:5]
+
+    context_parts = []
     source_documents = []
 
     for item in final_pages:
-        context_parts.append(f"--- Nguồn: {item['source']} (Trang {item['page']}) ---\n{item['content']}")
+        context_parts.append(
+            f"--- Source: {item['source']} (Page {item['page']}) ---\n"
+            f"{item['content']}"
+        )
+
         source_documents.append({
-            "file_name": item['source'],
-            "page": item['page'],
-            "image_base64": item.get('image_base64')
+            "file_name": item["source"],
+            "page": item["page"],
+            "image_base64": item.get("image_base64")
         })
 
     return "\n\n".join(context_parts), source_documents

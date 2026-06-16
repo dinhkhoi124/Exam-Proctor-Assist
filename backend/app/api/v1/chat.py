@@ -102,7 +102,7 @@ async def chat(
     # =========================
     # RAG RETRIEVAL
     # =========================
-    context, source_docs = retrieve_context(optimized_query)
+    context, source_docs = retrieve_context(optimized_query, top_k=15, use_rerank=True)
 
     if not context:
         return ChatResponse(
@@ -111,11 +111,11 @@ async def chat(
         )
 
     # Lọc danh sách file hợp lệ từ RAG
-    valid_files = set()
-    for doc in source_docs:
-        f_name = doc.get('source') or doc.get('file_name')
-        if f_name:
-            valid_files.add(f_name)
+    # valid_files = set()
+    # for doc in source_docs:
+    #     f_name = doc.get('source') or doc.get('file_name')
+    #     if f_name:
+    #         valid_files.add(f_name)
 
     # =========================
     # BUILD STRICT PROMPT
@@ -146,37 +146,95 @@ Chỉ trích dẫn những trang thực sự cần thiết cho câu trả lời.
 
     # =========================
     # CÁC BƯỚC HẬU KỲ & TRÍCH XUẤT ẢNH
+    # Retrieval -> Citation -> Validation -> Image
     # =========================
-    page_images_data = []
-    seen_references = set()
 
     pattern = r"\[SOURCE:\s*(.*?),\s*PAGE:\s*(\d+)\]"
-    matches = re.findall(pattern, answer, re.IGNORECASE)
 
+    matches = re.findall(
+        pattern,
+        answer,
+        re.IGNORECASE
+    )
+
+    # Các trang thực sự được retrieve
+    retrieved_pages = {
+        (doc["file_name"], doc["page"]): doc
+        for doc in source_docs
+    }
+
+    page_images_data = []
+    seen_pages = set()
+
+    # ==================================
+    # ƯU TIÊN 1:
+    # Hiển thị ảnh mà LLM đã trích dẫn
+    # nhưng chỉ khi trang đó nằm trong
+    # kết quả retrieval
+    # ==================================
     for file_name, page_num in matches:
+
         file_name = file_name.strip()
+
         try:
             page_num = int(page_num.strip())
         except ValueError:
             continue
-        
-        # Chỉ xử lý nếu file thực sự thuộc kết quả RAG trả về
-        if file_name in valid_files:
-            ref_key = f"{file_name}_{page_num}"
-            if ref_key not in seen_references:
-                img_b64 = get_page_image(file_name, page_num)
-                if img_b64:
-                    page_images_data.append({
-                        "page": page_num,
-                        "file_name": file_name,
-                        "base64": img_b64
-                    })
-                    seen_references.add(ref_key)
-        else:
-            print(f"🚫 Chặn trích dẫn file không liên quan: {file_name}")
 
-    # Làm sạch chuỗi trả lời
-    clean_answer = re.sub(pattern, "", answer, flags=re.IGNORECASE).strip()
+        page_key = (file_name, page_num)
+
+        if page_key not in retrieved_pages:
+            print(
+                f"🚫 Citation ngoài retrieval bị chặn: "
+                f"{file_name} - Page {page_num}"
+            )
+            continue
+
+        doc = retrieved_pages[page_key]
+
+        image_b64 = doc.get("image_base64")
+
+        if image_b64:
+            page_images_data.append({
+                "page": doc["page"],
+                "file_name": doc["file_name"],
+                "base64": image_b64
+            })
+
+            seen_pages.add(page_key)
+
+    # ==================================
+    # ƯU TIÊN 2:
+    # Nếu LLM không citation được
+    # hoặc citation sai
+    # thì fallback về top retrieval
+    # ==================================
+    if not page_images_data:
+
+        for doc in source_docs[:3]:
+
+            page_key = (
+                doc["file_name"],
+                doc["page"]
+            )
+
+            if page_key in seen_pages:
+                continue
+
+            image_b64 = doc.get("image_base64")
+
+            if image_b64:
+                page_images_data.append({
+                    "page": doc["page"],
+                    "file_name": doc["file_name"],
+                    "base64": image_b64
+                })
+
+    # ==================================
+    # Loại citation khỏi câu trả lời
+    # ==================================
+    clean_answer = re.sub(
+        pattern, "", answer, flags=re.IGNORECASE).strip()
 
     # Determine Top Topic
     topic_name = classify_topic(req.message if req.message else image_description)
