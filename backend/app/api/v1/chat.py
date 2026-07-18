@@ -19,6 +19,7 @@ from app.core.websocket import manager
 
 from app.services.logging_service import log_user_activity, save_chat_log
 from app.services.topic_service import classify_topic
+from app.services.query_routing import select_retrieval_query
 
 router = APIRouter()
 
@@ -96,7 +97,13 @@ async def chat(
     # =========================
     # TỐI ƯU HÓA TRUY VẤN (REWRITE QUERY)
     # =========================
-    optimized_query = rewrite_query(req.message, image_description)
+    optimized_query = select_retrieval_query(
+        input_type=req.input_type,
+        query_text=query_text,
+        message=req.message,
+        image_description=image_description,
+        rewrite=rewrite_query,
+    )
     print(f"🔍 Optimized Query: {optimized_query}")
 
     # =========================

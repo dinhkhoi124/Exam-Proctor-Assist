@@ -1,9 +1,21 @@
 # app/services/llm_service.py
 from openai import OpenAI
 import os
+from dataclasses import dataclass
+from time import perf_counter
+from typing import Optional
 from app.prompts.exam_support import SYSTEM_PROMPT 
 
 client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
+
+
+@dataclass(frozen=True)
+class LLMAnswerResult:
+    text: str
+    latency_ms: int
+    model: str
+    prompt_tokens: Optional[int] = None
+    completion_tokens: Optional[int] = None
 
 def rewrite_query(user_input: str, image_ocr: str = None) -> str:
     rewrite_prompt = f"""
@@ -30,7 +42,9 @@ def rewrite_query(user_input: str, image_ocr: str = None) -> str:
     
     return response.choices[0].message.content.strip()
 
-def generate_answer(prompt: str, image_base64: str = None):
+def generate_answer_with_metadata(
+    prompt: str, image_base64: str = None
+) -> LLMAnswerResult:
     """
     Hàm sinh câu trả lời cuối cùng từ Context và ảnh.
     """
@@ -54,10 +68,24 @@ def generate_answer(prompt: str, image_base64: str = None):
     
     messages.append({"role": "user", "content": user_content})
 
+    model = "gpt-4o-mini"
+    started = perf_counter()
     response = client.chat.completions.create(
-        model="gpt-4o-mini",
+        model=model,
         messages=messages,
         temperature=0.1 
     )
 
-    return response.choices[0].message.content.strip()
+    usage = getattr(response, "usage", None)
+    return LLMAnswerResult(
+        text=response.choices[0].message.content.strip(),
+        latency_ms=int((perf_counter() - started) * 1000),
+        model=model,
+        prompt_tokens=getattr(usage, "prompt_tokens", None),
+        completion_tokens=getattr(usage, "completion_tokens", None),
+    )
+
+
+def generate_answer(prompt: str, image_base64: str = None):
+    """Backward-compatible text-only answer API used by production routes."""
+    return generate_answer_with_metadata(prompt, image_base64=image_base64).text

@@ -112,3 +112,38 @@ update_database_feedback_logs.txt
 
 backend/app/services/email_service_v1.py
 
+# ASR benchmark runtime artifacts (may contain transcripts/answers)
+dataset_benchmark/benchmark_outputs/
+dataset_benchmark/archive/**/*.json
+dataset_benchmark/archive/**/*.jsonl
+dataset_benchmark/archive/**/*.png
+dataset_benchmark/archive/**/*.xlsx
+dataset_benchmark/annotations/answers_mapping_*.json
+dataset_benchmark/annotations/answers_rater_*.xlsx
+
+# Temporary local audit CSVs
+/*.csv
+
+# Audio archives and directories
+dataset_benchmark/*.zip
+dataset_benchmark/Audio_wav-*/
+**/*.wav
+**/*.mp3
+
+# Rater and adjudication workbooks
+dataset_benchmark/annotations/gold_rater_*.xlsx
+dataset_benchmark/annotations/gold_adjudicated.xlsx
+
+# Robustness v2 runtime artifacts
+dataset_benchmark/robustness_v2/audio_augmented/
+dataset_benchmark/robustness_v2/noise_assets/
+dataset_benchmark/robustness_v2/rir_assets/
+dataset_benchmark/robustness_v2/cache/
+dataset_benchmark/robustness_v2/checkpoints/
+dataset_benchmark/robustness_v2/annotations/answers_mapping_*.json
+dataset_benchmark/robustness_v2/annotations/answers_rater_*.xlsx
+dataset_benchmark/robustness_v2/annotations/gold_rater_*.xlsx
+dataset_benchmark/robustness_v2/annotations/gold_adjudicated.xlsx
+database/
+report/
+plan/

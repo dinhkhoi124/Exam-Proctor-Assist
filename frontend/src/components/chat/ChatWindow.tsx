@@ -9,6 +9,7 @@ import { VoiceModeOverlay } from "./VoiceModeOverlay";
 import { api } from "@/lib/api";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
+import { buildChatRequestPayload } from "@/lib/chatPayload";
 
 interface ChatSessionItem {
   id: string;
@@ -150,11 +151,10 @@ export function ChatWindow() {
       setIsLoading(true);
 
       try {
-        const response = await api.post("/api/v1/chat", {
-          message: content,
-          image: imageUrl || null,
-          session_id: currentSessionId
-        });
+        const response = await api.post(
+          "/api/v1/chat",
+          buildChatRequestPayload(content, type, imageUrl, currentSessionId),
+        );
 
         const data = response.data;
 

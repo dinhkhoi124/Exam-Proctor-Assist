@@ -1,0 +1,2093 @@
+{
+  "total_rows": 298,
+  "non_nan_rows": 296,
+  "total_wavs": 229,
+  "mapping": [
+    {
+      "excel_row": 2,
+      "question": "nan",
+      "speaker": "Vĩ",
+      "wav_file": "2.wav",
+      "wav_exists": true
+    },
+    {
+      "excel_row": 3,
+      "question": "Lệnh nào dùng để mở Network Connections khi cấu hình WiFi?\"}",
+      "speaker": "Vĩ",
+      "wav_file": "3.wav",
+      "wav_exists": true
+    },
+    {
+      "excel_row": 4,
+      "question": "nan",
+      "speaker": "Vĩ",
+      "wav_file": "4.wav",
+      "wav_exists": true
+    },
+    {
+      "excel_row": 5,
+      "question": "Tùy chọn nào dùng để bật hoặc tắt tự động kết nối mạng không dây?\"}",
+      "speaker": "Vĩ",
+      "wav_file": "5.wav",
+      "wav_exists": true
+    },
+    {
+      "excel_row": 6,
+      "question": "Nếu không muốn máy tự kết nối WiFi khi ở trong vùng phủ sóng thì xử lý sao?\"}",
+      "speaker": "Vĩ",
+      "wav_file": "6.wav",
+      "wav_exists": true
+    },
+    {
+      "excel_row": 7,
+      "question": "Nếu muốn máy tự kết nối WiFi khi có mạng trong vùng phủ sóng thì chọn mục nào?\"}",
+      "speaker": "Vĩ",
+      "wav_file": "7.wav",
+      "wav_exists": true
+    },
+    {
+      "excel_row": 8,
+      "question": "Sau khi bật hoặc tắt Connect automatically thì cần nhấn gì?\"}",
+      "speaker": "Vĩ",
+      "wav_file": "8.wav",
+      "wav_exists": true
+    },
+    {
+      "excel_row": 9,
+      "question": "Có thể chỉnh tự động kết nối WiFi ở phần nào?\"}",
+      "speaker": "Vĩ",
+      "wav_file": "9.wav",
+      "wav_exists": true
+    },
+    {
+      "excel_row": 10,
+      "question": "Để vào phần Wireless Properties thì trước đó cần chọn gì?\"}",
+      "speaker": "Vĩ",
+      "wav_file": "10.wav",
+      "wav_exists": true
+    },
+    {
+      "excel_row": 11,
+      "question": "Máy tính tự động kết nối WiFi không mong muốn",
+      "speaker": "Vĩ",
+      "wav_file": "11.wav",
+      "wav_exists": true
+    },
+    {
+      "excel_row": 12,
+      "question": "Giám thị cần hướng dẫn người dùng bật lại auto connect WiFi thì nói ngắn gọn thế nào?\"}",
+      "speaker": "Vĩ",
+      "wav_file": "12.wav",
+      "wav_exists": true
+    },
+    {
+      "excel_row": 13,
+      "question": "Hướng dẫn này có nói cách đổi mật khẩu WiFi không?\"}",
+      "speaker": "Vĩ",
+      "wav_file": "13.wav",
+      "wav_exists": true
+    },
+    {
+      "excel_row": 14,
+      "question": "Hướng dẫn này có nêu cách sửa lỗi mất mạng do router không?\"}",
+      "speaker": "Vĩ",
+      "wav_file": "14.wav",
+      "wav_exists": true
+    },
+    {
+      "excel_row": 15,
+      "question": "Có cần khởi động lại máy tính sau khi bật/tắt tự động kết nối WiFi không?\"}",
+      "speaker": "Vĩ",
+      "wav_file": "15.wav",
+      "wav_exists": true
+    },
+    {
+      "excel_row": 16,
+      "question": "Win + R dùng để làm gì?\"}",
+      "speaker": "Vĩ",
+      "wav_file": "16.wav",
+      "wav_exists": true
+    },
+    {
+      "excel_row": 17,
+      "question": "Bước đầu tiên là gì?\"}",
+      "speaker": "Vĩ",
+      "wav_file": "17.wav",
+      "wav_exists": true
+    },
+    {
+      "excel_row": 18,
+      "question": "Cần nhập gì vào Run?\"}",
+      "speaker": "Vĩ",
+      "wav_file": "18.wav",
+      "wav_exists": true
+    },
+    {
+      "excel_row": 19,
+      "question": "ncpa.cpl dùng để mở gì?\"}",
+      "speaker": "Vĩ",
+      "wav_file": "19.wav",
+      "wav_exists": true
+    },
+    {
+      "excel_row": 20,
+      "question": "Sau khi nhập ncpa.cpl cần làm gì?\"}",
+      "speaker": "Vĩ",
+      "wav_file": "20.wav",
+      "wav_exists": true
+    },
+    {
+      "excel_row": 21,
+      "question": "OK trong Run có tác dụng gì?\"}",
+      "speaker": "Vĩ",
+      "wav_file": "21.wav",
+      "wav_exists": true
+    },
+    {
+      "excel_row": 22,
+      "question": "Network Connections được mở ở bước nào?\"}",
+      "speaker": "Vĩ",
+      "wav_file": "22.wav",
+      "wav_exists": true
+    },
+    {
+      "excel_row": 23,
+      "question": "Bước 2 là gì?\"}",
+      "speaker": "Vĩ",
+      "wav_file": "23.wav",
+      "wav_exists": true
+    },
+    {
+      "excel_row": 24,
+      "question": "Cần chọn gì trong Network Connections?\"}",
+      "speaker": "Vĩ",
+      "wav_file": "24.wav",
+      "wav_exists": true
+    },
+    {
+      "excel_row": 25,
+      "question": "Sau khi chọn mạng không dây thì làm gì?\"}",
+      "speaker": "Vĩ",
+      "wav_file": "25.wav",
+      "wav_exists": true
+    },
+    {
+      "excel_row": 26,
+      "question": "Wireless Properties nằm ở bước mấy?\"}",
+      "speaker": "Vĩ",
+      "wav_file": "26.wav",
+      "wav_exists": true
+    },
+    {
+      "excel_row": 27,
+      "question": "Bước 3 là gì?\"}",
+      "speaker": "Vĩ",
+      "wav_file": "27.wav",
+      "wav_exists": true
+    },
+    {
+      "excel_row": 28,
+      "question": "Mục nào dùng để cấu hình tự động kết nối?\"}",
+      "speaker": "Vĩ",
+      "wav_file": "28.wav",
+      "wav_exists": true
+    },
+    {
+      "excel_row": 29,
+      "question": "Bước 4 là gì?\"}",
+      "speaker": "Vĩ",
+      "wav_file": "29.wav",
+      "wav_exists": true
+    },
+    {
+      "excel_row": 30,
+      "question": "Muốn bật tự động kết nối thì làm gì?\"}",
+      "speaker": "Vĩ",
+      "wav_file": "30.wav",
+      "wav_exists": true
+    },
+    {
+      "excel_row": 31,
+      "question": "Muốn tắt tự động kết nối thì làm gì?\"}",
+      "speaker": "Vĩ",
+      "wav_file": "31.wav",
+      "wav_exists": true
+    },
+    {
+      "excel_row": 32,
+      "question": "Sau khi thay đổi tùy chọn cần làm gì?\"}",
+      "speaker": "Vĩ",
+      "wav_file": "32.wav",
+      "wav_exists": true
+    },
+    {
+      "excel_row": 33,
+      "question": "Sau khi nhấn OK có thể làm gì?\"}",
+      "speaker": "Vĩ",
+      "wav_file": "33.wav",
+      "wav_exists": true
+    },
+    {
+      "excel_row": 34,
+      "question": "Close dùng để làm gì?\"}",
+      "speaker": "Vĩ",
+      "wav_file": "34.wav",
+      "wav_exists": true
+    },
+    {
+      "excel_row": 35,
+      "question": "Có thể đóng Network Connections khi nào?\"}",
+      "speaker": "Vĩ",
+      "wav_file": "35.wav",
+      "wav_exists": true
+    },
+    {
+      "excel_row": 36,
+      "question": "Quy trình gồm bao nhiêu bước?\"}",
+      "speaker": "Vĩ",
+      "wav_file": "36.wav",
+      "wav_exists": true
+    },
+    {
+      "excel_row": 37,
+      "question": "Mục tiêu của hướng dẫn là gì?\"}",
+      "speaker": "Vĩ",
+      "wav_file": "37.wav",
+      "wav_exists": true
+    },
+    {
+      "excel_row": 38,
+      "question": "Lệnh nào được nhập trong Run?\"}",
+      "speaker": "Vĩ",
+      "wav_file": "38.wav",
+      "wav_exists": true
+    },
+    {
+      "excel_row": 39,
+      "question": "Hộp thoại nào được mở bằng Win + R?\"}",
+      "speaker": "Vĩ",
+      "wav_file": "39.wav",
+      "wav_exists": true
+    },
+    {
+      "excel_row": 40,
+      "question": "Wireless Properties được mở sau thao tác nào?\"}",
+      "speaker": "Vĩ",
+      "wav_file": "40.wav",
+      "wav_exists": true
+    },
+    {
+      "excel_row": 41,
+      "question": "Checkbox Connect automatically có ý nghĩa gì?\"}",
+      "speaker": "Vĩ",
+      "wav_file": "41.wav",
+      "wav_exists": true
+    },
+    {
+      "excel_row": 42,
+      "question": "Muốn giữ tự động kết nối thì trạng thái checkbox thế nào?\"}",
+      "speaker": "Vĩ",
+      "wav_file": "42.wav",
+      "wav_exists": true
+    },
+    {
+      "excel_row": 43,
+      "question": "Muốn ngừng tự động kết nối thì trạng thái checkbox thế nào?\"}",
+      "speaker": "Vĩ",
+      "wav_file": "43.wav",
+      "wav_exists": true
+    },
+    {
+      "excel_row": 44,
+      "question": "Network Connections được truy cập bằng cách nào?\"}",
+      "speaker": "Vĩ",
+      "wav_file": "44.wav",
+      "wav_exists": true
+    },
+    {
+      "excel_row": 45,
+      "question": "Sau khi mở Network Connections cần thao tác với gì?\"}",
+      "speaker": "Vĩ",
+      "wav_file": "45.wav",
+      "wav_exists": true
+    },
+    {
+      "excel_row": 46,
+      "question": "Wireless Properties là nút ở bước nào?\"}",
+      "speaker": "Vĩ",
+      "wav_file": "46.wav",
+      "wav_exists": true
+    },
+    {
+      "excel_row": 47,
+      "question": "Bước cuối cùng trước khi đóng cửa sổ là gì?\"}",
+      "speaker": "Vĩ",
+      "wav_file": "47.wav",
+      "wav_exists": true
+    },
+    {
+      "excel_row": 48,
+      "question": "Có bắt buộc đóng Network Connections không?\"}",
+      "speaker": "Vĩ",
+      "wav_file": "48.wav",
+      "wav_exists": true
+    },
+    {
+      "excel_row": 49,
+      "question": "Thao tác nào quyết định bật/tắt tự động kết nối?\"}",
+      "speaker": "Vĩ",
+      "wav_file": "49.wav",
+      "wav_exists": true
+    },
+    {
+      "excel_row": 50,
+      "question": "Người dùng có thể thay đổi tự động kết nối ở đâu?\"}",
+      "speaker": "Vĩ",
+      "wav_file": "50.wav",
+      "wav_exists": true
+    },
+    {
+      "excel_row": 51,
+      "question": "Sau khi cấu hình xong nên nhấn gì để lưu?\"}",
+      "speaker": "Vĩ",
+      "wav_file": "51.wav",
+      "wav_exists": true
+    },
+    {
+      "excel_row": 52,
+      "question": "Mạng nào được chọn trong hướng dẫn?\"}",
+      "speaker": "Vĩ",
+      "wav_file": "52.wav",
+      "wav_exists": true
+    },
+    {
+      "excel_row": 53,
+      "question": "Run được mở bằng tổ hợp phím nào?\"}",
+      "speaker": "Vĩ",
+      "wav_file": "53.wav",
+      "wav_exists": true
+    },
+    {
+      "excel_row": 54,
+      "question": "Tùy chọn Connect automatically nằm ở đâu?\"}",
+      "speaker": "Vĩ",
+      "wav_file": "54.wav",
+      "wav_exists": true
+    },
+    {
+      "excel_row": 55,
+      "question": "Sau khi nhấp Close có thể làm gì?\"}",
+      "speaker": "Vĩ",
+      "wav_file": "55.wav",
+      "wav_exists": true
+    },
+    {
+      "excel_row": 56,
+      "question": "Bước nào liên quan đến Wireless Properties?\"}",
+      "speaker": "Vĩ",
+      "wav_file": "56.wav",
+      "wav_exists": true
+    },
+    {
+      "excel_row": 57,
+      "question": "Bước nào liên quan đến Connect automatically when this network is in range?\"}",
+      "speaker": "Vĩ",
+      "wav_file": "57.wav",
+      "wav_exists": true
+    },
+    {
+      "excel_row": 58,
+      "question": "Làm sao truy cập Wireless Properties?\"}",
+      "speaker": "Vĩ",
+      "wav_file": "58.wav",
+      "wav_exists": true
+    },
+    {
+      "excel_row": 59,
+      "question": "Làm sao mở Network Connections nhanh?\"}",
+      "speaker": "Vĩ",
+      "wav_file": "59.wav",
+      "wav_exists": true
+    },
+    {
+      "excel_row": 60,
+      "question": "Sau khi mở Run cần nhập lệnh gì?\"}",
+      "speaker": "Vĩ",
+      "wav_file": "60.wav",
+      "wav_exists": true
+    },
+    {
+      "excel_row": 61,
+      "question": "Nếu muốn chỉnh tự động kết nối cần mở gì?\"}",
+      "speaker": "Vĩ",
+      "wav_file": "61.wav",
+      "wav_exists": true
+    },
+    {
+      "excel_row": 62,
+      "question": "Nhấn OK sau bước nào?\"}",
+      "speaker": "Vĩ",
+      "wav_file": "62.wav",
+      "wav_exists": true
+    },
+    {
+      "excel_row": 63,
+      "question": "Có thể thay đổi tự động kết nối mà không mở Wireless Properties không?\"}",
+      "speaker": "Vĩ",
+      "wav_file": "63.wav",
+      "wav_exists": true
+    },
+    {
+      "excel_row": 64,
+      "question": "Làm sao đổi mật khẩu WiFi?\"}",
+      "speaker": "Vĩ",
+      "wav_file": "64.wav",
+      "wav_exists": true
+    },
+    {
+      "excel_row": 65,
+      "question": "Làm sao reset modem?\"}",
+      "speaker": "Vĩ",
+      "wav_file": "65.wav",
+      "wav_exists": true
+    },
+    {
+      "excel_row": 66,
+      "question": "Làm sao cài driver WiFi?\"}",
+      "speaker": "Vĩ",
+      "wav_file": "66.wav",
+      "wav_exists": true
+    },
+    {
+      "excel_row": 67,
+      "question": "Làm sao đổi tên WiFi?\"}",
+      "speaker": "Vĩ",
+      "wav_file": "67.wav",
+      "wav_exists": true
+    },
+    {
+      "excel_row": 68,
+      "question": "Làm sao xem mật khẩu WiFi?\"}",
+      "speaker": "Vĩ",
+      "wav_file": "68.wav",
+      "wav_exists": true
+    },
+    {
+      "excel_row": 69,
+      "question": "Làm sao kết nối Bluetooth?\"}",
+      "speaker": "Vĩ",
+      "wav_file": "69.wav",
+      "wav_exists": true
+    },
+    {
+      "excel_row": 70,
+      "question": "Làm sao cấu hình IP tĩnh?\"}",
+      "speaker": "Vĩ",
+      "wav_file": "70.wav",
+      "wav_exists": true
+    },
+    {
+      "excel_row": 71,
+      "question": "Làm sao kiểm tra tốc độ mạng?\"}",
+      "speaker": "Vĩ",
+      "wav_file": "71.wav",
+      "wav_exists": true
+    },
+    {
+      "excel_row": 72,
+      "question": "Làm sao dùng VPN?\"}",
+      "speaker": "Vĩ",
+      "wav_file": "72.wav",
+      "wav_exists": true
+    },
+    {
+      "excel_row": 73,
+      "question": "Làm sao sửa lỗi DNS?\"}",
+      "speaker": "Vĩ",
+      "wav_file": "73.wav",
+      "wav_exists": true
+    },
+    {
+      "excel_row": 74,
+      "question": "Làm sao cài Windows?\"}",
+      "speaker": "Vĩ",
+      "wav_file": "74.wav",
+      "wav_exists": true
+    },
+    {
+      "excel_row": 75,
+      "question": "Làm sao tạo hotspot?\"}",
+      "speaker": "Vĩ",
+      "wav_file": "75.wav",
+      "wav_exists": true
+    },
+    {
+      "excel_row": 76,
+      "question": "Làm sao quên WiFi đã lưu?\"}",
+      "speaker": "Vĩ",
+      "wav_file": "76.wav",
+      "wav_exists": true
+    },
+    {
+      "excel_row": 77,
+      "question": "Làm sao reset mật khẩu EOS?\"}",
+      "speaker": "Vĩ",
+      "wav_file": "77.wav",
+      "wav_exists": true
+    },
+    {
+      "excel_row": 78,
+      "question": "Làm sao đổi tài khoản Microsoft?\"}",
+      "speaker": "Vĩ",
+      "wav_file": "78.wav",
+      "wav_exists": true
+    },
+    {
+      "excel_row": 79,
+      "question": "Sinh viên quên mật khẩu đăng nhập EOS/PEA thì giám thị xử lý thế nào?\"}",
+      "speaker": "Vĩ",
+      "wav_file": "79.wav",
+      "wav_exists": true
+    },
+    {
+      "excel_row": 80,
+      "question": "Tài khoản thi EOS/PEA của sinh viên là tài khoản gì?\"}",
+      "speaker": "Vĩ",
+      "wav_file": "80.wav",
+      "wav_exists": true
+    },
+    {
+      "excel_row": 81,
+      "question": "Nếu sinh viên còn lưu thông tin tài khoản WiFi Student thì có cần reset pass không?\"}",
+      "speaker": "Vĩ",
+      "wav_file": "81.wav",
+      "wav_exists": true
+    },
+    {
+      "excel_row": 82,
+      "question": "Sinh viên quên luôn mật khẩu WiFi Student thì nên tìm lại ở đâu?\"}",
+      "speaker": "Vĩ",
+      "wav_file": "82.wav",
+      "wav_exists": true
+    },
+    {
+      "excel_row": 83,
+      "question": "Nếu sinh viên không lưu pass và không tìm lại được trong Gmail thì làm gì?\"}",
+      "speaker": "Vĩ",
+      "wav_file": "83.wav",
+      "wav_exists": true
+    },
+    {
+      "excel_row": 84,
+      "question": "Bước đầu tiên khi reset mật khẩu trên trang reset.fun.cantho là gì?\"}",
+      "speaker": "Vĩ",
+      "wav_file": "84.wav",
+      "wav_exists": true
+    },
+    {
+      "excel_row": 85,
+      "question": "Sau khi hệ thống gửi mật khẩu mới về email",
+      "speaker": "Vĩ",
+      "wav_file": "85.wav",
+      "wav_exists": true
+    },
+    {
+      "excel_row": 86,
+      "question": "Ở bước đổi mật khẩu mới",
+      "speaker": "Vĩ",
+      "wav_file": "86.wav",
+      "wav_exists": true
+    },
+    {
+      "excel_row": 87,
+      "question": "Sau khi đổi mật khẩu thành công",
+      "speaker": "Vĩ",
+      "wav_file": "87.wav",
+      "wav_exists": true
+    },
+    {
+      "excel_row": 88,
+      "question": "Giám thị cần nhắc sinh viên lưu thông tin tài khoản ở đâu?\"}",
+      "speaker": "Vĩ",
+      "wav_file": "88.wav",
+      "wav_exists": true
+    },
+    {
+      "excel_row": 89,
+      "question": "Sinh viên hỏi có thể reset mật khẩu EOS/PEA bằng trang nào?\"}",
+      "speaker": "Vĩ",
+      "wav_file": "89.wav",
+      "wav_exists": false
+    },
+    {
+      "excel_row": 90,
+      "question": "Khi reset pass",
+      "speaker": "Vĩ",
+      "wav_file": "90.wav",
+      "wav_exists": true
+    },
+    {
+      "excel_row": 91,
+      "question": "Nếu sinh viên đổi mật khẩu xong nhưng chưa thấy thông báo thành công thì có thể kết luận đã đổi xong chưa?\"}",
+      "speaker": "Vĩ",
+      "wav_file": "91.wav",
+      "wav_exists": true
+    },
+    {
+      "excel_row": 92,
+      "question": "Giám thị có được tự tạo tài khoản mới cho sinh viên không?\"}",
+      "speaker": "Vĩ",
+      "wav_file": "92.wav",
+      "wav_exists": true
+    },
+    {
+      "excel_row": 93,
+      "question": "Sinh viên quên mật khẩu nhưng không có email đăng ký với trường thì xử lý thế nào?\"}",
+      "speaker": "Vĩ",
+      "wav_file": "93.wav",
+      "wav_exists": true
+    },
+    {
+      "excel_row": 94,
+      "question": "Tài khoản EOS/PEA của sinh viên là tài khoản gì?\"}",
+      "speaker": "Vĩ",
+      "wav_file": "94.wav",
+      "wav_exists": true
+    },
+    {
+      "excel_row": 95,
+      "question": "Khi sinh viên báo quên mật khẩu",
+      "speaker": "Vĩ",
+      "wav_file": "95.wav",
+      "wav_exists": true
+    },
+    {
+      "excel_row": 96,
+      "question": "Nếu sinh viên còn lưu thông tin tài khoản WiFi Student thì làm gì?\"}",
+      "speaker": "Vĩ",
+      "wav_file": "96.wav",
+      "wav_exists": true
+    },
+    {
+      "excel_row": 97,
+      "question": "Nếu sinh viên quên pass Student thì có thể tìm ở đâu?\"}",
+      "speaker": "Vĩ",
+      "wav_file": "97.wav",
+      "wav_exists": true
+    },
+    {
+      "excel_row": 98,
+      "question": "Nên tìm kiếm những từ khóa nào trong Gmail?\"}",
+      "speaker": "Vĩ",
+      "wav_file": "98.wav",
+      "wav_exists": true
+    },
+    {
+      "excel_row": 99,
+      "question": "Giám thị nên nhắc sinh viên lưu thông tin ở đâu?\"}",
+      "speaker": "Vĩ",
+      "wav_file": "99.wav",
+      "wav_exists": true
+    },
+    {
+      "excel_row": 100,
+      "question": "Vì sao nên lưu thông tin trên Notepad hoặc Word?\"}",
+      "speaker": "Vĩ",
+      "wav_file": "100.wav",
+      "wav_exists": true
+    },
+    {
+      "excel_row": 101,
+      "question": "Nếu không tìm lại được mật khẩu thì làm gì?\"}",
+      "speaker": "Toàn",
+      "wav_file": "101.wav",
+      "wav_exists": true
+    },
+    {
+      "excel_row": 102,
+      "question": "Bước 1 của quy trình reset là gì?\"}",
+      "speaker": "Toàn",
+      "wav_file": "102.wav",
+      "wav_exists": true
+    },
+    {
+      "excel_row": 103,
+      "question": "Sau khi nhập thông tin ở bước 1 điều gì xảy ra?\"}",
+      "speaker": "Toàn",
+      "wav_file": "103.wav",
+      "wav_exists": true
+    },
+    {
+      "excel_row": 104,
+      "question": "Mật khẩu mới được gửi đến đâu?\"}",
+      "speaker": "Toàn",
+      "wav_file": "104.wav",
+      "wav_exists": true
+    },
+    {
+      "excel_row": 105,
+      "question": "Sau khi nhận email cần làm gì?\"}",
+      "speaker": "Toàn",
+      "wav_file": "105.wav",
+      "wav_exists": true
+    },
+    {
+      "excel_row": 106,
+      "question": "Bước 2 của quy trình reset là gì?\"}",
+      "speaker": "Toàn",
+      "wav_file": "106.wav",
+      "wav_exists": true
+    },
+    {
+      "excel_row": 107,
+      "question": "Ở bước 2 cần nhập mật khẩu nào?\"}",
+      "speaker": "Toàn",
+      "wav_file": "107.wav",
+      "wav_exists": true
+    },
+    {
+      "excel_row": 108,
+      "question": "Sau khi bấm Enter ở bước 2 nhận được gì?\"}",
+      "speaker": "Toàn",
+      "wav_file": "108.wav",
+      "wav_exists": true
+    },
+    {
+      "excel_row": 109,
+      "question": "Sau khi đổi thành công dùng mật khẩu mới ở đâu?\"}",
+      "speaker": "Toàn",
+      "wav_file": "109.wav",
+      "wav_exists": true
+    },
+    {
+      "excel_row": 110,
+      "question": "Trang web reset mật khẩu là gì?\"}",
+      "speaker": "Toàn",
+      "wav_file": "110.wav",
+      "wav_exists": true
+    },
+    {
+      "excel_row": 111,
+      "question": "Email nào được dùng trong quy trình reset?\"}",
+      "speaker": "Toàn",
+      "wav_file": "111.wav",
+      "wav_exists": true
+    },
+    {
+      "excel_row": 112,
+      "question": "Nếu sinh viên không nhớ pass nhưng còn Gmail thì làm gì?\"}",
+      "speaker": "Toàn",
+      "wav_file": "112.wav",
+      "wav_exists": true
+    },
+    {
+      "excel_row": 113,
+      "question": "Thông tin nào cần nhập trên trang reset?\"}",
+      "speaker": "Toàn",
+      "wav_file": "113.wav",
+      "wav_exists": true
+    },
+    {
+      "excel_row": 114,
+      "question": "Tên tài khoản ví dụ trong tài liệu là gì?\"}",
+      "speaker": "Toàn",
+      "wav_file": "114.wav",
+      "wav_exists": true
+    },
+    {
+      "excel_row": 115,
+      "question": "Mật khẩu mới đầu tiên lấy từ đâu?\"}",
+      "speaker": "Toàn",
+      "wav_file": "115.wav",
+      "wav_exists": true
+    },
+    {
+      "excel_row": 116,
+      "question": "Sau khi nhận pass từ email thì làm gì tiếp?\"}",
+      "speaker": "Toàn",
+      "wav_file": "116.wav",
+      "wav_exists": true
+    },
+    {
+      "excel_row": 117,
+      "question": "Sinh viên cần đặt mật khẩu mới theo quy tắc nào?\"}",
+      "speaker": "Toàn",
+      "wav_file": "117.wav",
+      "wav_exists": true
+    },
+    {
+      "excel_row": 118,
+      "question": "Sau khi đặt mật khẩu mới cần làm gì?\"}",
+      "speaker": "Toàn",
+      "wav_file": "118.wav",
+      "wav_exists": true
+    },
+    {
+      "excel_row": 119,
+      "question": "Thông báo nào xác nhận đổi pass thành công?\"}",
+      "speaker": "Toàn",
+      "wav_file": "119.wav",
+      "wav_exists": true
+    },
+    {
+      "excel_row": 120,
+      "question": "Nếu sinh viên còn nhớ tài khoản nhưng quên pass thì có thể reset không?\"}",
+      "speaker": "Toàn",
+      "wav_file": "120.wav",
+      "wav_exists": true
+    },
+    {
+      "excel_row": 121,
+      "question": "Giám thị hỗ trợ sinh viên bằng cách nào khi quên pass?\"}",
+      "speaker": "Toàn",
+      "wav_file": "121.wav",
+      "wav_exists": true
+    },
+    {
+      "excel_row": 122,
+      "question": "Tài khoản WiFi Student liên quan gì đến EOS/PEA?\"}",
+      "speaker": "Toàn",
+      "wav_file": "122.wav",
+      "wav_exists": true
+    },
+    {
+      "excel_row": 123,
+      "question": "Sau khi đổi pass thành công có dùng được cho WiFi Students không?\"}",
+      "speaker": "Toàn",
+      "wav_file": "123.wav",
+      "wav_exists": true
+    },
+    {
+      "excel_row": 124,
+      "question": "Gmail dùng để làm gì trong hướng dẫn này?\"}",
+      "speaker": "Toàn",
+      "wav_file": "124.wav",
+      "wav_exists": true
+    },
+    {
+      "excel_row": 125,
+      "question": "Nếu sinh viên không lưu thông tin tài khoản thì bước tiếp theo là gì?\"}",
+      "speaker": "Toàn",
+      "wav_file": "125.wav",
+      "wav_exists": true
+    },
+    {
+      "excel_row": 126,
+      "question": "Hệ thống tự động gửi gì sau bước 1?\"}",
+      "speaker": "Toàn",
+      "wav_file": "126.wav",
+      "wav_exists": true
+    },
+    {
+      "excel_row": 127,
+      "question": "Mật khẩu nhận từ email có phải mật khẩu cuối cùng không?\"}",
+      "speaker": "Toàn",
+      "wav_file": "127.wav",
+      "wav_exists": true
+    },
+    {
+      "excel_row": 128,
+      "question": "Đăng nhập vào EOS bằng mật khẩu nào sau khi reset?\"}",
+      "speaker": "Toàn",
+      "wav_file": "128.wav",
+      "wav_exists": true
+    },
+    {
+      "excel_row": 129,
+      "question": "Đăng nhập WiFi Students bằng mật khẩu nào?\"}",
+      "speaker": "Toàn",
+      "wav_file": "129.wav",
+      "wav_exists": true
+    },
+    {
+      "excel_row": 130,
+      "question": "Mục đích của trang reset.fun.cantho là gì?\"}",
+      "speaker": "Toàn",
+      "wav_file": "130.wav",
+      "wav_exists": true
+    },
+    {
+      "excel_row": 131,
+      "question": "Nếu sinh viên có file lưu tài khoản thì cần reset không?\"}",
+      "speaker": "Toàn",
+      "wav_file": "131.wav",
+      "wav_exists": true
+    },
+    {
+      "excel_row": 132,
+      "question": "Những từ khóa tìm kiếm trong Gmail nhằm mục đích gì?\"}",
+      "speaker": "Toàn",
+      "wav_file": "132.wav",
+      "wav_exists": true
+    },
+    {
+      "excel_row": 133,
+      "question": "Sau khi đổi pass thành công",
+      "speaker": "Toàn",
+      "wav_file": "133.wav",
+      "wav_exists": true
+    },
+    {
+      "excel_row": 134,
+      "question": "Ai hướng dẫn sinh viên thực hiện reset?\"}",
+      "speaker": "Toàn",
+      "wav_file": "134.wav",
+      "wav_exists": true
+    },
+    {
+      "excel_row": 135,
+      "question": "Điều kiện để nhận được email chứa pass mới là gì?\"}",
+      "speaker": "Toàn",
+      "wav_file": "135.wav",
+      "wav_exists": true
+    },
+    {
+      "excel_row": 136,
+      "question": "Bước nào yêu cầu kiểm tra email?\"}",
+      "speaker": "Toàn",
+      "wav_file": "136.wav",
+      "wav_exists": true
+    },
+    {
+      "excel_row": 137,
+      "question": "Bước nào yêu cầu nhập lại mật khẩu mới?\"}",
+      "speaker": "Toàn",
+      "wav_file": "137.wav",
+      "wav_exists": true
+    },
+    {
+      "excel_row": 138,
+      "question": "Thông tin nên lưu để tránh quên pass lần sau là gì?\"}",
+      "speaker": "Toàn",
+      "wav_file": "138.wav",
+      "wav_exists": true
+    },
+    {
+      "excel_row": 139,
+      "question": "Làm sao cài lại Windows?\"}",
+      "speaker": "Toàn",
+      "wav_file": "139.wav",
+      "wav_exists": true
+    },
+    {
+      "excel_row": 140,
+      "question": "Làm sao đổi tên WiFi?\"}",
+      "speaker": "Toàn",
+      "wav_file": "140.wav",
+      "wav_exists": true
+    },
+    {
+      "excel_row": 141,
+      "question": "Làm sao cấu hình IP tĩnh?\"}",
+      "speaker": "Toàn",
+      "wav_file": "141.wav",
+      "wav_exists": true
+    },
+    {
+      "excel_row": 142,
+      "question": "Làm sao cài driver mạng?\"}",
+      "speaker": "Toàn",
+      "wav_file": "142.wav",
+      "wav_exists": true
+    },
+    {
+      "excel_row": 143,
+      "question": "Làm sao kết nối Bluetooth?\"}",
+      "speaker": "Toàn",
+      "wav_file": "143.wav",
+      "wav_exists": true
+    },
+    {
+      "excel_row": 144,
+      "question": "Làm sao thay đổi email trường?\"}",
+      "speaker": "Toàn",
+      "wav_file": "144.wav",
+      "wav_exists": true
+    },
+    {
+      "excel_row": 145,
+      "question": "Làm sao xóa tài khoản EOS?\"}",
+      "speaker": "Toàn",
+      "wav_file": "145.wav",
+      "wav_exists": true
+    },
+    {
+      "excel_row": 146,
+      "question": "Làm sao tạo tài khoản WiFi Student mới?\"}",
+      "speaker": "Toàn",
+      "wav_file": "146.wav",
+      "wav_exists": true
+    },
+    {
+      "excel_row": 147,
+      "question": "Làm sao nâng cấp tài khoản Coursera?\"}",
+      "speaker": "Toàn",
+      "wav_file": "147.wav",
+      "wav_exists": true
+    },
+    {
+      "excel_row": 148,
+      "question": "Làm sao cài phần mềm EOS?\"}",
+      "speaker": "Toàn",
+      "wav_file": "148.wav",
+      "wav_exists": true
+    },
+    {
+      "excel_row": 149,
+      "question": "Làm sao kiểm tra tốc độ Internet?\"}",
+      "speaker": "Toàn",
+      "wav_file": "149.wav",
+      "wav_exists": true
+    },
+    {
+      "excel_row": 150,
+      "question": "Làm sao sửa lỗi DNS?\"}",
+      "speaker": "Toàn",
+      "wav_file": "150.wav",
+      "wav_exists": true
+    },
+    {
+      "excel_row": 151,
+      "question": "Forget WiFi dùng để làm gì?\"}",
+      "speaker": "Toàn",
+      "wav_file": "151.wav",
+      "wav_exists": true
+    },
+    {
+      "excel_row": 152,
+      "question": "Bước đầu tiên để Forget WiFi là gì?\"}",
+      "speaker": "Toàn",
+      "wav_file": "152.wav",
+      "wav_exists": true
+    },
+    {
+      "excel_row": 153,
+      "question": "Sau khi mở Settings thì chọn mục nào?\"}",
+      "speaker": "Toàn",
+      "wav_file": "153.wav",
+      "wav_exists": true
+    },
+    {
+      "excel_row": 154,
+      "question": "Có thể vào Network & Internet bằng cách khác không?\"}",
+      "speaker": "Toàn",
+      "wav_file": "154.wav",
+      "wav_exists": true
+    },
+    {
+      "excel_row": 155,
+      "question": "Để xem danh sách WiFi đã lưu thì vào đâu?\"}",
+      "speaker": "Toàn",
+      "wav_file": "155.wav",
+      "wav_exists": true
+    },
+    {
+      "excel_row": 156,
+      "question": "Làm sao để xóa một mạng WiFi đã lưu?\"}",
+      "speaker": "Toàn",
+      "wav_file": "156.wav",
+      "wav_exists": true
+    },
+    {
+      "excel_row": 157,
+      "question": "Trong kỳ thi được phép giữ lại mạng nào?\"}",
+      "speaker": "Toàn",
+      "wav_file": "157.wav",
+      "wav_exists": true
+    },
+    {
+      "excel_row": 158,
+      "question": "Giám thị cần kiểm tra tình trạng Forget WiFi khi nào?\"}",
+      "speaker": "Toàn",
+      "wav_file": "158.wav",
+      "wav_exists": true
+    },
+    {
+      "excel_row": 159,
+      "question": "Nếu sinh viên giữ lại WiFi khác ngoài FU-Exam thì sao?\"}",
+      "speaker": "Toàn",
+      "wav_file": "159.wav",
+      "wav_exists": true
+    },
+    {
+      "excel_row": 160,
+      "question": "Nếu sinh viên cố tình không forget WiFi và máy tự chuyển sang mạng khác thì sao?\"}",
+      "speaker": "Toàn",
+      "wav_file": "160.wav",
+      "wav_exists": true
+    },
+    {
+      "excel_row": 161,
+      "question": "Nếu có quá nhiều mạng WiFi thì xử lý thế nào?\"}",
+      "speaker": "Toàn",
+      "wav_file": "161.wav",
+      "wav_exists": true
+    },
+    {
+      "excel_row": 162,
+      "question": "Lệnh nào dùng để xóa toàn bộ hồ sơ WiFi?\"}",
+      "speaker": "Toàn",
+      "wav_file": "162.wav",
+      "wav_exists": true
+    },
+    {
+      "excel_row": 163,
+      "question": "Command Prompt cần mở bằng quyền gì?\"}",
+      "speaker": "Toàn",
+      "wav_file": "163.wav",
+      "wav_exists": true
+    },
+    {
+      "excel_row": 164,
+      "question": "Có được giữ lại WiFi Student cùng với FU-Exam không?\"}",
+      "speaker": "Toàn",
+      "wav_file": "164.wav",
+      "wav_exists": true
+    },
+    {
+      "excel_row": 165,
+      "question": "Nếu lệnh xóa WiFi không hoạt động thì làm gì?\"}",
+      "speaker": "Toàn",
+      "wav_file": "165.wav",
+      "wav_exists": true
+    },
+    {
+      "excel_row": 166,
+      "question": "Giám thị có được đổi mật khẩu WiFi cho sinh viên không?\"}",
+      "speaker": "Trí",
+      "wav_file": "166.wav",
+      "wav_exists": true
+    },
+    {
+      "excel_row": 167,
+      "question": "Có thể mở Settings bằng cách nào?\"}",
+      "speaker": "Trí",
+      "wav_file": "167.wav",
+      "wav_exists": true
+    },
+    {
+      "excel_row": 168,
+      "question": "Windows + I dùng để làm gì?\"}",
+      "speaker": "Trí",
+      "wav_file": "168.wav",
+      "wav_exists": true
+    },
+    {
+      "excel_row": 169,
+      "question": "Biểu tượng Settings có hình gì?\"}",
+      "speaker": "Trí",
+      "wav_file": "169.wav",
+      "wav_exists": true
+    },
+    {
+      "excel_row": 170,
+      "question": "Sau khi mở Settings cần chọn gì?\"}",
+      "speaker": "Trí",
+      "wav_file": "170.wav",
+      "wav_exists": true
+    },
+    {
+      "excel_row": 171,
+      "question": "Network & Internet nằm ở đâu?\"}",
+      "speaker": "Trí",
+      "wav_file": "171.wav",
+      "wav_exists": true
+    },
+    {
+      "excel_row": 172,
+      "question": "Có thể truy cập Network & Internet từ đâu?\"}",
+      "speaker": "Trí",
+      "wav_file": "172.wav",
+      "wav_exists": true
+    },
+    {
+      "excel_row": 173,
+      "question": "Biểu tượng quả cầu xuất hiện khi nào?\"}",
+      "speaker": "Trí",
+      "wav_file": "173.wav",
+      "wav_exists": true
+    },
+    {
+      "excel_row": 174,
+      "question": "Bước 3 của quy trình là gì?\"}",
+      "speaker": "Trí",
+      "wav_file": "174.wav",
+      "wav_exists": true
+    },
+    {
+      "excel_row": 175,
+      "question": "Manage known networks dùng để làm gì?\"}",
+      "speaker": "Trí",
+      "wav_file": "175.wav",
+      "wav_exists": true
+    },
+    {
+      "excel_row": 176,
+      "question": "Danh sách nào xuất hiện trong Manage known networks?\"}",
+      "speaker": "Trí",
+      "wav_file": "176.wav",
+      "wav_exists": true
+    },
+    {
+      "excel_row": 177,
+      "question": "Forget dùng để làm gì?\"}",
+      "speaker": "Trí",
+      "wav_file": "177.wav",
+      "wav_exists": true
+    },
+    {
+      "excel_row": 178,
+      "question": "Chỉ được giữ lại mạng nào?\"}",
+      "speaker": "Trí",
+      "wav_file": "178.wav",
+      "wav_exists": true
+    },
+    {
+      "excel_row": 179,
+      "question": "GT kiểm tra Forget WiFi khi nào?\"}",
+      "speaker": "Trí",
+      "wav_file": "179.wav",
+      "wav_exists": true
+    },
+    {
+      "excel_row": 180,
+      "question": "Sau khi sinh viên nộp bài cần kiểm tra ở đâu?\"}",
+      "speaker": "Trí",
+      "wav_file": "180.wav",
+      "wav_exists": true
+    },
+    {
+      "excel_row": 181,
+      "question": "Nếu giữ WiFi ngoài FU‑Exam thì sao?\"}",
+      "speaker": "Trí",
+      "wav_file": "181.wav",
+      "wav_exists": true
+    },
+    {
+      "excel_row": 182,
+      "question": "Khi nào lập biên bản đình chỉ?\"}",
+      "speaker": "Trí",
+      "wav_file": "182.wav",
+      "wav_exists": true
+    },
+    {
+      "excel_row": 183,
+      "question": "Khi nào dùng Command Prompt?\"}",
+      "speaker": "Trí",
+      "wav_file": "183.wav",
+      "wav_exists": true
+    },
+    {
+      "excel_row": 184,
+      "question": "Command Prompt mở bằng quyền gì?\"}",
+      "speaker": "Trí",
+      "wav_file": "184.wav",
+      "wav_exists": true
+    },
+    {
+      "excel_row": 185,
+      "question": "Gõ gì để mở Command Prompt?\"}",
+      "speaker": "Trí",
+      "wav_file": "185.wav",
+      "wav_exists": true
+    },
+    {
+      "excel_row": 186,
+      "question": "Lệnh nào xóa toàn bộ hồ sơ WiFi?\"}",
+      "speaker": "Trí",
+      "wav_file": "186.wav",
+      "wav_exists": true
+    },
+    {
+      "excel_row": 187,
+      "question": "Sau khi nhập lệnh cần làm gì?\"}",
+      "speaker": "Trí",
+      "wav_file": "187.wav",
+      "wav_exists": true
+    },
+    {
+      "excel_row": 188,
+      "question": "Lệnh netsh có tác dụng gì?\"}",
+      "speaker": "Trí",
+      "wav_file": "188.wav",
+      "wav_exists": true
+    },
+    {
+      "excel_row": 189,
+      "question": "Bước 1 của hướng dẫn Forget WiFi là gì?\"}",
+      "speaker": "Trí",
+      "wav_file": "189.wav",
+      "wav_exists": true
+    },
+    {
+      "excel_row": 190,
+      "question": "Bước 2 của hướng dẫn là gì?\"}",
+      "speaker": "Trí",
+      "wav_file": "190.wav",
+      "wav_exists": true
+    },
+    {
+      "excel_row": 191,
+      "question": "Bước 4 của hướng dẫn là gì?\"}",
+      "speaker": "Trí",
+      "wav_file": "191.wav",
+      "wav_exists": true
+    },
+    {
+      "excel_row": 192,
+      "question": "GT có thể truy cập Network & Internet settings từ đâu trên Taskbar?\"}",
+      "speaker": "Trí",
+      "wav_file": "192.wav",
+      "wav_exists": true
+    },
+    {
+      "excel_row": 193,
+      "question": "Wi‑Fi nằm ở đâu trong Settings?\"}",
+      "speaker": "Trí",
+      "wav_file": "193.wav",
+      "wav_exists": true
+    },
+    {
+      "excel_row": 194,
+      "question": "Sau khi chọn Wi‑Fi cần chọn gì?\"}",
+      "speaker": "Trí",
+      "wav_file": "194.wav",
+      "wav_exists": true
+    },
+    {
+      "excel_row": 195,
+      "question": "Mạng nào phải được xóa?\"}",
+      "speaker": "Trí",
+      "wav_file": "195.wav",
+      "wav_exists": true
+    },
+    {
+      "excel_row": 196,
+      "question": "Mục tiêu của Forget WiFi là gì?\"}",
+      "speaker": "Trí",
+      "wav_file": "196.wav",
+      "wav_exists": true
+    },
+    {
+      "excel_row": 197,
+      "question": "Nếu có quá nhiều mạng thì xử lý thế nào?\"}",
+      "speaker": "Trí",
+      "wav_file": "197.wav",
+      "wav_exists": true
+    },
+    {
+      "excel_row": 198,
+      "question": "Run as administrator dùng cho ứng dụng nào?\"}",
+      "speaker": "Trí",
+      "wav_file": "198.wav",
+      "wav_exists": true
+    },
+    {
+      "excel_row": 199,
+      "question": "Enter được nhấn ở bước nào của CMD?\"}",
+      "speaker": "Trí",
+      "wav_file": "199.wav",
+      "wav_exists": true
+    },
+    {
+      "excel_row": 200,
+      "question": "GT hành lang được báo khi nào?\"}",
+      "speaker": "Trí",
+      "wav_file": "200.wav",
+      "wav_exists": true
+    },
+    {
+      "excel_row": 201,
+      "question": "Có cần kiểm tra trước thi không?\"}",
+      "speaker": "Trí",
+      "wav_file": "201.wav",
+      "wav_exists": true
+    },
+    {
+      "excel_row": 202,
+      "question": "Có cần kiểm tra sau thi không?\"}",
+      "speaker": "Trí",
+      "wav_file": "202.wav",
+      "wav_exists": true
+    },
+    {
+      "excel_row": 203,
+      "question": "Forget nằm ở đâu?\"}",
+      "speaker": "Trí",
+      "wav_file": "203.wav",
+      "wav_exists": true
+    },
+    {
+      "excel_row": 204,
+      "question": "Mạng WiFi nào không được giữ lại?\"}",
+      "speaker": "Trí",
+      "wav_file": "204.wav",
+      "wav_exists": true
+    },
+    {
+      "excel_row": 205,
+      "question": "Sinh viên cố tình không Forget WiFi bị xử lý thế nào?\"}",
+      "speaker": "Trí",
+      "wav_file": "205.wav",
+      "wav_exists": true
+    },
+    {
+      "excel_row": 206,
+      "question": "Biểu tượng WiFi trên Taskbar dùng để làm gì?\"}",
+      "speaker": "Trí",
+      "wav_file": "206.wav",
+      "wav_exists": true
+    },
+    {
+      "excel_row": 207,
+      "question": "Start nằm ở đâu?\"}",
+      "speaker": "Trí",
+      "wav_file": "207.wav",
+      "wav_exists": true
+    },
+    {
+      "excel_row": 208,
+      "question": "Settings có thể mở bằng menu nào?\"}",
+      "speaker": "Trí",
+      "wav_file": "208.wav",
+      "wav_exists": true
+    },
+    {
+      "excel_row": 209,
+      "question": "Mục nào chứa Manage known networks?\"}",
+      "speaker": "Trí",
+      "wav_file": "209.wav",
+      "wav_exists": true
+    },
+    {
+      "excel_row": 210,
+      "question": "GT kiểm tra tình trạng gì trên máy sinh viên?\"}",
+      "speaker": "Trí",
+      "wav_file": "210.wav",
+      "wav_exists": true
+    },
+    {
+      "excel_row": 211,
+      "question": "Mục đích của lệnh netsh wlan delete profile là gì?\"}",
+      "speaker": "Trí",
+      "wav_file": "211.wav",
+      "wav_exists": true
+    },
+    {
+      "excel_row": 212,
+      "question": "Làm sao đổi mật khẩu WiFi?\"}",
+      "speaker": "Trí",
+      "wav_file": "212.wav",
+      "wav_exists": true
+    },
+    {
+      "excel_row": 213,
+      "question": "Làm sao reset modem?\"}",
+      "speaker": "Trí",
+      "wav_file": "213.wav",
+      "wav_exists": true
+    },
+    {
+      "excel_row": 214,
+      "question": "Làm sao cài driver WiFi?\"}",
+      "speaker": "Trí",
+      "wav_file": "214.wav",
+      "wav_exists": true
+    },
+    {
+      "excel_row": 215,
+      "question": "Làm sao đổi SSID?\"}",
+      "speaker": "Trí",
+      "wav_file": "215.wav",
+      "wav_exists": true
+    },
+    {
+      "excel_row": 216,
+      "question": "Làm sao cấu hình IP tĩnh?\"}",
+      "speaker": "Trí",
+      "wav_file": "216.wav",
+      "wav_exists": true
+    },
+    {
+      "excel_row": 217,
+      "question": "Làm sao tạo hotspot?\"}",
+      "speaker": "Trí",
+      "wav_file": "217.wav",
+      "wav_exists": true
+    },
+    {
+      "excel_row": 218,
+      "question": "Làm sao kết nối Bluetooth?\"}",
+      "speaker": "Trí",
+      "wav_file": "218.wav",
+      "wav_exists": true
+    },
+    {
+      "excel_row": 219,
+      "question": "Làm sao cài VPN?\"}",
+      "speaker": "Trí",
+      "wav_file": "219.wav",
+      "wav_exists": true
+    },
+    {
+      "excel_row": 220,
+      "question": "Làm sao sửa DNS?\"}",
+      "speaker": "Trí",
+      "wav_file": "220.wav",
+      "wav_exists": true
+    },
+    {
+      "excel_row": 221,
+      "question": "Làm sao cài lại Windows?\"}",
+      "speaker": "Trí",
+      "wav_file": "221.wav",
+      "wav_exists": true
+    },
+    {
+      "excel_row": 222,
+      "question": "Làm sao đổi mật khẩu Student?\"}",
+      "speaker": "Trí",
+      "wav_file": "222.wav",
+      "wav_exists": true
+    },
+    {
+      "excel_row": 223,
+      "question": "Làm sao cài EOS?\"}",
+      "speaker": "Trí",
+      "wav_file": "223.wav",
+      "wav_exists": true
+    },
+    {
+      "excel_row": 224,
+      "question": "Sinh viên cần làm gì trước khi đăng nhập bài thi viết Nhật?\"}",
+      "speaker": "Trí",
+      "wav_file": "224.wav",
+      "wav_exists": true
+    },
+    {
+      "excel_row": 225,
+      "question": "Làm sao để tắt bộ gõ tiếng Việt đang chạy?\"}",
+      "speaker": "Trí",
+      "wav_file": "225.wav",
+      "wav_exists": true
+    },
+    {
+      "excel_row": 226,
+      "question": "Sau khi tắt bộ gõ tiếng Việt",
+      "speaker": "Trí",
+      "wav_file": "226.wav",
+      "wav_exists": true
+    },
+    {
+      "excel_row": 227,
+      "question": "Bộ gõ tiếng Việt cần được chạy bằng quyền gì?\"}",
+      "speaker": "Trí",
+      "wav_file": "227.wav",
+      "wav_exists": true
+    },
+    {
+      "excel_row": 228,
+      "question": "Laptop của sinh viên cần cài sẵn gì cho phần thi viết Nhật?\"}",
+      "speaker": "Trí",
+      "wav_file": "228.wav",
+      "wav_exists": true
+    },
+    {
+      "excel_row": 229,
+      "question": "Trong phần mềm thi",
+      "speaker": "Trí",
+      "wav_file": "229.wav",
+      "wav_exists": true
+    },
+    {
+      "excel_row": 230,
+      "question": "Input mode để gõ chữ tiếng Nhật là gì?\"}",
+      "speaker": "Trí",
+      "wav_file": "230.wav",
+      "wav_exists": true
+    },
+    {
+      "excel_row": 231,
+      "question": "Làm sao để chuyển từ gõ tiếng Nhật sang tiếng Việt?\"}",
+      "speaker": "Khôi",
+      "wav_file": "231.wav",
+      "wav_exists": false
+    },
+    {
+      "excel_row": 232,
+      "question": "Lệnh nào dùng để chạy lại bộ gõ tiếng Việt?\"}",
+      "speaker": "Khôi",
+      "wav_file": "232.wav",
+      "wav_exists": false
+    },
+    {
+      "excel_row": 233,
+      "question": "Lệnh nào dùng để tắt Vietkey hoặc Unikey?\"}",
+      "speaker": "Khôi",
+      "wav_file": "233.wav",
+      "wav_exists": false
+    },
+    {
+      "excel_row": 234,
+      "question": "Font chữ nào cần có trên laptop sinh viên?\"}",
+      "speaker": "Khôi",
+      "wav_file": "234.wav",
+      "wav_exists": false
+    },
+    {
+      "excel_row": 235,
+      "question": "Nếu sinh viên muốn gõ tiếng Nhật trong phần mềm thi thì input mode phải là gì?\"}",
+      "speaker": "Khôi",
+      "wav_file": "235.wav",
+      "wav_exists": false
+    },
+    {
+      "excel_row": 236,
+      "question": "Nếu đang gõ tiếng Nhật mà muốn chuyển sang tiếng Việt thì chọn gì?\"}",
+      "speaker": "Khôi",
+      "wav_file": "236.wav",
+      "wav_exists": false
+    },
+    {
+      "excel_row": 237,
+      "question": "Nếu máy chưa cài bộ gõ tiếng Nhật thì xử lý thế nào?\"}",
+      "speaker": "Khôi",
+      "wav_file": "237.wav",
+      "wav_exists": false
+    },
+    {
+      "excel_row": 238,
+      "question": "Nếu chọn Close IME rồi vẫn không gõ được tiếng Việt thì làm gì?\"}",
+      "speaker": "Khôi",
+      "wav_file": "238.wav",
+      "wav_exists": false
+    },
+    {
+      "excel_row": 239,
+      "question": "Sinh viên có cần đổi mật khẩu để gõ được tiếng Nhật không?\"}",
+      "speaker": "Khôi",
+      "wav_file": "239.wav",
+      "wav_exists": false
+    },
+    {
+      "excel_row": 240,
+      "question": "Trước khi đăng nhập bài thi Nhật cần làm gì với bộ gõ tiếng Việt?\"}",
+      "speaker": "Khôi",
+      "wav_file": "240.wav",
+      "wav_exists": false
+    },
+    {
+      "excel_row": 241,
+      "question": "Bộ gõ tiếng Việt nào được nhắc đến trong hướng dẫn?\"}",
+      "speaker": "Khôi",
+      "wav_file": "241.wav",
+      "wav_exists": false
+    },
+    {
+      "excel_row": 242,
+      "question": "Thanh nào được mở để tắt bộ gõ tiếng Việt?\"}",
+      "speaker": "Khôi",
+      "wav_file": "242.wav",
+      "wav_exists": false
+    },
+    {
+      "excel_row": 243,
+      "question": "Cần click chuột như thế nào vào biểu tượng Vietkey hoặc Unikey?\"}",
+      "speaker": "Khôi",
+      "wav_file": "243.wav",
+      "wav_exists": false
+    },
+    {
+      "excel_row": 244,
+      "question": "Sau khi click chuột phải vào Vietkey hoặc Unikey cần chọn gì?\"}",
+      "speaker": "Khôi",
+      "wav_file": "244.wav",
+      "wav_exists": false
+    },
+    {
+      "excel_row": 245,
+      "question": "Mục đích của việc chọn Kết thúc là gì?\"}",
+      "speaker": "Khôi",
+      "wav_file": "245.wav",
+      "wav_exists": false
+    },
+    {
+      "excel_row": 246,
+      "question": "Sau khi tắt bộ gõ tiếng Việt cần làm gì tiếp theo?\"}",
+      "speaker": "Khôi",
+      "wav_file": "246.wav",
+      "wav_exists": false
+    },
+    {
+      "excel_row": 247,
+      "question": "Bộ gõ tiếng Việt cần được chạy bằng quyền gì?\"}",
+      "speaker": "Khôi",
+      "wav_file": "247.wav",
+      "wav_exists": false
+    },
+    {
+      "excel_row": 248,
+      "question": "Tùy chọn nào dùng để chạy bộ gõ bằng quyền Admin?\"}",
+      "speaker": "Khôi",
+      "wav_file": "248.wav",
+      "wav_exists": false
+    },
+    {
+      "excel_row": 249,
+      "question": "Run as administrator được dùng ở bước nào?\"}",
+      "speaker": "Khôi",
+      "wav_file": "249.wav",
+      "wav_exists": false
+    },
+    {
+      "excel_row": 250,
+      "question": "Laptop sinh viên cần cài sẵn font chữ nào?\"}",
+      "speaker": "Khôi",
+      "wav_file": "250.wav",
+      "wav_exists": false
+    },
+    {
+      "excel_row": 251,
+      "question": "Ngoài font chữ MS Mincho",
+      "speaker": "Khôi",
+      "wav_file": "251.wav",
+      "wav_exists": false
+    },
+    {
+      "excel_row": 252,
+      "question": "Trong phần mềm thi cần chuyển sang bộ gõ nào?\"}",
+      "speaker": "Khôi",
+      "wav_file": "252.wav",
+      "wav_exists": false
+    },
+    {
+      "excel_row": 253,
+      "question": "Input mode nào được sử dụng để gõ tiếng Nhật?\"}",
+      "speaker": "Khôi",
+      "wav_file": "253.wav",
+      "wav_exists": false
+    },
+    {
+      "excel_row": 254,
+      "question": "Hiragana được dùng để làm gì?\"}",
+      "speaker": "Khôi",
+      "wav_file": "254.wav",
+      "wav_exists": false
+    },
+    {
+      "excel_row": 255,
+      "question": "Sinh viên cần chuyển sang bộ gõ nào để gõ tiếng Nhật?\"}",
+      "speaker": "Khôi",
+      "wav_file": "255.wav",
+      "wav_exists": false
+    },
+    {
+      "excel_row": 256,
+      "question": "Muốn gõ chữ tiếng Nhật cần thiết lập gì?\"}",
+      "speaker": "Khôi",
+      "wav_file": "256.wav",
+      "wav_exists": false
+    },
+    {
+      "excel_row": 257,
+      "question": "Khi đang ở chế độ gõ tiếng Nhật muốn chuyển sang tiếng Việt thì làm sao?\"}",
+      "speaker": "Khôi",
+      "wav_file": "257.wav",
+      "wav_exists": false
+    },
+    {
+      "excel_row": 258,
+      "question": "Close IME dùng để làm gì?\"}",
+      "speaker": "Khôi",
+      "wav_file": "258.wav",
+      "wav_exists": false
+    },
+    {
+      "excel_row": 259,
+      "question": "Cần click chuột phải ở đâu để chọn Close IME?\"}",
+      "speaker": "Khôi",
+      "wav_file": "259.wav",
+      "wav_exists": false
+    },
+    {
+      "excel_row": 260,
+      "question": "Close IME xuất hiện ở đâu?\"}",
+      "speaker": "Khôi",
+      "wav_file": "260.wav",
+      "wav_exists": false
+    },
+    {
+      "excel_row": 261,
+      "question": "Bước đầu tiên trước khi thi viết Nhật là gì?\"}",
+      "speaker": "Khôi",
+      "wav_file": "261.wav",
+      "wav_exists": false
+    },
+    {
+      "excel_row": 262,
+      "question": "Taskbar nằm ở đâu theo hướng dẫn?\"}",
+      "speaker": "Khôi",
+      "wav_file": "262.wav",
+      "wav_exists": false
+    },
+    {
+      "excel_row": 263,
+      "question": "Có cần tắt Unikey trước khi vào bài thi không?\"}",
+      "speaker": "Khôi",
+      "wav_file": "263.wav",
+      "wav_exists": false
+    },
+    {
+      "excel_row": 264,
+      "question": "Có cần tắt Vietkey trước khi vào bài thi không?\"}",
+      "speaker": "Khôi",
+      "wav_file": "264.wav",
+      "wav_exists": false
+    },
+    {
+      "excel_row": 265,
+      "question": "Sau khi chọn Kết thúc thì bộ gõ tiếng Việt ở trạng thái nào?\"}",
+      "speaker": "Khôi",
+      "wav_file": "265.wav",
+      "wav_exists": false
+    },
+    {
+      "excel_row": 266,
+      "question": "Mật khẩu của FU-Exam là gì?",
+      "speaker": "Khôi",
+      "wav_file": "266.wav",
+      "wav_exists": false
+    },
+    {
+      "excel_row": 267,
+      "question": "Checkout ở đâu?",
+      "speaker": "Khôi",
+      "wav_file": "267.wav",
+      "wav_exists": false
+    },
+    {
+      "excel_row": 268,
+      "question": "MS Mincho có vai trò gì trong hướng dẫn?\"}",
+      "speaker": "Khôi",
+      "wav_file": "268.wav",
+      "wav_exists": false
+    },
+    {
+      "excel_row": 269,
+      "question": "Bộ gõ tiếng Nhật có vai trò gì?\"}",
+      "speaker": "Khôi",
+      "wav_file": "269.wav",
+      "wav_exists": false
+    },
+    {
+      "excel_row": 270,
+      "question": "Trong phần mềm thi có cần dùng bộ gõ tiếng Việt để gõ tiếng Nhật không?\"}",
+      "speaker": "Khôi",
+      "wav_file": "270.wav",
+      "wav_exists": false
+    },
+    {
+      "excel_row": 271,
+      "question": "Muốn chuyển lại tiếng Việt sau khi gõ tiếng Nhật thì chọn gì?\"}",
+      "speaker": "Khôi",
+      "wav_file": "271.wav",
+      "wav_exists": false
+    },
+    {
+      "excel_row": 272,
+      "question": "Close IME được chọn bằng thao tác nào?\"}",
+      "speaker": "Khôi",
+      "wav_file": "272.wav",
+      "wav_exists": false
+    },
+    {
+      "excel_row": 273,
+      "question": "Hướng dẫn này áp dụng cho phần thi nào?\"}",
+      "speaker": "Khôi",
+      "wav_file": "273.wav",
+      "wav_exists": false
+    },
+    {
+      "excel_row": 274,
+      "question": "Sinh viên cần chuẩn bị gì về phần mềm trước khi thi viết Nhật?\"}",
+      "speaker": "Khôi",
+      "wav_file": "274.wav",
+      "wav_exists": false
+    },
+    {
+      "excel_row": 275,
+      "question": "Sinh viên cần chuẩn bị gì về font chữ?\"}",
+      "speaker": "Khôi",
+      "wav_file": "275.wav",
+      "wav_exists": false
+    },
+    {
+      "excel_row": 276,
+      "question": "Bộ gõ tiếng Việt được khởi động lại khi nào?\"}",
+      "speaker": "Khôi",
+      "wav_file": "276.wav",
+      "wav_exists": false
+    },
+    {
+      "excel_row": 277,
+      "question": "Nếu muốn nhập tiếng Nhật thì nên chọn chế độ nào?\"}",
+      "speaker": "Khôi",
+      "wav_file": "277.wav",
+      "wav_exists": false
+    },
+    {
+      "excel_row": 278,
+      "question": "Sau khi chuyển sang Hiragana có thể làm gì?\"}",
+      "speaker": "Khôi",
+      "wav_file": "278.wav",
+      "wav_exists": false
+    },
+    {
+      "excel_row": 279,
+      "question": "Hướng dẫn có yêu cầu cài sẵn bộ gõ tiếng Nhật không?\"}",
+      "speaker": "Khôi",
+      "wav_file": "279.wav",
+      "wav_exists": false
+    },
+    {
+      "excel_row": 280,
+      "question": "Trước khi chọn Close IME cần ở chế độ nào?\"}",
+      "speaker": "Khôi",
+      "wav_file": "280.wav",
+      "wav_exists": false
+    },
+    {
+      "excel_row": 281,
+      "question": "Mục đích của hướng dẫn là gì?\"}",
+      "speaker": "Khôi",
+      "wav_file": "281.wav",
+      "wav_exists": false
+    },
+    {
+      "excel_row": 282,
+      "question": "Sinh viên cần thao tác với Unikey như thế nào trước khi thi?\"}",
+      "speaker": "Khôi",
+      "wav_file": "282.wav",
+      "wav_exists": false
+    },
+    {
+      "excel_row": 283,
+      "question": "Sinh viên cần thao tác với Vietkey như thế nào trước khi thi?\"}",
+      "speaker": "Khôi",
+      "wav_file": "283.wav",
+      "wav_exists": false
+    },
+    {
+      "excel_row": 284,
+      "question": "Input mode được nhắc đến trong hướng dẫn là gì?\"}",
+      "speaker": "Khôi",
+      "wav_file": "284.wav",
+      "wav_exists": false
+    },
+    {
+      "excel_row": 285,
+      "question": "Sau khi hoàn tất cài đặt có thể gõ loại ngôn ngữ nào?\"}",
+      "speaker": "Khôi",
+      "wav_file": "285.wav",
+      "wav_exists": false
+    },
+    {
+      "excel_row": 286,
+      "question": "Để quay lại gõ tiếng Việt cần sử dụng tính năng nào?\"}",
+      "speaker": "Khôi",
+      "wav_file": "286.wav",
+      "wav_exists": false
+    },
+    {
+      "excel_row": 287,
+      "question": "Close IME giúp chuyển giữa những ngôn ngữ nào?\"}",
+      "speaker": "Khôi",
+      "wav_file": "287.wav",
+      "wav_exists": false
+    },
+    {
+      "excel_row": 288,
+      "question": "Đổi mật khẩu WiFi Student?\"}",
+      "speaker": "Khôi",
+      "wav_file": "288.wav",
+      "wav_exists": false
+    },
+    {
+      "excel_row": 289,
+      "question": "Reset mật khẩu EOS?\"}",
+      "speaker": "Khôi",
+      "wav_file": "289.wav",
+      "wav_exists": false
+    },
+    {
+      "excel_row": 290,
+      "question": "Cài đặt Coursera?\"}",
+      "speaker": "Khôi",
+      "wav_file": "290.wav",
+      "wav_exists": false
+    },
+    {
+      "excel_row": 291,
+      "question": "Kết nối FU-Exam?\"}",
+      "speaker": "Khôi",
+      "wav_file": "291.wav",
+      "wav_exists": false
+    },
+    {
+      "excel_row": 292,
+      "question": "Nộp bài trên E360?\"}",
+      "speaker": "Khôi",
+      "wav_file": "292.wav",
+      "wav_exists": false
+    },
+    {
+      "excel_row": 293,
+      "question": "Cài driver âm thanh?\"}",
+      "speaker": "Khôi",
+      "wav_file": "293.wav",
+      "wav_exists": false
+    },
+    {
+      "excel_row": 294,
+      "question": "Đăng nhập Google?\"}",
+      "speaker": "Khôi",
+      "wav_file": "294.wav",
+      "wav_exists": false
+    },
+    {
+      "excel_row": 295,
+      "question": "Đổi mật khẩu Gmail?\"}",
+      "speaker": "Khôi",
+      "wav_file": "295.wav",
+      "wav_exists": false
+    },
+    {
+      "excel_row": 296,
+      "question": "Tạo hotspot WiFi?\"}",
+      "speaker": "Khôi",
+      "wav_file": "296.wav",
+      "wav_exists": false
+    },
+    {
+      "excel_row": 297,
+      "question": "Cấu hình IP tĩnh?\"}",
+      "speaker": "Khôi",
+      "wav_file": "297.wav",
+      "wav_exists": false
+    },
+    {
+      "excel_row": 298,
+      "question": "Sửa lỗi DNS?\"}",
+      "speaker": "Khôi",
+      "wav_file": "298.wav",
+      "wav_exists": false
+    },
+    {
+      "excel_row": 299,
+      "question": "Cài lại Windows?\"}",
+      "speaker": "Khôi",
+      "wav_file": "299.wav",
+      "wav_exists": false
+    }
+  ]
+}

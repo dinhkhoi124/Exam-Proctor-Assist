@@ -18,6 +18,17 @@ OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
 if not OPENAI_API_KEY:
     raise RuntimeError("OPENAI_API_KEY is not set in .env")
 
+VOICE_PIPELINE_MODE = os.getenv("VOICE_PIPELINE_MODE", "baseline").strip().lower()
+if VOICE_PIPELINE_MODE not in {"baseline", "corrected"}:
+    raise RuntimeError(
+        "VOICE_PIPELINE_MODE must be either 'baseline' or 'corrected'"
+    )
+
+ASR_CORRECTION_MODEL = os.getenv("ASR_CORRECTION_MODEL", "gpt-4o-mini")
+ASR_CORRECTION_TIMEOUT_SECONDS = float(
+    os.getenv("ASR_CORRECTION_TIMEOUT_SECONDS", "30")
+)
+
 BASE_DIR = os.path.dirname(os.path.dirname(__file__))
 
 RAG_DATA_DIR = os.path.join(BASE_DIR, "rag", "data")

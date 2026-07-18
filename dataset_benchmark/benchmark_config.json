@@ -1,0 +1,48 @@
+{
+  "manifest": "dataset_benchmark/manifest.csv",
+  "ground_truth": "dataset_benchmark/AUDIO_299.xlsx",
+  "audio_dir": "dataset_benchmark/Audio_wav-20260708T055213Z-3-001/Audio_wav",
+  "output_dir": "dataset_benchmark/benchmark_outputs",
+  "annotation_dir": "dataset_benchmark/annotations",
+  "top_k": 15,
+  "use_rerank": false,
+  "retry_attempts": 3,
+  "retry_base_delay_seconds": 1.0,
+  "split_seed": 42,
+  "human_subset_seed": 43,
+  "bootstrap_iterations": 10000,
+  "dataset": {
+    "version": "v1-aligned-101-230",
+    "eligible_audio_id_start": 101,
+    "eligible_audio_id_end": 230,
+    "eligible_samples": 130,
+    "dev_samples": 26,
+    "test_samples": 104,
+    "human_eval_samples": 60,
+    "alignment_validation_seed": 44,
+    "alignment_validation_samples": 20,
+    "alignment_validation_mean_wer": 0.0825564713064713
+  },
+  "prompt_lock": {
+    "status": "locked",
+    "locked_at": "2026-07-14",
+    "sha256": "9ea1a085b9887dba7781a7fb620063e70325891edadad6dbcc94e798be7bde1d",
+    "validated_dev_samples": 26,
+    "test_results_seen_at_lock": false
+  },
+  "pricing": {
+    "currency": "USD",
+    "as_of": "2026-07-14",
+    "source": "https://developers.openai.com/api/docs/pricing",
+    "assumption": "OpenAI Standard API rates; gpt-4o-mini input treated as uncached because cached-token detail is not logged by this runner.",
+    "models": {
+      "gpt-4o-mini": {
+        "input_per_million": 0.15,
+        "output_per_million": 0.6
+      },
+      "gpt-4o-mini-transcribe": {
+        "per_minute": 0.003
+      }
+    }
+  }
+}
