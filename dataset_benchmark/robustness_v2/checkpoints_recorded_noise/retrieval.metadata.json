@@ -1,0 +1,56 @@
+{
+  "schema_version": "1.0.0",
+  "stage": "retrieval",
+  "status": "success",
+  "captured_at_utc": "2026-07-21T09:16:48.856926+00:00",
+  "inputs": {
+    "config": {
+      "path": "E:\\merged_partition_content\\Khoi_Project\\FPT-Assistant-v3\\dataset_benchmark\\robustness_v2\\configs\\local_recorded_noise_inference_config.json",
+      "sha256": "bca10b397dc7714f9e9f3d928db38c38abfb7c3d9b0239b733f9a06a1a8a6758",
+      "size_bytes": 2443
+    },
+    "correction_cache": {
+      "path": "E:\\merged_partition_content\\Khoi_Project\\FPT-Assistant-v3\\dataset_benchmark\\robustness_v2\\cache_recorded_noise\\corrections.jsonl",
+      "sha256": "7cc02a5f667bb40004c25cbd826ddff9c86dc4d28d27a80eacc5dc928633275a",
+      "size_bytes": 425631
+    },
+    "index_index.faiss": {
+      "path": "E:\\merged_partition_content\\Khoi_Project\\FPT-Assistant-v3\\backend\\app\\rag\\vector_store\\index.faiss",
+      "sha256": "5e7c64d8ae39570adf64c26b1b8b27022a02e58ca73f8c9bd9c2fbcad21e712a",
+      "size_bytes": 792621
+    },
+    "index_metadata.json": {
+      "path": "E:\\merged_partition_content\\Khoi_Project\\FPT-Assistant-v3\\backend\\app\\rag\\vector_store\\metadata.json",
+      "sha256": "4c3f66d0e0e25f6c391b78cea43f4be0bee8aa05dbe933077ba3bf0be71d113d",
+      "size_bytes": 202997
+    },
+    "risk_cache": {
+      "path": "E:\\merged_partition_content\\Khoi_Project\\FPT-Assistant-v3\\dataset_benchmark\\robustness_v2\\cache_recorded_noise\\risk_decisions.jsonl",
+      "sha256": "adcc9e7e3c170a843382cae9f1626905d2a53b550edd3e3e17b08be721aaf05a",
+      "size_bytes": 1550470
+    },
+    "stt_cache": {
+      "path": "E:\\merged_partition_content\\Khoi_Project\\FPT-Assistant-v3\\dataset_benchmark\\robustness_v2\\cache_recorded_noise\\stt.jsonl",
+      "sha256": "258ff55b49f872356badaa3bbef087976655ec200e226e8ae59e63b889379e36",
+      "size_bytes": 506377
+    }
+  },
+  "outputs": {
+    "retrieval_cache": {
+      "path": "E:\\merged_partition_content\\Khoi_Project\\FPT-Assistant-v3\\dataset_benchmark\\robustness_v2\\cache_recorded_noise\\retrieval.jsonl",
+      "sha256": "987d4ee8530c378b80346baa6a3f30f326e612ab84e84b71f3f279edf31abcb2",
+      "size_bytes": 45220984
+    }
+  },
+  "missing_outputs": [],
+  "details": {
+    "config_hash": "c2737172719a73a1123397ce892e392bc0fb87ffa4ea88aa725fae2c0ddda72d",
+    "records": 1950,
+    "pipelines": [
+      "P0",
+      "P1",
+      "P2"
+    ],
+    "index_signature": "8d3b684de40f7f3d7ac32c8267a73eeeff3004751ff4b1bcec1ca3bd57d51383"
+  }
+}

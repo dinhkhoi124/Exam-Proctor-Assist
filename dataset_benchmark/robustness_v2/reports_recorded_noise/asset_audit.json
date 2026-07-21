@@ -1,0 +1,34 @@
+{
+  "schema_version": "1.0.0",
+  "raw_root": "E:\\merged_partition_content\\Khoi_Project\\FPT-Assistant-v3\\dataset_benchmark\\robustness_v2\\assets\\recorded_noise",
+  "output_root": "E:\\merged_partition_content\\Khoi_Project\\FPT-Assistant-v3\\dataset_benchmark\\robustness_v2\\assets\\recorded_noise_wav",
+  "manifest": "E:\\merged_partition_content\\Khoi_Project\\FPT-Assistant-v3\\dataset_benchmark\\robustness_v2\\assets\\recorded_noise_wav\\manifest.csv",
+  "asset_count": 40,
+  "unique_raw_hashes": 40,
+  "unique_wav_hashes": 40,
+  "cross_split_raw_hashes": [],
+  "cross_split_wav_hashes": [],
+  "counts": {
+    "dev:cafe": 3,
+    "dev:fan": 3,
+    "dev:office": 3,
+    "dev:speech_babble": 3,
+    "test:cafe": 7,
+    "test:fan": 7,
+    "test:office": 7,
+    "test:speech_babble": 7
+  },
+  "duration_seconds": {
+    "dev:cafe": 22.250687,
+    "dev:fan": 29.802689,
+    "dev:office": 17.547813,
+    "dev:speech_babble": 18.965375,
+    "test:cafe": 53.504,
+    "test:fan": 53.887938,
+    "test:office": 52.586626,
+    "test:speech_babble": 51.690624
+  },
+  "minimum_rms": 0.000574991,
+  "maximum_peak": 0.197418213,
+  "verified": true
+}

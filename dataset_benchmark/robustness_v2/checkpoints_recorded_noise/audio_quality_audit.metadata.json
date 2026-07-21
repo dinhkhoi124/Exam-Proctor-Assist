@@ -1,0 +1,36 @@
+{
+  "schema_version": "1.0.0",
+  "stage": "audit_recorded_noise_audio",
+  "status": "success",
+  "captured_at_utc": "2026-07-21T05:59:52.430349+00:00",
+  "inputs": {
+    "config": {
+      "path": "E:\\merged_partition_content\\Khoi_Project\\FPT-Assistant-v3\\dataset_benchmark\\robustness_v2\\configs\\augmentation_recorded_noise_config.json",
+      "sha256": "51c1e6abf53b3346ad0bcbc3752d91122a74f257c7be300c8f6cbfb24a722735",
+      "size_bytes": 3398
+    },
+    "generated_manifest": {
+      "path": "E:\\merged_partition_content\\Khoi_Project\\FPT-Assistant-v3\\dataset_benchmark\\robustness_v2\\manifests\\recorded_noise_generated.jsonl",
+      "sha256": "98831e8b822aadfd283f81993f9cad6eae6a7205ff1290ea85737dae39736c4e",
+      "size_bytes": 2122317
+    }
+  },
+  "outputs": {
+    "listening_index": {
+      "path": "E:\\merged_partition_content\\Khoi_Project\\FPT-Assistant-v3\\dataset_benchmark\\robustness_v2\\reports_recorded_noise\\LISTENING_SAMPLES.md",
+      "sha256": "c3129fb4cc854706ea638a4ce4f27da641dbb7bb505e0edc9005ffe14d968df1",
+      "size_bytes": 1010
+    },
+    "quality_audit": {
+      "path": "E:\\merged_partition_content\\Khoi_Project\\FPT-Assistant-v3\\dataset_benchmark\\robustness_v2\\reports_recorded_noise\\audio_quality_audit.json",
+      "sha256": "292785b5d8252d40d8366d1c8468151111bb5c901d787d85b935f695b8b1ec67",
+      "size_bytes": 383479
+    }
+  },
+  "missing_outputs": [],
+  "details": {
+    "config_hash": "5d9aac9e4bc9b9f3ba40e86756b844ce49a8c0ab9d1bfcd74e08f37cacaecdf7",
+    "verified": true,
+    "api_calls": 0
+  }
+}

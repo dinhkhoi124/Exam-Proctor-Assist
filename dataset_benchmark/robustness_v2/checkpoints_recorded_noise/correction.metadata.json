@@ -1,0 +1,51 @@
+{
+  "schema_version": "1.0.0",
+  "stage": "correction",
+  "status": "success",
+  "captured_at_utc": "2026-07-21T08:32:34.818596+00:00",
+  "inputs": {
+    "compatible_import_cache": {
+      "path": "E:\\merged_partition_content\\Khoi_Project\\FPT-Assistant-v3\\dataset_benchmark\\benchmark_outputs\\corrected_transcripts.jsonl",
+      "sha256": "63ae04bab8ef0c02f3d3408e4abea6af8a7a0275dcc011935171309b528022e6",
+      "size_bytes": 48412
+    },
+    "config": {
+      "path": "E:\\merged_partition_content\\Khoi_Project\\FPT-Assistant-v3\\dataset_benchmark\\robustness_v2\\configs\\local_recorded_noise_inference_config.json",
+      "sha256": "bca10b397dc7714f9e9f3d928db38c38abfb7c3d9b0239b733f9a06a1a8a6758",
+      "size_bytes": 2443
+    },
+    "prompt": {
+      "path": "E:\\merged_partition_content\\Khoi_Project\\FPT-Assistant-v3\\backend\\app\\prompts\\asr_correction.py",
+      "sha256": "9ea1a085b9887dba7781a7fb620063e70325891edadad6dbcc94e798be7bde1d",
+      "size_bytes": 1839
+    },
+    "risk_cache": {
+      "path": "E:\\merged_partition_content\\Khoi_Project\\FPT-Assistant-v3\\dataset_benchmark\\robustness_v2\\cache_recorded_noise\\risk_decisions.jsonl",
+      "sha256": "adcc9e7e3c170a843382cae9f1626905d2a53b550edd3e3e17b08be721aaf05a",
+      "size_bytes": 1550470
+    },
+    "stt_cache": {
+      "path": "E:\\merged_partition_content\\Khoi_Project\\FPT-Assistant-v3\\dataset_benchmark\\robustness_v2\\cache_recorded_noise\\stt.jsonl",
+      "sha256": "258ff55b49f872356badaa3bbef087976655ec200e226e8ae59e63b889379e36",
+      "size_bytes": 506377
+    }
+  },
+  "outputs": {
+    "correction_cache": {
+      "path": "E:\\merged_partition_content\\Khoi_Project\\FPT-Assistant-v3\\dataset_benchmark\\robustness_v2\\cache_recorded_noise\\corrections.jsonl",
+      "sha256": "7cc02a5f667bb40004c25cbd826ddff9c86dc4d28d27a80eacc5dc928633275a",
+      "size_bytes": 425631
+    }
+  },
+  "missing_outputs": [],
+  "details": {
+    "config_hash": "c2737172719a73a1123397ce892e392bc0fb87ffa4ea88aa725fae2c0ddda72d",
+    "records": 650,
+    "api_calls": 520,
+    "pipelines": [
+      "P0",
+      "P1",
+      "P2"
+    ]
+  }
+}

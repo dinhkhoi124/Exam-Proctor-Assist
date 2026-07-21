@@ -1,0 +1,101 @@
+{
+  "schema_version": "1.0.0",
+  "config_hash": "c2737172719a73a1123397ce892e392bc0fb87ffa4ea88aa725fae2c0ddda72d",
+  "expected_variants": 650,
+  "required_variants": 650,
+  "expected_pipeline_rows": 1950,
+  "cache_counts": {
+    "stt": {
+      "expected": 650,
+      "actual": 650,
+      "api_origin": 520,
+      "failed_or_excluded": 0
+    },
+    "risk_decisions": {
+      "expected": 650,
+      "actual": 650,
+      "api_origin": 0,
+      "failed_or_excluded": 0
+    },
+    "corrections": {
+      "expected": 650,
+      "actual": 650,
+      "api_origin": 520,
+      "failed_or_excluded": 0
+    },
+    "retrieval": {
+      "expected": 1950,
+      "actual": 1950,
+      "api_origin": 0,
+      "failed_or_excluded": 0
+    },
+    "final_answers": {
+      "expected": 1950,
+      "actual": 1950,
+      "api_origin": 936,
+      "failed_or_excluded": 0
+    },
+    "judge": {
+      "expected": 1950,
+      "actual": 1950,
+      "api_origin": 1950,
+      "failed_or_excluded": 0
+    }
+  },
+  "actual_cost_usd": {
+    "stt": 0.137285,
+    "correction": 0.03411,
+    "final_answers": 0.660052,
+    "judge": 0.865126,
+    "total": 1.696573
+  },
+  "stt_billable_minutes": 45.762,
+  "provenance": {
+    "validate_config": {
+      "metadata_exists": true,
+      "config_hash_match": true
+    },
+    "build_manifest": {
+      "metadata_exists": true,
+      "config_hash_match": true
+    },
+    "generate_augmentation": {
+      "metadata_exists": true,
+      "config_hash_match": true
+    },
+    "stt": {
+      "metadata_exists": true,
+      "config_hash_match": true
+    },
+    "risk_detection": {
+      "metadata_exists": true,
+      "config_hash_match": true
+    },
+    "correction": {
+      "metadata_exists": true,
+      "config_hash_match": true
+    },
+    "retrieval": {
+      "metadata_exists": true,
+      "config_hash_match": true
+    },
+    "final_answers": {
+      "metadata_exists": true,
+      "config_hash_match": true
+    },
+    "judge": {
+      "metadata_exists": true,
+      "config_hash_match": true
+    },
+    "evaluate": {
+      "metadata_exists": true,
+      "config_hash_match": true
+    },
+    "report": {
+      "metadata_exists": true,
+      "config_hash_match": true
+    }
+  },
+  "verified": true,
+  "api_calls_performed_by_audit": 0
+}

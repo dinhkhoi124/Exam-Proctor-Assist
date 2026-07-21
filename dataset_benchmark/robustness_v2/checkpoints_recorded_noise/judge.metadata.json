@@ -1,0 +1,49 @@
+{
+  "schema_version": "1.0.0",
+  "stage": "judge",
+  "status": "success",
+  "captured_at_utc": "2026-07-21T15:30:59.160202+00:00",
+  "inputs": {
+    "config": {
+      "path": "E:\\merged_partition_content\\Khoi_Project\\FPT-Assistant-v3\\dataset_benchmark\\robustness_v2\\configs\\local_recorded_noise_inference_config.json",
+      "sha256": "bca10b397dc7714f9e9f3d928db38c38abfb7c3d9b0239b733f9a06a1a8a6758",
+      "size_bytes": 2443
+    },
+    "final_answer_cache": {
+      "path": "E:\\merged_partition_content\\Khoi_Project\\FPT-Assistant-v3\\dataset_benchmark\\robustness_v2\\cache_recorded_noise\\final_answers.jsonl",
+      "sha256": "52af0b9a1e654d2ddf9ba00afdbafc968870504a649231d4aea4cbe61ff28285",
+      "size_bytes": 3137558
+    },
+    "judge_prompt": {
+      "path": "E:\\merged_partition_content\\Khoi_Project\\FPT-Assistant-v3\\dataset_benchmark\\robustness_v2\\prompts\\llm_judge_v1.txt",
+      "sha256": "b532607c92f4a9d75a1ff76aa9471ab92d46766fda394496a5ba81faa1a79078",
+      "size_bytes": 507
+    },
+    "retrieval_cache": {
+      "path": "E:\\merged_partition_content\\Khoi_Project\\FPT-Assistant-v3\\dataset_benchmark\\robustness_v2\\cache_recorded_noise\\retrieval.jsonl",
+      "sha256": "987d4ee8530c378b80346baa6a3f30f326e612ab84e84b71f3f279edf31abcb2",
+      "size_bytes": 45220984
+    },
+    "run_manifest": {
+      "path": "E:\\merged_partition_content\\Khoi_Project\\FPT-Assistant-v3\\dataset_benchmark\\robustness_v2\\manifests\\pipeline_recorded_noise_manifest.jsonl",
+      "sha256": "e71ebbbe6f27d0646e345460cc7b449ecdb42f8b333c45b16f0204d2d817b04a",
+      "size_bytes": 2122317
+    }
+  },
+  "outputs": {
+    "judge_cache": {
+      "path": "E:\\merged_partition_content\\Khoi_Project\\FPT-Assistant-v3\\dataset_benchmark\\robustness_v2\\cache_recorded_noise\\judge.jsonl",
+      "sha256": "3097f07e109ec69881217dcc8ea681bf509867f9b9aba6385abc7c1eaad379e6",
+      "size_bytes": 2695745
+    }
+  },
+  "missing_outputs": [],
+  "details": {
+    "config_hash": "c2737172719a73a1123397ce892e392bc0fb87ffa4ea88aa725fae2c0ddda72d",
+    "enabled": true,
+    "records": 1950,
+    "api_calls": 1950,
+    "excluded": 0,
+    "role": "auxiliary_only_human_rating_is_primary"
+  }
+}

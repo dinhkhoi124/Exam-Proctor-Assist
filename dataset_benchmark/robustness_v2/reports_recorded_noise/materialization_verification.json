@@ -1,0 +1,360 @@
+{
+  "schema_version": "1.0.0",
+  "augmentation_config_hash": "5d9aac9e4bc9b9f3ba40e86756b844ce49a8c0ab9d1bfcd74e08f37cacaecdf7",
+  "manifest_path": "E:\\merged_partition_content\\Khoi_Project\\FPT-Assistant-v3\\dataset_benchmark\\robustness_v2\\manifests\\recorded_noise_generated.jsonl",
+  "manifest_sha256": "98831e8b822aadfd283f81993f9cad6eae6a7205ff1290ea85737dae39736c4e",
+  "manifest_rows": 650,
+  "condition_distribution": {
+    "C0": 130,
+    "C1": 130,
+    "C2": 260,
+    "C3": 130
+  },
+  "split_distribution": {
+    "test": 520,
+    "dev": 130
+  },
+  "audio_augmented_wav_count": 520,
+  "audio_augmented_bytes": 87885504,
+  "all_output_wav_count": 650,
+  "all_output_bytes": 109861300,
+  "expected_materialized_wav_count": 520,
+  "missing_variant_ids": [],
+  "missing_materialized_paths": [],
+  "unexpected_audio_augmented_paths": [],
+  "full_hash_verification": {
+    "checked": 650,
+    "mismatch_count": 0,
+    "mismatches": []
+  },
+  "random_hash_sample": {
+    "sampling_unit": "C1-C3 materialized WAV",
+    "seed": 20260721,
+    "requested_size": 40,
+    "actual_size": 40,
+    "rows": [
+      {
+        "variant_id": "148_c2_v01_recorded_cafe",
+        "condition_level": "C2",
+        "path": "E:\\merged_partition_content\\Khoi_Project\\FPT-Assistant-v3\\dataset_benchmark\\robustness_v2\\audio_recorded_noise\\C2\\148_c2_v01_recorded_cafe.wav",
+        "manifest_sha256": "07a8bb4eef0e89ac9668bd937304095eea82eb9f1d4776f2fbeccfa21002c80a",
+        "actual_sha256": "07a8bb4eef0e89ac9668bd937304095eea82eb9f1d4776f2fbeccfa21002c80a",
+        "match": true
+      },
+      {
+        "variant_id": "197_c2_v02_recorded_office",
+        "condition_level": "C2",
+        "path": "E:\\merged_partition_content\\Khoi_Project\\FPT-Assistant-v3\\dataset_benchmark\\robustness_v2\\audio_recorded_noise\\C2\\197_c2_v02_recorded_office.wav",
+        "manifest_sha256": "c49b58fddeac242c6558739202445b3b7cd2eefb161c10a4358b874461436c96",
+        "actual_sha256": "c49b58fddeac242c6558739202445b3b7cd2eefb161c10a4358b874461436c96",
+        "match": true
+      },
+      {
+        "variant_id": "202_c2_v02_recorded_office",
+        "condition_level": "C2",
+        "path": "E:\\merged_partition_content\\Khoi_Project\\FPT-Assistant-v3\\dataset_benchmark\\robustness_v2\\audio_recorded_noise\\C2\\202_c2_v02_recorded_office.wav",
+        "manifest_sha256": "ab59b1d63022ba5841b9310b93e53008dd4cf5377e069070b6559b03a635d9d8",
+        "actual_sha256": "ab59b1d63022ba5841b9310b93e53008dd4cf5377e069070b6559b03a635d9d8",
+        "match": true
+      },
+      {
+        "variant_id": "204_c2_v01_recorded_cafe",
+        "condition_level": "C2",
+        "path": "E:\\merged_partition_content\\Khoi_Project\\FPT-Assistant-v3\\dataset_benchmark\\robustness_v2\\audio_recorded_noise\\C2\\204_c2_v01_recorded_cafe.wav",
+        "manifest_sha256": "fd8da4edcee88712b04ff5c067d8f5adb77f136ad803b6ca1e25976117c8bcf2",
+        "actual_sha256": "fd8da4edcee88712b04ff5c067d8f5adb77f136ad803b6ca1e25976117c8bcf2",
+        "match": true
+      },
+      {
+        "variant_id": "171_c3_v01_recorded_speech_babble",
+        "condition_level": "C3",
+        "path": "E:\\merged_partition_content\\Khoi_Project\\FPT-Assistant-v3\\dataset_benchmark\\robustness_v2\\audio_recorded_noise\\C3\\171_c3_v01_recorded_speech_babble.wav",
+        "manifest_sha256": "44d99b363d9d79aefc056ebf2c242ea5191efcb846c986b9f9f1a4a818e048cc",
+        "actual_sha256": "44d99b363d9d79aefc056ebf2c242ea5191efcb846c986b9f9f1a4a818e048cc",
+        "match": true
+      },
+      {
+        "variant_id": "220_c2_v02_recorded_office",
+        "condition_level": "C2",
+        "path": "E:\\merged_partition_content\\Khoi_Project\\FPT-Assistant-v3\\dataset_benchmark\\robustness_v2\\audio_recorded_noise\\C2\\220_c2_v02_recorded_office.wav",
+        "manifest_sha256": "26d43646ec0d8f61707e8d02db27319356bb38d280f6849ad447244c3ba497e7",
+        "actual_sha256": "26d43646ec0d8f61707e8d02db27319356bb38d280f6849ad447244c3ba497e7",
+        "match": true
+      },
+      {
+        "variant_id": "102_c3_v01_recorded_speech_babble",
+        "condition_level": "C3",
+        "path": "E:\\merged_partition_content\\Khoi_Project\\FPT-Assistant-v3\\dataset_benchmark\\robustness_v2\\audio_recorded_noise\\C3\\102_c3_v01_recorded_speech_babble.wav",
+        "manifest_sha256": "4178d2d0f0d7296e35f1473d2eb35e00281feb3b2e10f4f70a216e7673effdf6",
+        "actual_sha256": "4178d2d0f0d7296e35f1473d2eb35e00281feb3b2e10f4f70a216e7673effdf6",
+        "match": true
+      },
+      {
+        "variant_id": "154_c2_v01_recorded_cafe",
+        "condition_level": "C2",
+        "path": "E:\\merged_partition_content\\Khoi_Project\\FPT-Assistant-v3\\dataset_benchmark\\robustness_v2\\audio_recorded_noise\\C2\\154_c2_v01_recorded_cafe.wav",
+        "manifest_sha256": "3c96a97ae380cd08023b3d8442e7b3d26f1c93add9b359cc7650524f2d80aa48",
+        "actual_sha256": "3c96a97ae380cd08023b3d8442e7b3d26f1c93add9b359cc7650524f2d80aa48",
+        "match": true
+      },
+      {
+        "variant_id": "214_c3_v01_recorded_speech_babble",
+        "condition_level": "C3",
+        "path": "E:\\merged_partition_content\\Khoi_Project\\FPT-Assistant-v3\\dataset_benchmark\\robustness_v2\\audio_recorded_noise\\C3\\214_c3_v01_recorded_speech_babble.wav",
+        "manifest_sha256": "240dd062aea6ca2777f8aadf5e4e19b1e53ff3e1d75a2c177b0f685a24a77eb9",
+        "actual_sha256": "240dd062aea6ca2777f8aadf5e4e19b1e53ff3e1d75a2c177b0f685a24a77eb9",
+        "match": true
+      },
+      {
+        "variant_id": "133_c1_v01_recorded_fan",
+        "condition_level": "C1",
+        "path": "E:\\merged_partition_content\\Khoi_Project\\FPT-Assistant-v3\\dataset_benchmark\\robustness_v2\\audio_recorded_noise\\C1\\133_c1_v01_recorded_fan.wav",
+        "manifest_sha256": "eb6571402ef2dec95391e51b61af348071e7572e75bc8284c58cda7c6ed84d31",
+        "actual_sha256": "eb6571402ef2dec95391e51b61af348071e7572e75bc8284c58cda7c6ed84d31",
+        "match": true
+      },
+      {
+        "variant_id": "145_c1_v01_recorded_fan",
+        "condition_level": "C1",
+        "path": "E:\\merged_partition_content\\Khoi_Project\\FPT-Assistant-v3\\dataset_benchmark\\robustness_v2\\audio_recorded_noise\\C1\\145_c1_v01_recorded_fan.wav",
+        "manifest_sha256": "142fc26c1fc680ad57b461b5e0bd86ce9f956f1943e264003915070bce7568a0",
+        "actual_sha256": "142fc26c1fc680ad57b461b5e0bd86ce9f956f1943e264003915070bce7568a0",
+        "match": true
+      },
+      {
+        "variant_id": "162_c1_v01_recorded_fan",
+        "condition_level": "C1",
+        "path": "E:\\merged_partition_content\\Khoi_Project\\FPT-Assistant-v3\\dataset_benchmark\\robustness_v2\\audio_recorded_noise\\C1\\162_c1_v01_recorded_fan.wav",
+        "manifest_sha256": "a0efc122f148f598594e334a456f02c4a3bd72c24d37a84d1baf2802404647f9",
+        "actual_sha256": "a0efc122f148f598594e334a456f02c4a3bd72c24d37a84d1baf2802404647f9",
+        "match": true
+      },
+      {
+        "variant_id": "200_c3_v01_recorded_speech_babble",
+        "condition_level": "C3",
+        "path": "E:\\merged_partition_content\\Khoi_Project\\FPT-Assistant-v3\\dataset_benchmark\\robustness_v2\\audio_recorded_noise\\C3\\200_c3_v01_recorded_speech_babble.wav",
+        "manifest_sha256": "5ce33c45f9102cf6b59053e74319a0f7496298e8ab25e9ed9e55ddc410cf0412",
+        "actual_sha256": "5ce33c45f9102cf6b59053e74319a0f7496298e8ab25e9ed9e55ddc410cf0412",
+        "match": true
+      },
+      {
+        "variant_id": "125_c1_v01_recorded_fan",
+        "condition_level": "C1",
+        "path": "E:\\merged_partition_content\\Khoi_Project\\FPT-Assistant-v3\\dataset_benchmark\\robustness_v2\\audio_recorded_noise\\C1\\125_c1_v01_recorded_fan.wav",
+        "manifest_sha256": "7c1162f9feb1816d6e837b304eb7266eee8f95d50ae97c6d438d8b4f439ab7c8",
+        "actual_sha256": "7c1162f9feb1816d6e837b304eb7266eee8f95d50ae97c6d438d8b4f439ab7c8",
+        "match": true
+      },
+      {
+        "variant_id": "195_c2_v01_recorded_cafe",
+        "condition_level": "C2",
+        "path": "E:\\merged_partition_content\\Khoi_Project\\FPT-Assistant-v3\\dataset_benchmark\\robustness_v2\\audio_recorded_noise\\C2\\195_c2_v01_recorded_cafe.wav",
+        "manifest_sha256": "5c69d893a7c33536976c048866e5390f8d26df9a25dffe6fc5fcc1fe1f72c1aa",
+        "actual_sha256": "5c69d893a7c33536976c048866e5390f8d26df9a25dffe6fc5fcc1fe1f72c1aa",
+        "match": true
+      },
+      {
+        "variant_id": "174_c2_v01_recorded_cafe",
+        "condition_level": "C2",
+        "path": "E:\\merged_partition_content\\Khoi_Project\\FPT-Assistant-v3\\dataset_benchmark\\robustness_v2\\audio_recorded_noise\\C2\\174_c2_v01_recorded_cafe.wav",
+        "manifest_sha256": "911dab8a6be41e8f922b80b7924669caad8a54621cb0b6cf4fd5aef626f9736f",
+        "actual_sha256": "911dab8a6be41e8f922b80b7924669caad8a54621cb0b6cf4fd5aef626f9736f",
+        "match": true
+      },
+      {
+        "variant_id": "226_c3_v01_recorded_speech_babble",
+        "condition_level": "C3",
+        "path": "E:\\merged_partition_content\\Khoi_Project\\FPT-Assistant-v3\\dataset_benchmark\\robustness_v2\\audio_recorded_noise\\C3\\226_c3_v01_recorded_speech_babble.wav",
+        "manifest_sha256": "6272e46cd9fd35543c76e4ce188bb4c9cc96af9a8cf91f85da0c601dbf7cd558",
+        "actual_sha256": "6272e46cd9fd35543c76e4ce188bb4c9cc96af9a8cf91f85da0c601dbf7cd558",
+        "match": true
+      },
+      {
+        "variant_id": "103_c2_v01_recorded_cafe",
+        "condition_level": "C2",
+        "path": "E:\\merged_partition_content\\Khoi_Project\\FPT-Assistant-v3\\dataset_benchmark\\robustness_v2\\audio_recorded_noise\\C2\\103_c2_v01_recorded_cafe.wav",
+        "manifest_sha256": "5087c0e95ec8a6f2cf02cbd43b5dc49e4bf15e81220947f00382e15c54c038a8",
+        "actual_sha256": "5087c0e95ec8a6f2cf02cbd43b5dc49e4bf15e81220947f00382e15c54c038a8",
+        "match": true
+      },
+      {
+        "variant_id": "169_c1_v01_recorded_fan",
+        "condition_level": "C1",
+        "path": "E:\\merged_partition_content\\Khoi_Project\\FPT-Assistant-v3\\dataset_benchmark\\robustness_v2\\audio_recorded_noise\\C1\\169_c1_v01_recorded_fan.wav",
+        "manifest_sha256": "e752c45401741e0b8e427a084474024ee96afa8fbd2b620e76b7f53ba46ce178",
+        "actual_sha256": "e752c45401741e0b8e427a084474024ee96afa8fbd2b620e76b7f53ba46ce178",
+        "match": true
+      },
+      {
+        "variant_id": "144_c2_v02_recorded_office",
+        "condition_level": "C2",
+        "path": "E:\\merged_partition_content\\Khoi_Project\\FPT-Assistant-v3\\dataset_benchmark\\robustness_v2\\audio_recorded_noise\\C2\\144_c2_v02_recorded_office.wav",
+        "manifest_sha256": "1ef6a90c1b0dc28a17c38fa49be88a21b16614c7adf327e93e83fc01594462a0",
+        "actual_sha256": "1ef6a90c1b0dc28a17c38fa49be88a21b16614c7adf327e93e83fc01594462a0",
+        "match": true
+      },
+      {
+        "variant_id": "122_c1_v01_recorded_fan",
+        "condition_level": "C1",
+        "path": "E:\\merged_partition_content\\Khoi_Project\\FPT-Assistant-v3\\dataset_benchmark\\robustness_v2\\audio_recorded_noise\\C1\\122_c1_v01_recorded_fan.wav",
+        "manifest_sha256": "6a4a1d2eb199c7bd503a79bc5b802aa639295dea35650936fc78856c2088a621",
+        "actual_sha256": "6a4a1d2eb199c7bd503a79bc5b802aa639295dea35650936fc78856c2088a621",
+        "match": true
+      },
+      {
+        "variant_id": "142_c2_v01_recorded_cafe",
+        "condition_level": "C2",
+        "path": "E:\\merged_partition_content\\Khoi_Project\\FPT-Assistant-v3\\dataset_benchmark\\robustness_v2\\audio_recorded_noise\\C2\\142_c2_v01_recorded_cafe.wav",
+        "manifest_sha256": "85b15c1651383483f047ada0296c70f62a6b7c3d5eaec7d594a03365317908ab",
+        "actual_sha256": "85b15c1651383483f047ada0296c70f62a6b7c3d5eaec7d594a03365317908ab",
+        "match": true
+      },
+      {
+        "variant_id": "208_c2_v02_recorded_office",
+        "condition_level": "C2",
+        "path": "E:\\merged_partition_content\\Khoi_Project\\FPT-Assistant-v3\\dataset_benchmark\\robustness_v2\\audio_recorded_noise\\C2\\208_c2_v02_recorded_office.wav",
+        "manifest_sha256": "4f1975f89c5c77f9a41fa78fc54ca62e030679d31eed03c29af6f3768e1db4f6",
+        "actual_sha256": "4f1975f89c5c77f9a41fa78fc54ca62e030679d31eed03c29af6f3768e1db4f6",
+        "match": true
+      },
+      {
+        "variant_id": "104_c1_v01_recorded_fan",
+        "condition_level": "C1",
+        "path": "E:\\merged_partition_content\\Khoi_Project\\FPT-Assistant-v3\\dataset_benchmark\\robustness_v2\\audio_recorded_noise\\C1\\104_c1_v01_recorded_fan.wav",
+        "manifest_sha256": "9354cccd58b8a628c646ac525d166c610080c9316cb9db1ba1539ccc429fec7d",
+        "actual_sha256": "9354cccd58b8a628c646ac525d166c610080c9316cb9db1ba1539ccc429fec7d",
+        "match": true
+      },
+      {
+        "variant_id": "149_c1_v01_recorded_fan",
+        "condition_level": "C1",
+        "path": "E:\\merged_partition_content\\Khoi_Project\\FPT-Assistant-v3\\dataset_benchmark\\robustness_v2\\audio_recorded_noise\\C1\\149_c1_v01_recorded_fan.wav",
+        "manifest_sha256": "af704bea9169e38021dfd6c3ad27de0f768ad2dde66cc3f59d9d3cae1ea211a8",
+        "actual_sha256": "af704bea9169e38021dfd6c3ad27de0f768ad2dde66cc3f59d9d3cae1ea211a8",
+        "match": true
+      },
+      {
+        "variant_id": "186_c2_v01_recorded_cafe",
+        "condition_level": "C2",
+        "path": "E:\\merged_partition_content\\Khoi_Project\\FPT-Assistant-v3\\dataset_benchmark\\robustness_v2\\audio_recorded_noise\\C2\\186_c2_v01_recorded_cafe.wav",
+        "manifest_sha256": "38e0b1f460a45a1a2aba6087eda8531f06a65ade24d4c360ffff1bda119ed8eb",
+        "actual_sha256": "38e0b1f460a45a1a2aba6087eda8531f06a65ade24d4c360ffff1bda119ed8eb",
+        "match": true
+      },
+      {
+        "variant_id": "102_c1_v01_recorded_fan",
+        "condition_level": "C1",
+        "path": "E:\\merged_partition_content\\Khoi_Project\\FPT-Assistant-v3\\dataset_benchmark\\robustness_v2\\audio_recorded_noise\\C1\\102_c1_v01_recorded_fan.wav",
+        "manifest_sha256": "61cd7719b8de8d9e4a93a32945aab378a571e40f8ee919ccd35e3bbfb9ab337e",
+        "actual_sha256": "61cd7719b8de8d9e4a93a32945aab378a571e40f8ee919ccd35e3bbfb9ab337e",
+        "match": true
+      },
+      {
+        "variant_id": "173_c2_v02_recorded_office",
+        "condition_level": "C2",
+        "path": "E:\\merged_partition_content\\Khoi_Project\\FPT-Assistant-v3\\dataset_benchmark\\robustness_v2\\audio_recorded_noise\\C2\\173_c2_v02_recorded_office.wav",
+        "manifest_sha256": "7bce8074b21b068a84d39b71a56f99ed1956b98714ce01f36b45d941154d2f97",
+        "actual_sha256": "7bce8074b21b068a84d39b71a56f99ed1956b98714ce01f36b45d941154d2f97",
+        "match": true
+      },
+      {
+        "variant_id": "229_c2_v02_recorded_office",
+        "condition_level": "C2",
+        "path": "E:\\merged_partition_content\\Khoi_Project\\FPT-Assistant-v3\\dataset_benchmark\\robustness_v2\\audio_recorded_noise\\C2\\229_c2_v02_recorded_office.wav",
+        "manifest_sha256": "bff8c96c493479ef1702d2d6a704f7613a82802e89bd21b7e55a83af9796d672",
+        "actual_sha256": "bff8c96c493479ef1702d2d6a704f7613a82802e89bd21b7e55a83af9796d672",
+        "match": true
+      },
+      {
+        "variant_id": "113_c2_v02_recorded_office",
+        "condition_level": "C2",
+        "path": "E:\\merged_partition_content\\Khoi_Project\\FPT-Assistant-v3\\dataset_benchmark\\robustness_v2\\audio_recorded_noise\\C2\\113_c2_v02_recorded_office.wav",
+        "manifest_sha256": "0b6a57b20056d90adff36040404adddc650153bbefdb89d9b217ede8906c560d",
+        "actual_sha256": "0b6a57b20056d90adff36040404adddc650153bbefdb89d9b217ede8906c560d",
+        "match": true
+      },
+      {
+        "variant_id": "168_c3_v01_recorded_speech_babble",
+        "condition_level": "C3",
+        "path": "E:\\merged_partition_content\\Khoi_Project\\FPT-Assistant-v3\\dataset_benchmark\\robustness_v2\\audio_recorded_noise\\C3\\168_c3_v01_recorded_speech_babble.wav",
+        "manifest_sha256": "928a6f0dd5a19baa4820c4d1b286c4613ec25b4b4d1b96632c5046e9954f04d4",
+        "actual_sha256": "928a6f0dd5a19baa4820c4d1b286c4613ec25b4b4d1b96632c5046e9954f04d4",
+        "match": true
+      },
+      {
+        "variant_id": "191_c2_v02_recorded_office",
+        "condition_level": "C2",
+        "path": "E:\\merged_partition_content\\Khoi_Project\\FPT-Assistant-v3\\dataset_benchmark\\robustness_v2\\audio_recorded_noise\\C2\\191_c2_v02_recorded_office.wav",
+        "manifest_sha256": "cba64a9a1e5d4a8b9538a70b561e191f14f514ee17ad987721c38784e1ea38cd",
+        "actual_sha256": "cba64a9a1e5d4a8b9538a70b561e191f14f514ee17ad987721c38784e1ea38cd",
+        "match": true
+      },
+      {
+        "variant_id": "193_c3_v01_recorded_speech_babble",
+        "condition_level": "C3",
+        "path": "E:\\merged_partition_content\\Khoi_Project\\FPT-Assistant-v3\\dataset_benchmark\\robustness_v2\\audio_recorded_noise\\C3\\193_c3_v01_recorded_speech_babble.wav",
+        "manifest_sha256": "30210bc0ca708f8b3d9be6ea8d27c8d217f60e345e65a18f57d977a0e9e59817",
+        "actual_sha256": "30210bc0ca708f8b3d9be6ea8d27c8d217f60e345e65a18f57d977a0e9e59817",
+        "match": true
+      },
+      {
+        "variant_id": "211_c1_v01_recorded_fan",
+        "condition_level": "C1",
+        "path": "E:\\merged_partition_content\\Khoi_Project\\FPT-Assistant-v3\\dataset_benchmark\\robustness_v2\\audio_recorded_noise\\C1\\211_c1_v01_recorded_fan.wav",
+        "manifest_sha256": "2c7e73424dad44d7c81f8310ad32eb189993b1c9a30ad2914aef8adaff2e2700",
+        "actual_sha256": "2c7e73424dad44d7c81f8310ad32eb189993b1c9a30ad2914aef8adaff2e2700",
+        "match": true
+      },
+      {
+        "variant_id": "222_c3_v01_recorded_speech_babble",
+        "condition_level": "C3",
+        "path": "E:\\merged_partition_content\\Khoi_Project\\FPT-Assistant-v3\\dataset_benchmark\\robustness_v2\\audio_recorded_noise\\C3\\222_c3_v01_recorded_speech_babble.wav",
+        "manifest_sha256": "fbd521780b6b306ff93665754bb2274221b6625273fecb37782adceb4ce474aa",
+        "actual_sha256": "fbd521780b6b306ff93665754bb2274221b6625273fecb37782adceb4ce474aa",
+        "match": true
+      },
+      {
+        "variant_id": "113_c2_v01_recorded_cafe",
+        "condition_level": "C2",
+        "path": "E:\\merged_partition_content\\Khoi_Project\\FPT-Assistant-v3\\dataset_benchmark\\robustness_v2\\audio_recorded_noise\\C2\\113_c2_v01_recorded_cafe.wav",
+        "manifest_sha256": "da416016f83c8794044ff1dcba50585c8cf36c6cd00766669b884f7c97802483",
+        "actual_sha256": "da416016f83c8794044ff1dcba50585c8cf36c6cd00766669b884f7c97802483",
+        "match": true
+      },
+      {
+        "variant_id": "141_c2_v01_recorded_cafe",
+        "condition_level": "C2",
+        "path": "E:\\merged_partition_content\\Khoi_Project\\FPT-Assistant-v3\\dataset_benchmark\\robustness_v2\\audio_recorded_noise\\C2\\141_c2_v01_recorded_cafe.wav",
+        "manifest_sha256": "a2fe0d744e20c5e0178c63b5a4bb43d4756ac455ed510b2a871c29ebdb339604",
+        "actual_sha256": "a2fe0d744e20c5e0178c63b5a4bb43d4756ac455ed510b2a871c29ebdb339604",
+        "match": true
+      },
+      {
+        "variant_id": "150_c2_v02_recorded_office",
+        "condition_level": "C2",
+        "path": "E:\\merged_partition_content\\Khoi_Project\\FPT-Assistant-v3\\dataset_benchmark\\robustness_v2\\audio_recorded_noise\\C2\\150_c2_v02_recorded_office.wav",
+        "manifest_sha256": "3e24c5967480e3a88a11dc24d5a3fe59209e4663a97a04041ea23f5167059c52",
+        "actual_sha256": "3e24c5967480e3a88a11dc24d5a3fe59209e4663a97a04041ea23f5167059c52",
+        "match": true
+      },
+      {
+        "variant_id": "129_c2_v02_recorded_office",
+        "condition_level": "C2",
+        "path": "E:\\merged_partition_content\\Khoi_Project\\FPT-Assistant-v3\\dataset_benchmark\\robustness_v2\\audio_recorded_noise\\C2\\129_c2_v02_recorded_office.wav",
+        "manifest_sha256": "af8e2e97dd3db015501ae6213992c907bb445771d466a2fba483569ce7c99226",
+        "actual_sha256": "af8e2e97dd3db015501ae6213992c907bb445771d466a2fba483569ce7c99226",
+        "match": true
+      },
+      {
+        "variant_id": "109_c2_v01_recorded_cafe",
+        "condition_level": "C2",
+        "path": "E:\\merged_partition_content\\Khoi_Project\\FPT-Assistant-v3\\dataset_benchmark\\robustness_v2\\audio_recorded_noise\\C2\\109_c2_v01_recorded_cafe.wav",
+        "manifest_sha256": "18c440ac64f72e156748ff59185ebb9b9dd210ffd9a6818d8a7926634483ff20",
+        "actual_sha256": "18c440ac64f72e156748ff59185ebb9b9dd210ffd9a6818d8a7926634483ff20",
+        "match": true
+      }
+    ]
+  },
+  "verified": true,
+  "api_calls": 0
+}

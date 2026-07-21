@@ -1,0 +1,67 @@
+{
+  "schema_version": "1.0.0",
+  "stage": "validate_config",
+  "status": "success",
+  "captured_at_utc": "2026-07-21T06:47:37.519786+00:00",
+  "inputs": {
+    "answer_prompt": {
+      "path": "E:\\merged_partition_content\\Khoi_Project\\FPT-Assistant-v3\\backend\\app\\prompts\\exam_support.py",
+      "sha256": "7f906eb35d260263d2f33beca2c34ec8983822eca7025523865efa79b0e5c029",
+      "size_bytes": 2333
+    },
+    "augmentation_plan": {
+      "path": "E:\\merged_partition_content\\Khoi_Project\\FPT-Assistant-v3\\dataset_benchmark\\robustness_v2\\manifests\\recorded_noise_plan.jsonl",
+      "sha256": "acbc2cf6595a075136dc9ba0f655acf7390e42bf800820019d36189de9d2f4bc",
+      "size_bytes": 2040480
+    },
+    "base_manifest": {
+      "path": "E:\\merged_partition_content\\Khoi_Project\\FPT-Assistant-v3\\dataset_benchmark\\robustness_v2\\manifests\\base_manifest_snapshot.jsonl",
+      "sha256": "75cc5a36705c4ad2ab228b8c5ffb7ff206012646f220b1d0b4222f71c686cc15",
+      "size_bytes": 67316
+    },
+    "config": {
+      "path": "E:\\merged_partition_content\\Khoi_Project\\FPT-Assistant-v3\\dataset_benchmark\\robustness_v2\\configs\\local_recorded_noise_inference_config.json",
+      "sha256": "bca10b397dc7714f9e9f3d928db38c38abfb7c3d9b0239b733f9a06a1a8a6758",
+      "size_bytes": 2443
+    },
+    "correction_prompt": {
+      "path": "E:\\merged_partition_content\\Khoi_Project\\FPT-Assistant-v3\\backend\\app\\prompts\\asr_correction.py",
+      "sha256": "9ea1a085b9887dba7781a7fb620063e70325891edadad6dbcc94e798be7bde1d",
+      "size_bytes": 1839
+    },
+    "judge_prompt": {
+      "path": "E:\\merged_partition_content\\Khoi_Project\\FPT-Assistant-v3\\dataset_benchmark\\robustness_v2\\prompts\\llm_judge_v1.txt",
+      "sha256": "b532607c92f4a9d75a1ff76aa9471ab92d46766fda394496a5ba81faa1a79078",
+      "size_bytes": 507
+    },
+    "split_audit": {
+      "path": "E:\\merged_partition_content\\Khoi_Project\\FPT-Assistant-v3\\dataset_benchmark\\robustness_v2\\reports\\split_leakage_audit.json",
+      "sha256": "a4ecf496ee0a5ac50199c79ee316d3ef79acc2dc656a932363fa7d846901a426",
+      "size_bytes": 1028
+    },
+    "variant_manifest": {
+      "path": "E:\\merged_partition_content\\Khoi_Project\\FPT-Assistant-v3\\dataset_benchmark\\robustness_v2\\manifests\\recorded_noise_generated.jsonl",
+      "sha256": "98831e8b822aadfd283f81993f9cad6eae6a7205ff1290ea85737dae39736c4e",
+      "size_bytes": 2122317
+    }
+  },
+  "outputs": {},
+  "missing_outputs": [],
+  "details": {
+    "config_hash": "c2737172719a73a1123397ce892e392bc0fb87ffa4ea88aa725fae2c0ddda72d",
+    "prompt_checks": {
+      "correction": [
+        "9ea1a085b9887dba7781a7fb620063e70325891edadad6dbcc94e798be7bde1d",
+        "9ea1a085b9887dba7781a7fb620063e70325891edadad6dbcc94e798be7bde1d"
+      ],
+      "answer": [
+        "7f906eb35d260263d2f33beca2c34ec8983822eca7025523865efa79b0e5c029",
+        "7f906eb35d260263d2f33beca2c34ec8983822eca7025523865efa79b0e5c029"
+      ],
+      "judge": [
+        "b532607c92f4a9d75a1ff76aa9471ab92d46766fda394496a5ba81faa1a79078",
+        "b532607c92f4a9d75a1ff76aa9471ab92d46766fda394496a5ba81faa1a79078"
+      ]
+    }
+  }
+}

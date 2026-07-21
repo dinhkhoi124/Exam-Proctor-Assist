@@ -1,0 +1,82 @@
+{
+  "schema_version": "1.0.0",
+  "stage": "evaluate",
+  "status": "success",
+  "captured_at_utc": "2026-07-21T15:43:10.961844+00:00",
+  "inputs": {
+    "config": {
+      "path": "E:\\merged_partition_content\\Khoi_Project\\FPT-Assistant-v3\\dataset_benchmark\\robustness_v2\\configs\\local_recorded_noise_inference_config.json",
+      "sha256": "bca10b397dc7714f9e9f3d928db38c38abfb7c3d9b0239b733f9a06a1a8a6758",
+      "size_bytes": 2443
+    },
+    "correction_cache": {
+      "path": "E:\\merged_partition_content\\Khoi_Project\\FPT-Assistant-v3\\dataset_benchmark\\robustness_v2\\cache_recorded_noise\\corrections.jsonl",
+      "sha256": "7cc02a5f667bb40004c25cbd826ddff9c86dc4d28d27a80eacc5dc928633275a",
+      "size_bytes": 425631
+    },
+    "final_answer_cache": {
+      "path": "E:\\merged_partition_content\\Khoi_Project\\FPT-Assistant-v3\\dataset_benchmark\\robustness_v2\\cache_recorded_noise\\final_answers.jsonl",
+      "sha256": "52af0b9a1e654d2ddf9ba00afdbafc968870504a649231d4aea4cbe61ff28285",
+      "size_bytes": 3137558
+    },
+    "gold_manifest": {
+      "path": "E:\\merged_partition_content\\Khoi_Project\\FPT-Assistant-v3\\dataset_benchmark\\manifest.csv",
+      "sha256": "76502e88730bb66f61cec20762d705cc68805c3a759d9fb03b408458ccf1f84e",
+      "size_bytes": 46835
+    },
+    "judge_cache": {
+      "path": "E:\\merged_partition_content\\Khoi_Project\\FPT-Assistant-v3\\dataset_benchmark\\robustness_v2\\cache_recorded_noise\\judge.jsonl",
+      "sha256": "3097f07e109ec69881217dcc8ea681bf509867f9b9aba6385abc7c1eaad379e6",
+      "size_bytes": 2695745
+    },
+    "retrieval_cache": {
+      "path": "E:\\merged_partition_content\\Khoi_Project\\FPT-Assistant-v3\\dataset_benchmark\\robustness_v2\\cache_recorded_noise\\retrieval.jsonl",
+      "sha256": "987d4ee8530c378b80346baa6a3f30f326e612ab84e84b71f3f279edf31abcb2",
+      "size_bytes": 45220984
+    },
+    "risk_cache": {
+      "path": "E:\\merged_partition_content\\Khoi_Project\\FPT-Assistant-v3\\dataset_benchmark\\robustness_v2\\cache_recorded_noise\\risk_decisions.jsonl",
+      "sha256": "adcc9e7e3c170a843382cae9f1626905d2a53b550edd3e3e17b08be721aaf05a",
+      "size_bytes": 1550470
+    },
+    "run_manifest": {
+      "path": "E:\\merged_partition_content\\Khoi_Project\\FPT-Assistant-v3\\dataset_benchmark\\robustness_v2\\manifests\\pipeline_recorded_noise_manifest.jsonl",
+      "sha256": "e71ebbbe6f27d0646e345460cc7b449ecdb42f8b333c45b16f0204d2d817b04a",
+      "size_bytes": 2122317
+    },
+    "stt_cache": {
+      "path": "E:\\merged_partition_content\\Khoi_Project\\FPT-Assistant-v3\\dataset_benchmark\\robustness_v2\\cache_recorded_noise\\stt.jsonl",
+      "sha256": "258ff55b49f872356badaa3bbef087976655ec200e226e8ae59e63b889379e36",
+      "size_bytes": 506377
+    }
+  },
+  "outputs": {
+    "base_level_csv": {
+      "path": "E:\\merged_partition_content\\Khoi_Project\\FPT-Assistant-v3\\dataset_benchmark\\robustness_v2\\reports_recorded_noise\\robustness_v2_recorded_noise_base_level.csv",
+      "sha256": "63c9f8c129cd4663be3a8f355cc2aa53fedfdeb0b77e51ca274f551c48b6e3eb",
+      "size_bytes": 13251
+    },
+    "evaluation_summary": {
+      "path": "E:\\merged_partition_content\\Khoi_Project\\FPT-Assistant-v3\\dataset_benchmark\\robustness_v2\\reports_recorded_noise\\robustness_v2_recorded_noise_summary.json",
+      "sha256": "f269818795cda0e3d793abae10b1bb0f9f87749646fbebd54f670f0a1ee62768",
+      "size_bytes": 338453
+    },
+    "metrics_csv": {
+      "path": "E:\\merged_partition_content\\Khoi_Project\\FPT-Assistant-v3\\dataset_benchmark\\robustness_v2\\reports_recorded_noise\\robustness_v2_recorded_noise_metrics.csv",
+      "sha256": "692a1dc5621eb92dcd69321211fa5802efcab33687ef6037af12fc711e43fa9c",
+      "size_bytes": 2069
+    },
+    "sample_level_csv": {
+      "path": "E:\\merged_partition_content\\Khoi_Project\\FPT-Assistant-v3\\dataset_benchmark\\robustness_v2\\reports_recorded_noise\\robustness_v2_recorded_noise_sample_level.csv",
+      "sha256": "99e9f91941e7860c4e584d6feb68734646f6be70c0964813725879b73d1ffd86",
+      "size_bytes": 1025655
+    }
+  },
+  "missing_outputs": [],
+  "details": {
+    "config_hash": "c2737172719a73a1123397ce892e392bc0fb87ffa4ea88aa725fae2c0ddda72d",
+    "independent_base_utterances": 104,
+    "pipeline_records": 1248,
+    "resampling_unit": "base_id"
+  }
+}

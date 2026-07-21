@@ -1,0 +1,32 @@
+{
+  "schema_version": "1.0.0",
+  "stage": "audit_split_leakage",
+  "status": "success",
+  "captured_at_utc": "2026-07-21T05:59:45.769947+00:00",
+  "inputs": {
+    "config": {
+      "path": "E:\\merged_partition_content\\Khoi_Project\\FPT-Assistant-v3\\dataset_benchmark\\robustness_v2\\configs\\augmentation_recorded_noise_config.json",
+      "sha256": "51c1e6abf53b3346ad0bcbc3752d91122a74f257c7be300c8f6cbfb24a722735",
+      "size_bytes": 3398
+    },
+    "manifest": {
+      "path": "E:\\merged_partition_content\\Khoi_Project\\FPT-Assistant-v3\\dataset_benchmark\\robustness_v2\\manifests\\recorded_noise_generated.jsonl",
+      "sha256": "98831e8b822aadfd283f81993f9cad6eae6a7205ff1290ea85737dae39736c4e",
+      "size_bytes": 2122317
+    }
+  },
+  "outputs": {
+    "leakage_audit": {
+      "path": "E:\\merged_partition_content\\Khoi_Project\\FPT-Assistant-v3\\dataset_benchmark\\robustness_v2\\reports_recorded_noise\\split_leakage_audit.json",
+      "sha256": "674467ea68c58ae0f824861c60a15ba70ea993c835b409a622d8c323686cfd2b",
+      "size_bytes": 1029
+    }
+  },
+  "missing_outputs": [],
+  "details": {
+    "config_hash": "5d9aac9e4bc9b9f3ba40e86756b844ce49a8c0ab9d1bfcd74e08f37cacaecdf7",
+    "audited_rows": 650,
+    "leakage_detected": false,
+    "api_calls": 0
+  }
+}
