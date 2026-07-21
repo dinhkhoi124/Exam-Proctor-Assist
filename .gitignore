@@ -166,3 +166,13 @@ dataset_benchmark/robustness_v2/reports_recorded_noise/*.console.json
 
 # Recorded-noise paid cache is handed off as a versioned Drive artifact
 dataset_benchmark/robustness_v2/cache_recorded_noise/
+
+# Local Drive handoff bundles
+dataset_benchmark/robustness_v2/*.zip
+dataset_benchmark/robustness_v2/assets/recorded_noise_wav.zip
+
+# Historical handoff prompt, not benchmark runtime
+dataset_benchmark/prompt_materialize_and_handoff.md
+
+# Unfinished local error-taxonomy workbooks
+dataset_benchmark/robustness_v2/annotations/error_analysis_rater_*.xlsx
