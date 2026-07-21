@@ -1,0 +1,137 @@
+{
+  "version": "2.0.0",
+  "global_seed": 20260718,
+  "base_manifest": "dataset_benchmark/robustness_v2/manifests/base_manifest_snapshot.jsonl",
+  "base_manifest_snapshot": "dataset_benchmark/robustness_v2/manifests/base_manifest_snapshot.jsonl",
+  "noise_asset_manifest": "dataset_benchmark/robustness_v2/noise_assets/manifest.csv",
+  "rir_asset_manifest": "dataset_benchmark/robustness_v2/rir_assets/manifest.csv",
+  "output_audio_dir": "dataset_benchmark/robustness_v2/audio_augmented",
+  "planned_manifest": "dataset_benchmark/robustness_v2/manifests/augmentation_plan.jsonl",
+  "generated_manifest": "dataset_benchmark/robustness_v2/manifests/augmentation_generated.jsonl",
+  "leakage_audit_output": "dataset_benchmark/robustness_v2/reports/split_leakage_audit.json",
+  "procedural_generation": {
+    "version": "synthetic_audio_v1",
+    "evidence_tier": "controlled_synthetic_primary",
+    "real_world_generalization_claim_allowed": false,
+    "external_validation_status": "not_provided",
+    "donor_policy": "same_split_exclude_target_and_semantic_cluster"
+  },
+  "split": {
+    "strategy": "semantic_cluster_v2_research",
+    "seed": 20260718,
+    "dev_fraction": 0.2,
+    "fresh_independent_test": false,
+    "disclosure": "V2 regrouping prevents augmentation/semantic leakage but is not a fresh independent test because v1 locked-test results were already observed.",
+    "near_duplicate_jaccard_threshold": 0.8,
+    "group_priority": ["semantic_cluster", "base_id", "speaker_session", "intent"]
+  },
+  "conditions": {
+    "C0": {
+      "enabled": true,
+      "variants_per_base": 1,
+      "chains": [{"id": "original", "operations": []}]
+    },
+    "C1": {
+      "enabled": true,
+      "variants_per_base": 2,
+      "chains": [
+        {
+          "id": "noise_mild",
+          "operations": [
+            {
+              "name": "background_noise",
+              "noise_type": "synthetic_fan_proxy",
+              "generator": "synthetic_fan_proxy",
+              "color": "pink",
+              "fundamental_hz_choices": [50, 60],
+              "harmonics": 5,
+              "modulation_depth": 0.12,
+              "snr_db_choices": [15, 20]
+            }
+          ]
+        },
+        {
+          "id": "gain_codec_mild",
+          "operations": [
+            {"name": "gain_reduction", "gain_db": -3},
+            {"name": "codec_compression", "bits": 10}
+          ]
+        }
+      ]
+    },
+    "C2": {
+      "enabled": true,
+      "variants_per_base": 3,
+      "chains": [
+        {
+          "id": "noise_moderate",
+          "operations": [
+            {
+              "name": "background_noise",
+              "noise_type": "synthetic_cafe_proxy",
+              "generator": "synthetic_cafe_proxy",
+              "donor_count": 4,
+              "snr_db_choices": [5, 10]
+            }
+          ]
+        },
+        {
+          "id": "noise_rir_office",
+          "operations": [
+            {
+              "name": "background_noise",
+              "noise_type": "synthetic_office_proxy",
+              "generator": "synthetic_office_proxy",
+              "color": "pink",
+              "click_rate_hz": 1.5,
+              "snr_db_choices": [5, 10]
+            },
+            {
+              "name": "room_reverberation",
+              "generator": "synthetic_image_source",
+              "room_dimension_ranges_m": [[3.0, 6.0], [3.0, 5.0], [2.5, 3.5]],
+              "rt60_sec_choices": [0.3, 0.45, 0.6],
+              "duration_sec": 0.75,
+              "max_order": 6
+            }
+          ]
+        },
+        {
+          "id": "phone_gain",
+          "operations": [
+            {"name": "bandpass_phone"},
+            {"name": "gain_reduction", "gain_db": -6}
+          ]
+        }
+      ]
+    },
+    "C3": {
+      "enabled": true,
+      "variants_per_base": 2,
+      "chains": [
+        {
+          "id": "noise_clip_stress",
+          "operations": [
+            {
+              "name": "background_noise",
+              "noise_type": "synthetic_speech_babble",
+              "generator": "in_corpus_speech_babble",
+              "donor_count": 6,
+              "snr_db_choices": [0, 5]
+            },
+            {"name": "mild_clipping", "threshold": 0.75}
+          ]
+        },
+        {
+          "id": "telephony_speed_stress",
+          "operations": [
+            {"name": "resample_8k"},
+            {"name": "codec_compression", "bits": 8},
+            {"name": "speed", "factor_choices": [0.9, 1.1]}
+          ]
+        }
+      ]
+    }
+  },
+  "prompt_few_shot_examples": []
+}

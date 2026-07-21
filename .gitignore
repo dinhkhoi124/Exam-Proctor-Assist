@@ -147,3 +147,22 @@ dataset_benchmark/robustness_v2/annotations/gold_adjudicated.xlsx
 database/
 report/
 plan/
+
+# Robustness v2 obsolete/generated local runs (recorded-noise evidence is kept)
+*.tmp
+dataset_benchmark/robustness_v2/drive-download-*.zip
+dataset_benchmark/robustness_v2/assets/recorded_noise_quarantine/
+dataset_benchmark/robustness_v2/cache_full/
+dataset_benchmark/robustness_v2/checkpoints_full/
+dataset_benchmark/robustness_v2/reports_full/
+dataset_benchmark/robustness_v2/reports/
+dataset_benchmark/robustness_v2/manifests/augmentation_plan.jsonl
+dataset_benchmark/robustness_v2/manifests/augmentation_generated.jsonl
+dataset_benchmark/robustness_v2/manifests/pipeline_full_manifest.jsonl
+dataset_benchmark/robustness_v2/manifests/pipeline_pilot_manifest.jsonl
+dataset_benchmark/robustness_v2/text_diagnostics/text_diagnostics_manifest.jsonl
+dataset_benchmark/robustness_v2/text_diagnostics/text_diagnostics_summary.json
+dataset_benchmark/robustness_v2/reports_recorded_noise/*.console.json
+
+# Recorded-noise paid cache is handed off as a versioned Drive artifact
+dataset_benchmark/robustness_v2/cache_recorded_noise/

@@ -1,0 +1,22 @@
+{
+  "version": "2.0.0",
+  "manifest": "dataset_benchmark/manifest.csv",
+  "raw_transcripts": "dataset_benchmark/benchmark_outputs/raw_transcripts.jsonl",
+  "corrected_transcripts": "dataset_benchmark/benchmark_outputs/corrected_transcripts.jsonl",
+  "annotation_dir": "dataset_benchmark/robustness_v2/annotations",
+  "oracle_output": "dataset_benchmark/robustness_v2/reports/oracle_recoverability.json",
+  "stage_metadata": {
+    "prepare_annotation": "dataset_benchmark/robustness_v2/reports/prepare_error_analysis_annotation.metadata.json",
+    "build_adjudication": "dataset_benchmark/robustness_v2/reports/build_error_analysis_adjudication.metadata.json",
+    "evaluate_oracle": "dataset_benchmark/robustness_v2/reports/evaluate_oracle_recoverability.metadata.json"
+  },
+  "annotation_seed": 20260718,
+  "wer_bins": [
+    "WER = 0",
+    "0 < WER <= 5%",
+    "5% < WER <= 15%",
+    "15% < WER <= 30%",
+    "WER > 30%"
+  ],
+  "recoverable_levels": ["high", "medium"]
+}

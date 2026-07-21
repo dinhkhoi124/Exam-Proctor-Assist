@@ -1,0 +1,155 @@
+{
+  "version": "2.0.0-priority4",
+  "global_seed": 20260718,
+  "dataset": {
+    "base_manifest": "dataset_benchmark/robustness_v2/manifests/base_manifest_snapshot.jsonl",
+    "variant_manifest": "dataset_benchmark/robustness_v2/manifests/augmentation_generated.jsonl",
+    "augmentation_plan": "dataset_benchmark/robustness_v2/manifests/augmentation_plan.jsonl",
+    "split_audit": "dataset_benchmark/robustness_v2/reports/split_leakage_audit.json",
+    "augmentation_config": "dataset_benchmark/robustness_v2/configs/augmentation_config.json",
+    "default_condition": "C0",
+    "pilot_max_base": 10
+  },
+  "pipelines": ["P0", "P1", "P2"],
+  "stt": {
+    "primary_model": "gpt-4o-mini-transcribe",
+    "fallback_model": "whisper-1",
+    "language": "vi",
+    "prompt": "Hội thoại hỗ trợ khắc phục sự cố tại FPT university",
+    "service_version": "backend_stt_v1",
+    "compatible_import_cache": "dataset_benchmark/benchmark_outputs/raw_transcripts.jsonl"
+  },
+  "correction": {
+    "model": "gpt-4o-mini",
+    "temperature": 0,
+    "service_version": "backend_asr_correction_v1",
+    "prompt_path": "backend/app/prompts/asr_correction.py",
+    "prompt_sha256": "9ea1a085b9887dba7781a7fb620063e70325891edadad6dbcc94e798be7bde1d",
+    "compatible_import_cache": "dataset_benchmark/benchmark_outputs/corrected_transcripts.jsonl",
+    "retry_attempts": 3,
+    "retry_base_delay_seconds": 1.0
+  },
+  "risk_detector": {
+    "version": "heuristic_v1",
+    "threshold": 0.6,
+    "minimum_tokens": 3,
+    "max_consecutive_token_repeats": 2,
+    "english_token_ratio_threshold": 0.5,
+    "english_lexicon": ["account", "password", "wifi", "reset", "login", "email", "server", "fail", "vpn"],
+    "retrieval_top1_min": 0.2,
+    "retrieval_margin_min": 0.1,
+    "stt_confidence_min": 0.7,
+    "allowed_symbols": "?!.:,;@/_-()[]%+",
+    "weights": {
+      "empty_transcript": 1.0,
+      "short_transcript": 0.35,
+      "unusual_characters": 0.35,
+      "repeated_tokens": 0.25,
+      "high_english_token_ratio": 0.2,
+      "domain_entity_or_acronym": 0.15,
+      "number_ip_or_version": 0.2,
+      "low_retrieval_score": 0.4,
+      "ambiguous_top1_top2_margin": 0.3,
+      "low_stt_confidence": 0.4
+    }
+  },
+  "threshold_tuning": {
+    "split": "dev",
+    "minimum_dev_samples": 5,
+    "thresholds": [0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8],
+    "lambda_cost": 0.02,
+    "lambda_overcorrection": 0.2,
+    "objective": "quality_gain-lambda_cost*call_rate-lambda_overcorrection*overcorrection_rate"
+  },
+  "retrieval": {
+    "top_k": 15,
+    "use_rerank": false,
+    "service_version": "hybrid_rag_v1",
+    "vector_store_dir": "backend/app/rag/vector_store"
+  },
+  "answer_generation": {
+    "model": "gpt-4o-mini",
+    "temperature": 0.1,
+    "service_version": "backend_answer_v1",
+    "prompt_path": "backend/app/prompts/exam_support.py",
+    "prompt_sha256": "7f906eb35d260263d2f33beca2c34ec8983822eca7025523865efa79b0e5c029",
+    "compatible_import_cache": "dataset_benchmark/benchmark_outputs/answer_results.jsonl",
+    "compatible_retrieval_cache": "dataset_benchmark/benchmark_outputs/retrieval_results.jsonl",
+    "external_api_allowed": false,
+    "external_api_policy": "deny_private_transcript_and_document_context_egress",
+    "retry_attempts": 3,
+    "retry_base_delay_seconds": 1.0
+  },
+  "judge": {
+    "enabled": false,
+    "role": "auxiliary_only_human_rating_is_primary",
+    "availability": "unavailable_disabled_by_config"
+  },
+  "metrics": {
+    "implemented_in_priority": 4,
+    "grouping_unit": "base_id",
+    "retrieval_proxy_is_not_gold": true
+  },
+  "statistics": {
+    "bootstrap_unit": "base_id",
+    "bootstrap_iterations": 5000,
+    "seed": 20260718,
+    "multiple_comparison_correction": "holm"
+  },
+  "evaluation": {
+    "gold_manifest": "dataset_benchmark/manifest.csv",
+    "answer_annotation_dir": "dataset_benchmark/annotations",
+    "error_annotation_dir": "dataset_benchmark/robustness_v2/annotations",
+    "clean_non_inferiority": {
+      "wer_margin_absolute": 0.005,
+      "task_success_margin": 0.02
+    },
+    "production_decision": {
+      "maximum_overcorrection_rate": 0.02,
+      "maximum_correction_call_rate": 0.5,
+      "maximum_p95_latency_ms": 3000,
+      "maximum_cost_per_1000_requests_usd": 10.0,
+      "minimum_speakers": 3,
+      "require_true_gold_retrieval": true,
+      "require_human_task_success": true,
+      "automatic_production_enable": false
+    }
+  },
+  "cost": {
+    "currency": "USD",
+    "as_of": "2026-07-19",
+    "source": "https://developers.openai.com/api/docs/pricing",
+    "approval_threshold_usd": 1.0,
+    "models": {
+      "gpt-4o-mini": {
+        "input_per_million_tokens": 0.15,
+        "output_per_million_tokens": 0.6
+      },
+      "gpt-4o-mini-transcribe": {
+        "per_minute_assumption": 0.003
+      }
+    },
+    "estimates": {
+      "correction_input_tokens_per_call": 450,
+      "correction_output_tokens_per_call": 30,
+      "answer_input_tokens_per_call": 2500,
+      "answer_output_tokens_per_call": 250
+    }
+  },
+  "outputs": {
+    "run_manifest": "dataset_benchmark/robustness_v2/manifests/pipeline_pilot_manifest.jsonl",
+    "cache_dir": "dataset_benchmark/robustness_v2/cache",
+    "checkpoint_dir": "dataset_benchmark/robustness_v2/checkpoints",
+    "threshold_tuning": "dataset_benchmark/robustness_v2/reports/selective_threshold_tuning.json",
+    "evaluation_summary": "dataset_benchmark/robustness_v2/reports/robustness_v2_summary.json",
+    "metrics_csv": "dataset_benchmark/robustness_v2/reports/robustness_v2_metrics.csv",
+    "sample_level_csv": "dataset_benchmark/robustness_v2/reports/robustness_v2_sample_level.csv",
+    "base_level_csv": "dataset_benchmark/robustness_v2/reports/robustness_v2_base_level.csv",
+    "report_markdown": "dataset_benchmark/robustness_v2/reports/robustness_v2_report.md"
+  },
+  "production": {
+    "modified": false,
+    "selective_correction_enabled": false,
+    "scope": "benchmark_only"
+  }
+}

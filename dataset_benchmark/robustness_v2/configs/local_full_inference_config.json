@@ -1,0 +1,51 @@
+{
+  "extends": "dataset_benchmark/robustness_v2/configs/benchmark_v2_config.json",
+  "version": "2.0.0-local-full-handoff",
+  "dataset": {
+    "default_condition": null,
+    "default_base_limit": null,
+    "pilot_max_base": 130,
+    "maximum_base": 130
+  },
+  "answer_generation": {
+    "external_api_allowed": true,
+    "external_api_policy": "project_owner_explicit_local_execution_after_cost_review"
+  },
+  "judge": {
+    "enabled": true,
+    "role": "auxiliary_only_human_rating_is_primary",
+    "model": "gpt-4o-mini",
+    "temperature": 0,
+    "service_version": "robustness_v2_judge_v1",
+    "prompt_path": "dataset_benchmark/robustness_v2/prompts/llm_judge_v1.txt",
+    "prompt_sha256": "b532607c92f4a9d75a1ff76aa9471ab92d46766fda394496a5ba81faa1a79078",
+    "retry_attempts": 3,
+    "retry_base_delay_seconds": 1.0
+  },
+  "cost": {
+    "as_of": "2026-07-19",
+    "source": "https://developers.openai.com/api/docs/models/gpt-4o-mini",
+    "estimates": {
+      "judge_input_tokens_per_call": 3000,
+      "judge_output_tokens_per_call": 120
+    }
+  },
+  "outputs": {
+    "run_manifest": "dataset_benchmark/robustness_v2/manifests/pipeline_full_manifest.jsonl",
+    "cache_dir": "dataset_benchmark/robustness_v2/cache_full",
+    "checkpoint_dir": "dataset_benchmark/robustness_v2/checkpoints_full",
+    "threshold_tuning": "dataset_benchmark/robustness_v2/reports_full/selective_threshold_tuning.json",
+    "evaluation_summary": "dataset_benchmark/robustness_v2/reports_full/robustness_v2_summary.json",
+    "metrics_csv": "dataset_benchmark/robustness_v2/reports_full/robustness_v2_metrics.csv",
+    "sample_level_csv": "dataset_benchmark/robustness_v2/reports_full/robustness_v2_sample_level.csv",
+    "base_level_csv": "dataset_benchmark/robustness_v2/reports_full/robustness_v2_base_level.csv",
+    "report_markdown": "dataset_benchmark/robustness_v2/reports_full/robustness_v2_report.md"
+  },
+  "execution": {
+    "mode": "local_full_c0_c3_inference",
+    "requires_paid_api_confirmation": true,
+    "confirmation_env_var": "ROBUSTNESS_V2_ALLOW_PAID_API",
+    "confirmation_value": "YES_I_REVIEWED_THE_FULL_COST",
+    "full_run_record_name": "full_inference_run.json"
+  }
+}

@@ -1,0 +1,90 @@
+{
+  "version": "2.1.0-recorded-noise",
+  "global_seed": 20260721,
+  "base_manifest": "dataset_benchmark/robustness_v2/manifests/base_manifest_snapshot.jsonl",
+  "base_manifest_snapshot": "dataset_benchmark/robustness_v2/manifests/base_manifest_snapshot.jsonl",
+  "noise_asset_manifest": "dataset_benchmark/robustness_v2/assets/recorded_noise_wav/manifest.csv",
+  "rir_asset_manifest": null,
+  "output_audio_dir": "dataset_benchmark/robustness_v2/audio_recorded_noise",
+  "planned_manifest": "dataset_benchmark/robustness_v2/manifests/recorded_noise_plan.jsonl",
+  "generated_manifest": "dataset_benchmark/robustness_v2/manifests/recorded_noise_generated.jsonl",
+  "leakage_audit_output": "dataset_benchmark/robustness_v2/reports_recorded_noise/split_leakage_audit.json",
+  "materialization_verification_output": "dataset_benchmark/robustness_v2/reports_recorded_noise/materialization_verification.json",
+  "quality_audit_output": "dataset_benchmark/robustness_v2/reports_recorded_noise/audio_quality_audit.json",
+  "listening_index_output": "dataset_benchmark/robustness_v2/reports_recorded_noise/LISTENING_SAMPLES.md",
+  "checkpoint_dir": "dataset_benchmark/robustness_v2/checkpoints_recorded_noise",
+  "procedural_generation": {
+    "version": "recorded_environmental_noise_v1",
+    "evidence_tier": "owner_recorded_environmental_noise_primary",
+    "real_world_generalization_claim_allowed": false,
+    "external_validation_status": "owner_recorded_hash_audited",
+    "donor_policy": "source_recording_disjoint_dev_test"
+  },
+  "split": {
+    "strategy": "semantic_cluster_v2_research",
+    "seed": 20260718,
+    "dev_fraction": 0.2,
+    "fresh_independent_test": false,
+    "disclosure": "V2 regrouping prevents augmentation/semantic leakage but is not a fresh independent test because v1 locked-test results were already observed.",
+    "near_duplicate_jaccard_threshold": 0.8,
+    "group_priority": ["semantic_cluster", "base_id", "speaker_session", "intent"]
+  },
+  "conditions": {
+    "C0": {
+      "enabled": true,
+      "variants_per_base": 1,
+      "chains": [{"id": "original", "operations": []}]
+    },
+    "C1": {
+      "enabled": true,
+      "variants_per_base": 1,
+      "chains": [{
+        "id": "recorded_fan",
+        "operations": [{
+          "name": "background_noise",
+          "noise_type": "fan",
+          "generator": "external_asset",
+          "snr_db_choices": [10, 15]
+        }]
+      }]
+    },
+    "C2": {
+      "enabled": true,
+      "variants_per_base": 2,
+      "chains": [
+        {
+          "id": "recorded_cafe",
+          "operations": [{
+            "name": "background_noise",
+            "noise_type": "cafe",
+            "generator": "external_asset",
+            "snr_db_choices": [5, 10]
+          }]
+        },
+        {
+          "id": "recorded_office",
+          "operations": [{
+            "name": "background_noise",
+            "noise_type": "office",
+            "generator": "external_asset",
+            "snr_db_choices": [5, 10]
+          }]
+        }
+      ]
+    },
+    "C3": {
+      "enabled": true,
+      "variants_per_base": 1,
+      "chains": [{
+        "id": "recorded_speech_babble",
+        "operations": [{
+          "name": "background_noise",
+          "noise_type": "speech_babble",
+          "generator": "external_asset",
+          "snr_db_choices": [0, 5]
+        }]
+      }]
+    }
+  },
+  "prompt_few_shot_examples": []
+}

@@ -1,0 +1,24 @@
+{
+  "schema_version": "1.0.0",
+  "seed": 20260718,
+  "source_manifest": "dataset_benchmark/robustness_v2/manifests/base_manifest_snapshot.jsonl",
+  "severities": [1, 2, 3],
+  "corruptions": [
+    "remove_punctuation",
+    "remove_diacritics",
+    "homophone_substitution",
+    "word_deletion",
+    "word_insertion",
+    "abbreviation_corruption",
+    "code_switch_corruption",
+    "number_format_corruption",
+    "ip_address_corruption",
+    "word_boundary_corruption"
+  ],
+  "outputs": {
+    "manifest": "dataset_benchmark/robustness_v2/text_diagnostics/text_diagnostics_manifest.jsonl",
+    "summary": "dataset_benchmark/robustness_v2/text_diagnostics/text_diagnostics_summary.json",
+    "metadata": "dataset_benchmark/robustness_v2/checkpoints/text_diagnostics.metadata.json"
+  },
+  "disclosure": "Controlled error-injection diagnostic set; not primary evidence of performance on real ASR errors."
+}
