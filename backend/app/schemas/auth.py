@@ -1,4 +1,5 @@
 from pydantic import BaseModel, EmailStr
+from typing import Literal
 
 
 class RegisterRequest(BaseModel):
@@ -35,7 +36,18 @@ class ForgotPasswordRequest(BaseModel):
     email: EmailStr
 
 
+class ResendVerificationRequest(BaseModel):
+    email: EmailStr
+
+
 class ResetPasswordRequest(BaseModel):
     token: str
     new_password: str
     confirm_password: str
+
+class UpdateRoleRequest(BaseModel):
+    role: Literal[
+        "user",
+        "manager",
+        "admin"
+    ]

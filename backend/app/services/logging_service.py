@@ -4,10 +4,11 @@ from app.models.user_activity import UserActivityLog
 from app.models.chat_topic import ChatTopic
 
 
-def log_user_activity(db: Session, user_id, activity_type: str):
+def log_user_activity(db: Session, user_id, activity_type: str, metadata: dict | None = None):
     log = UserActivityLog(
         user_id=user_id,
-        activity_type=activity_type
+        activity_type=activity_type,
+        metadata_=metadata,
     )
     db.add(log)
     db.commit()
@@ -23,7 +24,8 @@ def save_chat_log(
     question,
     answer,
     topic_name,
-    latency
+    latency,
+    session_id=None
 ):
     topic_id = get_topic_id(db, topic_name)
 
@@ -33,7 +35,10 @@ def save_chat_log(
         answer=answer,
         topic_id=topic_id,   
         latency_ms=latency,
-        status="success"
+        status="success",
+        session_id=session_id
     )
     db.add(chat)
     db.commit()
+    db.refresh(chat)
+    return chat

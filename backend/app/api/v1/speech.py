@@ -1,30 +1,60 @@
-from fastapi import APIRouter, UploadFile, File
+import asyncio
+import logging
+from fastapi import APIRouter, UploadFile, File, HTTPException
+
 from app.services.stt_service import speech_to_text
-from fastapi.responses import StreamingResponse
-from io import BytesIO
-from app.services.tts_service import text_to_speech
+from app.services.voice_correction_service import VoiceCorrectionService
+from app.core.config import VOICE_CORRECTION_ENABLED
+
 
 router = APIRouter()
+logger = logging.getLogger(__name__)
+
+# Khởi tạo voice correction service
+voice_service = VoiceCorrectionService()
+
 
 @router.post("/speech/stt")
 async def stt(file: UploadFile = File(...)):
     audio_bytes = await file.read()
 
-    # 🔴 DEBUG BẮT BUỘC
-    print("VOICE DEBUG")
-    print("filename:", file.filename)
-    print("bytes length:", len(audio_bytes))
-    print("first 20 bytes:", audio_bytes[:20])
+    if not audio_bytes:
+        return {"text": ""}
 
-    if not audio_bytes or len(audio_bytes) < 8000:
-        return {
-            "text": ""
-        }
+    # =========================
+    # STEP 1: Speech to Text
+    # =========================
+    try:
+        raw_text = await asyncio.to_thread(
+            speech_to_text, audio_bytes, file.filename or "recording.webm"
+        )
+    except RuntimeError as exc:
+        raise HTTPException(
+            status_code=502,
+            detail="Dịch vụ nhận dạng giọng nói gặp lỗi.",
+        ) from exc
 
-    text = speech_to_text(audio_bytes, file.filename)
-    print("TRANSCRIPT:", text)
+    logger.info("Speech transcript received (characters=%d)", len(raw_text))
+
+    if not raw_text:
+        return {"text": ""}
+
+    # =========================
+    # STEP 2: Voice Correction
+    # =========================
+    corrected_text = (
+        await voice_service.fix_voice_query(raw_text)
+        if VOICE_CORRECTION_ENABLED
+        else raw_text
+    )
+
+    logger.info(
+        "Speech transcript normalization completed (characters=%d)",
+        len(corrected_text),
+    )
 
     return {
-        "text": text
+        "text": corrected_text,
+        "raw_text": raw_text,
+        "corrected": VOICE_CORRECTION_ENABLED,
     }
-

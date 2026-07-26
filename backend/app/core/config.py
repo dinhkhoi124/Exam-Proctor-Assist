@@ -3,13 +3,73 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
+FRONTEND_URL = os.getenv("FRONTEND_URL", "http://localhost:8080").rstrip("/")
+FRONTEND_ORIGINS = [
+    origin.strip().rstrip("/")
+    for origin in os.getenv("FRONTEND_ORIGINS", FRONTEND_URL).split(",")
+    if origin.strip()
+]
+
 # =========================
-# OPENAI (RAG)
+# MODEL PROVIDERS
 # =========================
+# LLM and vision endpoints use the OpenAI-compatible protocol. They can point
+# either to OpenAI or to a local server such as vLLM without changing code.
 OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
 
-if not OPENAI_API_KEY:
-    raise RuntimeError("OPENAI_API_KEY is not set in .env")
+LLM_BASE_URL = os.getenv("LLM_BASE_URL", "").strip().rstrip("/") or None
+LLM_API_KEY = (
+    os.getenv("LLM_API_KEY")
+    or OPENAI_API_KEY
+    or ("local" if LLM_BASE_URL else None)
+)
+LLM_MODEL = os.getenv("LLM_MODEL", "gpt-4o-mini")
+LLM_TIMEOUT_SECONDS = float(os.getenv("LLM_TIMEOUT_SECONDS", "120"))
+LLM_MAX_TOKENS = int(os.getenv("LLM_MAX_TOKENS", "512"))
+LLM_TEMPERATURE = float(os.getenv("LLM_TEMPERATURE", "0.2"))
+LLM_FREQUENCY_PENALTY = float(os.getenv("LLM_FREQUENCY_PENALTY", "0.25"))
+# vLLM supports repetition_penalty as an OpenAI-compatible extension. Keep it
+# at 1.0 when switching to a provider that does not support this field.
+LLM_REPETITION_PENALTY = float(os.getenv("LLM_REPETITION_PENALTY", "1.0"))
+QUERY_REWRITE_MODEL = os.getenv("QUERY_REWRITE_MODEL", LLM_MODEL)
+
+VISION_BASE_URL = (
+    os.getenv("VISION_BASE_URL", "").strip().rstrip("/") or LLM_BASE_URL
+)
+VISION_API_KEY = (
+    os.getenv("VISION_API_KEY")
+    or LLM_API_KEY
+    or ("local" if VISION_BASE_URL else None)
+)
+VISION_MODEL = os.getenv("VISION_MODEL", LLM_MODEL)
+VISION_MAX_TOKENS = int(os.getenv("VISION_MAX_TOKENS", "160"))
+EMBEDDING_DEVICE = os.getenv("EMBEDDING_DEVICE", "cpu")
+
+if not LLM_API_KEY:
+    raise RuntimeError(
+        "Configure LLM_API_KEY/OPENAI_API_KEY, or set LLM_BASE_URL for a local provider"
+    )
+
+# OpenAI-specific audio services remain optional while the local Faster-Whisper service is deployed.
+OPENAI_STT_MODEL = os.getenv("OPENAI_STT_MODEL", "gpt-4o-mini-transcribe")
+OPENAI_STT_FALLBACK_MODEL = os.getenv("OPENAI_STT_FALLBACK_MODEL", "whisper-1")
+STT_BASE_URL = os.getenv("STT_BASE_URL", "").strip().rstrip("/") or None
+STT_API_KEY = os.getenv("STT_API_KEY") or OPENAI_API_KEY or ("local" if STT_BASE_URL else None)
+STT_MODEL = os.getenv("STT_MODEL", OPENAI_STT_MODEL)
+STT_FALLBACK_MODEL = os.getenv("STT_FALLBACK_MODEL", OPENAI_STT_FALLBACK_MODEL)
+STT_TIMEOUT_SECONDS = float(os.getenv("STT_TIMEOUT_SECONDS", "180"))
+STT_LANGUAGE = os.getenv("STT_LANGUAGE", "").strip() or None
+VOICE_CORRECTION_ENABLED = os.getenv("VOICE_CORRECTION_ENABLED", "true").lower() in {
+    "1",
+    "true",
+    "yes",
+}
+VOICE_LLM_NORMALIZATION_ENABLED = os.getenv(
+    "VOICE_LLM_NORMALIZATION_ENABLED", "false"
+).lower() in {"1", "true", "yes"}
+
+OPENAI_TTS_MODEL = os.getenv("OPENAI_TTS_MODEL", "gpt-4o-mini-tts")
+OPENAI_TTS_VOICE = os.getenv("OPENAI_TTS_VOICE", "alloy")
 
 BASE_DIR = os.path.dirname(os.path.dirname(__file__))
 
@@ -45,17 +105,3 @@ RESET_TOKEN_EXPIRE_MINUTES = int(
     os.getenv("RESET_TOKEN_EXPIRE_MINUTES", 10)
 )
 
-# =========================
-# EMAIL CONFIG
-# =========================
-MAIL_USERNAME = os.getenv("MAIL_USERNAME")
-MAIL_PASSWORD = os.getenv("MAIL_PASSWORD")
-MAIL_FROM = os.getenv("MAIL_FROM")
-MAIL_PORT = int(os.getenv("MAIL_PORT", 587))
-MAIL_SERVER = os.getenv("MAIL_SERVER")
-MAIL_TLS = os.getenv("MAIL_TLS", "True") == "True"
-MAIL_SSL = os.getenv("MAIL_SSL", "False") == "True"
-
-# Chỉ kiểm tra email nếu bạn thực sự bật tính năng gửi mail
-if MAIL_USERNAME and not MAIL_PASSWORD:
-    raise RuntimeError("MAIL_PASSWORD is missing in .env")
