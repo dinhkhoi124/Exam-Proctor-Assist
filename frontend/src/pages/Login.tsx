@@ -1,18 +1,20 @@
 import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
-import { useAuth } from "@/context/AuthContext";
+import { useAuth } from "@/context/auth";
 import { api } from "@/lib/api";
+import { getApiErrorMessage, getApiErrorPayload, isRecord } from "@/lib/api-errors";
 import { toast } from "sonner";
 
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 
-import { Shield, Eye, Brain, CheckCircle } from "lucide-react";
+import { AlertCircle, Mail, Shield, Eye, Brain, CheckCircle } from "lucide-react";
 
 import heroImage from "@/assets/exam-proctoring-hero.jpg";
-import logoImage from "@/assets/Logo-Dai-hoc-FPT.jpg"; // Import logo mới
+import logoImage from "@/assets/Logo-Dai-hoc-FPT.webp";
 
 export default function Login() {
   const { login } = useAuth();
@@ -21,12 +23,49 @@ export default function Login() {
   const [identifier, setIdentifier] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
+  const [resendLoading, setResendLoading] = useState(false);
+  const [unverifiedAccount, setUnverifiedAccount] = useState<{
+    message: string;
+    canResendVerification: boolean;
+  } | null>(null);
+
+  const handleResendVerification = async () => {
+    const email = identifier.trim();
+
+    if (!email.includes("@")) {
+      toast.error("Please enter your email address to resend verification.");
+      return;
+    }
+
+    try {
+      setResendLoading(true);
+
+      const response = await api.post("/api/v1/auth/resend-verification", {
+        email,
+      });
+
+      toast.success(
+        response.data?.message ||
+          "If the account exists and is not verified, a verification email has been sent.",
+      );
+    } catch (error) {
+      toast.error(
+        getApiErrorMessage(
+          error,
+          "Could not resend verification email. Please try again later.",
+        ),
+      );
+    } finally {
+      setResendLoading(false);
+    }
+  };
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
 
     try {
       setLoading(true);
+      setUnverifiedAccount(null);
 
       const response = await api.post("/api/v1/auth/login", {
         identifier,
@@ -50,17 +89,41 @@ export default function Login() {
 
       toast.success("Login successful!");
 
+      const redirectPath = (user?.role === "admin" || user?.role === "manager") ? "/admin" : "/";
+
       setTimeout(() => {
-        navigate("/", { replace: true });
+        navigate(redirectPath, { replace: true });
       }, 50);
 
-      navigate("/", { replace: true });
-    } catch (error: any) {
-      toast.error(
-        error?.response?.data?.detail?.[0]?.msg ||
-          error?.response?.data?.detail ||
-          "Invalid credentials",
-      );
+      navigate(redirectPath, { replace: true });
+    } catch (error) {
+      const errorData = getApiErrorPayload(error);
+      const nestedDetail = isRecord(errorData?.detail)
+        ? errorData.detail
+        : undefined;
+      const emailNotVerified =
+        errorData?.error === "EMAIL_NOT_VERIFIED" ||
+        nestedDetail?.error === "EMAIL_NOT_VERIFIED";
+
+      if (emailNotVerified) {
+        const payload =
+          errorData?.error === "EMAIL_NOT_VERIFIED"
+            ? errorData
+            : nestedDetail;
+
+        setUnverifiedAccount({
+          message:
+            typeof payload?.message === "string"
+              ? payload.message
+              : "Account is not verified",
+          canResendVerification: Boolean(payload.can_resend_verification),
+        });
+
+        toast.error("Account is not verified. Please verify your email.");
+        return;
+      }
+
+      toast.error(getApiErrorMessage(error, "Invalid credentials"));
     } finally {
       setLoading(false);
     }
@@ -91,7 +154,7 @@ export default function Login() {
             <div className="flex items-center gap-3">
               <div className="bg-white p-2 rounded-lg shadow-md">
                 <img
-                  src={logoImage} // Sử dụng logo mới
+                  src={logoImage}
                   alt="FPT University Logo"
                   className="h-11 w-auto"
                 />
@@ -158,7 +221,7 @@ export default function Login() {
           <div className="mb-8 flex items-center gap-3 lg:hidden">
             <div className="bg-white p-2 rounded-lg shadow-md">
               <img
-                src={logoImage} // Sử dụng logo mới
+                src={logoImage}
                 alt="FPT University Logo"
                 className="h-12 w-auto"
               />
@@ -186,7 +249,10 @@ export default function Login() {
                     <Input
                       placeholder="Enter your email or username"
                       value={identifier}
-                      onChange={(e) => setIdentifier(e.target.value)}
+                      onChange={(e) => {
+                        setIdentifier(e.target.value);
+                        setUnverifiedAccount(null);
+                      }}
                       className="h-11"
                     />
                   </div>
@@ -207,10 +273,42 @@ export default function Login() {
                       type="password"
                       placeholder="••••••••"
                       value={password}
-                      onChange={(e) => setPassword(e.target.value)}
+                      onChange={(e) => {
+                        setPassword(e.target.value);
+                        setUnverifiedAccount(null);
+                      }}
                       className="h-11"
                     />
                   </div>
+
+                  {unverifiedAccount && (
+                    <Alert variant="destructive">
+                      <AlertCircle className="h-4 w-4" />
+                      <AlertTitle>Email verification required</AlertTitle>
+                      <AlertDescription className="space-y-3">
+                        <p>
+                          {unverifiedAccount.message}. Please check your inbox
+                          or spam folder before signing in.
+                        </p>
+
+                        {unverifiedAccount.canResendVerification && (
+                          <Button
+                            type="button"
+                            variant="outline"
+                            size="sm"
+                            className="h-9"
+                            onClick={handleResendVerification}
+                            disabled={resendLoading}
+                          >
+                            <Mail className="mr-2 h-4 w-4" />
+                            {resendLoading
+                              ? "Sending..."
+                              : "Resend verification email"}
+                          </Button>
+                        )}
+                      </AlertDescription>
+                    </Alert>
+                  )}
 
                   <Button
                     type="submit"
