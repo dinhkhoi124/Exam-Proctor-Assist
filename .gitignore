@@ -176,3 +176,10 @@ dataset_benchmark/prompt_materialize_and_handoff.md
 
 # Unfinished local error-taxonomy workbooks
 dataset_benchmark/robustness_v2/annotations/error_analysis_rater_*.xlsx
+
+# ASR
+ASR/
+document_report_paper/
+
+# DB new
+/DBTest_New
