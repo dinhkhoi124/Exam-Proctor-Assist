@@ -84,3 +84,17 @@ tai lieu/
 deploy_packages/
 Old/
 _git_worktrees/
+
+# ======================
+# Database dumps & backups
+# ======================
+Database_Structure.sql
+ChatbotDB.sql
+backup.sql
+# ======================
+# Local working documents
+# ======================
+document-antigravity/
+ASR/
+database/
+DBTest_New
