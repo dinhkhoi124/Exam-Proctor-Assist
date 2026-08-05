@@ -1,390 +1,441 @@
 # FPT Exam Assistant
 
-AI-powered chatbot designed to support **exam proctors and students** in quickly accessing **exam regulations and academic policies**.  
+AI-powered chatbot designed to support **exam proctors and students** in quickly accessing **exam regulations and academic policies**.
 
-The system leverages **Retrieval-Augmented Generation (RAG)** to provide accurate answers from official university documents, combined with **speech capabilities** for voice interaction.
+The system combines **Hybrid Retrieval-Augmented Generation (RAG)** with a **domain fine-tuned language model** to deliver accurate, context-grounded answers from official university documents — with both text and voice interaction.
 
-This project demonstrates how modern AI systems integrate **LLMs, vector search, and web applications** to build intelligent assistants for educational environments.
-
----
-
-# Introduction
-
-DEMO LINK: ``` https://drive.google.com/drive/folders/1qb7H7sxLXqCxdXK33WfDRCM7p0oMOvCr?usp=sharing ```
-
-**FPT Exam Assistant** is an AI chatbot designed to assist **exam proctors and students** by providing instant access to university exam regulations and academic policies.
-
-Instead of manually searching through lengthy PDF documents, users can simply **ask questions via text or voice**, and the chatbot will retrieve relevant information from official documents using **Retrieval-Augmented Generation (RAG)**.
-
-The system supports:
-
-- Exam regulation Q&A
-- Academic policy lookup
-- Voice-based interaction
-- Secure authentication
-- Retrieval from official documents
-
-This project serves as a **prototype for an AI-powered university exam support system**.
+> **Demo:** `https://drive.google.com/file/d/1zOehgN_HM-6vAPCKc0fsHZJW_Eh9R4cd/view?usp=sharing`
 
 ---
 
-# Key Features
+## Related Repositories
 
-## AI Question Answering
-
-Users can ask questions related to:
-
-- exam regulations
-- academic rules
-- exam procedures
-- student policies
-
-The chatbot retrieves relevant document chunks and generates answers using **GPT-4o**.
+| Repository | Description |
+|---|---|
+| 🔬 [Exam-Assist-Benchmark](https://github.com/dmt171004/Exam-Assist-Benchmark) | Benchmarking framework — automatic metrics, LLM-as-a-Judge, efficiency analysis |
+| 🧪 [Exam-Assist-Finetuning](https://github.com/dmt171004/Exam-Assist-Finetuning) | Fine-tuning pipeline for Qwen3-VL on exam-support domain data |
 
 ---
 
-## Retrieval-Augmented Generation (RAG)
+## Overview
 
-The system improves answer reliability by retrieving information directly from **official PDF documents**.
+**FPT Exam Assistant** allows exam proctors and students to ask questions via text or voice and instantly receive answers grounded in official university PDF documents.
 
-### RAG Pipeline
+Core capabilities:
+- Exam regulation Q&A (text and voice)
+- Academic policy lookup with source citation
+- Step-by-step guidance with inline images from source PDFs
+- Full authentication and user management
+- Admin dashboard with analytics, feedback, RAG document management, and reporting
+
+---
+
+## Key Features
+
+### Hybrid RAG Pipeline
+
+The retrieval pipeline combines BM25 sparse search and multilingual-E5-base dense search, merged via Weighted Reciprocal Rank Fusion:
 
 ```
-User Question
-│
-▼
-Embedding (OpenAI)
-│
-▼
-Vector Search (FAISS)
-│
-▼
-Relevant Document Chunks
-│
-▼
-Prompt + Context
-│
-▼
-GPT-4o Answer
-
-```
----
-
-## Voice Interaction
-
-Users can interact with the system using voice.
-
-Supported features:
-
-- Speech-to-Text using **gpt-4o-mini-transcribe**
-- Voice question input
-
----
-
-## Authentication System
-
-The system includes a full authentication flow:
-
-- User registration
-- Login with JWT
-- Secure password handling
-- Token expiration
-
----
-
-## Step-by-Step Instructions with Images
-
-The chatbot can also provide **step-by-step guidance with text and images**, helping users understand procedures such as:
-
-- exam registration
-- exam regulations
-- administrative processes
-
----
-
-# Tech Stack
-
-## Backend
-
-- **FastAPI**
-- **Python**
-- **SQLAlchemy**
-- **PostgreSQL**
-- **JWT Authentication**
-- **FAISS (Vector Database)**
-
----
-
-## AI / LLM
-
-- **OpenAI GPT-4o**
-- **OpenAI Embeddings**
-- **gpt-4o-mini-transcribe** (Speech-to-Text)
-
----
-
-## RAG System
-
-- Document parsing
-- Text chunking
-- Embedding generation
-- FAISS vector search
-- Context injection into LLM prompts
-
----
-
-## Frontend
-
-- **React**
-- **TypeScript**
-- **Vite**
-- **TailwindCSS**
-- **Axios**
-
----
-
-# System Architecture
+User Question / Voice Transcript
+        │
+        ▼
+  Query Normalization (rule-based)
+        │
+        ├─── BM25 top-30 (rank-bm25)
+        │
+        └─── Dense top-30 (multilingual-E5-base, CPU)
+                │
+                ▼
+        Weighted RRF (k=60, 0.5 / 0.5)
+                │
+                ▼
+  Exact / Heading / Intent Boost
+                │
+                ▼
+  Child → Parent Chunk Aggregation
+                │
+                ▼
+  Deduplication + Confidence Gate
+  (RAG_MIN_DENSE_SCORE / RAG_MIN_BM25_SCORE)
+                │
+                ▼
+  ≤ 5 Evidence Parent Chunks
+                │
+                ▼
+  LLM Answer + Evidence ID Citation (E1, E2, …)
+                │
+                ▼
+  Illustrative Images (from best-scoring source PDF)
 ```
 
-            ┌───────────────────┐
-            │     Frontend      │
-            │  React + Vite UI  │
-            └─────────┬─────────┘
-                      │ REST API
-                      ▼
-            ┌───────────────────┐
-            │      FastAPI      │
-            │      Backend      │
-            └─────────┬─────────┘
-                      │
-    ┌─────────────────┼─────────────────┐
-    ▼                 ▼                 ▼
+### Language Model Support
 
-Authentication RAG Module Speech API
-(JWT + PostgreSQL) (FAISS + LLM) (Transcribe)
+The system is model-agnostic. Two configurations are supported out of the box:
 
-                      │
-                      ▼
-                OpenAI API
-               (GPT-4o + Embedding)
+| Mode | LLM | STT |
+|---|---|---|
+| **Local (default)** | `qwen3-exam-assist` via vLLM (OpenAI-compatible API) | `faster-whisper-medium` via CTranslate2 CPU service |
+| **OpenAI fallback** | `gpt-4o-mini` | `gpt-4o-mini-transcribe` / `whisper-1` |
 
-```
+Switching between modes requires only `.env` changes — no code modifications needed.
+
+### Voice Interaction
+
+- Speech-to-Text: local **Faster-Whisper** (CTranslate2, CPU `int8`) with WebRTC VAD pre-filter, served as an OpenAI-compatible API at `http://127.0.0.1:8002/v1`
+- Deterministic voice correction applied before query submission
+- Fallback to OpenAI STT configurable via environment variables
+
+### Authentication & User Management
+
+- JWT-based registration, login, email verification, password reset
+- Soft delete with 30-day retention, trash/restore/permanent delete UI
+- Case-insensitive email and username identity
+- Admin management: batch delete chat sessions, purge expired accounts (background advisory-lock task)
+
+### Admin Dashboard
+
+| Module | Description |
+|---|---|
+| **Dashboard** | Usage statistics, active users, session counts |
+| **Users Management** | Full CRUD, soft delete, trash batches, restore |
+| **Chatbot Data** | RAG document upload, activation, deletion |
+| **Feedback Management** | View and filter user feedback logs |
+| **Reports** | Generated analytics reports with chart export |
+| **Settings** | Email SMTP configuration |
+
 ---
 
-# Project Structure
+## Tech Stack
+
+### Backend
+
+| Layer | Technology |
+|---|---|
+| Framework | **FastAPI** (Python 3.12) |
+| ORM / DB | **SQLAlchemy** + **PostgreSQL** |
+| Auth | **JWT** (`python-jose`) + **bcrypt** |
+| RAG – Dense | `intfloat/multilingual-E5-base` (sentence-transformers, CPU) |
+| RAG – Sparse | **BM25** (`rank-bm25`) |
+| RAG – Index | **FAISS** (`faiss-cpu`) |
+| PDF Parsing | `pdfplumber`, `pymupdf`, `pdfminer-six` |
+| LLM Client | OpenAI-compatible (`openai` SDK) → local vLLM or OpenAI API |
+| STT | **Faster-Whisper** (CTranslate2) — local service; OpenAI fallback |
+| Vietnamese NLP | `underthesea`, `rapidfuzz` |
+| Packaging | `uv` + `pyproject.toml` |
+| Real-time | WebSocket (`websockets`) |
+
+### Frontend
+
+| Layer | Technology |
+|---|---|
+| Framework | **React 18** + **TypeScript** |
+| Build tool | **Vite** |
+| Styling | **TailwindCSS** + Radix UI primitives |
+| HTTP | **Axios** + **TanStack React Query** |
+| Charts | **Recharts** |
+| Auth state | Context API (`AuthContext`, `auth.ts`) |
+| Testing | **Vitest** + Testing Library |
+
+---
+
+## System Architecture
 
 ```
+            ┌──────────────────────┐
+            │      Frontend        │
+            │  React + Vite + TS   │
+            └──────────┬───────────┘
+                       │ REST API + WebSocket
+                       ▼
+            ┌──────────────────────┐
+            │   FastAPI Backend    │
+            └──────────┬───────────┘
+                       │
+      ┌────────────────┼─────────────────┐
+      ▼                ▼                 ▼
+ Auth Module      RAG Module        Speech Module
+(JWT + PostgreSQL) (Hybrid BM25     (Faster-Whisper
+                   + E5 + FAISS     CTranslate2 CPU
+                   + LLM Answer)    or OpenAI STT)
+                       │
+                       ▼
+              LLM Inference Server
+         (local vLLM / OpenAI-compatible)
+              qwen3-exam-assist
+                  or GPT-4o-mini
+```
 
-CHATBOT_EXAM_ASSISTANT_V2
+---
+
+## Project Structure
+
+```
+FPT-Assistant-v3/
 │
-├── backend
-│ ├── app
-│ │ ├── api/v1
-│ │ │ ├── auth
-│ │ │ ├── chat
-│ │ │ └── speech
-│ │ │
-│ │ ├── core
-│ │ │ └── config, logger
-│ │ │
-│ │ ├── db
-│ │ │ └── database connection
-│ │ │
-│ │ ├── models
-│ │ │ └── database models
-│ │ │
-│ │ ├── prompts
-│ │ │ └── LLM prompt templates
-│ │ │
-│ │ ├── rag
-│ │ │ └── retrieval pipeline
-│ │ │
-│ │ ├── schemas
-│ │ │ └── request/response validation
-│ │ │
-│ │ ├── services
-│ │ │ └── business logic
-│ │ │
-│ │ └── main.py
-│ │
-│ ├── static
-│ ├── test
-│ ├── requirements.txt
-│ └── .env
+├── backend/
+│   ├── app/
+│   │   ├── api/v1/
+│   │   │   ├── auth.py           # Registration, login, password reset
+│   │   │   ├── chat.py           # Chat Q&A endpoint
+│   │   │   ├── chat_session.py   # Session management
+│   │   │   ├── speech.py         # STT / TTS
+│   │   │   ├── admin.py          # Admin operations, purge tasks
+│   │   │   ├── feedback.py       # Feedback logging
+│   │   │   ├── rag_documents.py  # RAG document CRUD
+│   │   │   ├── reports.py        # Analytics reports
+│   │   │   └── email_setting.py  # SMTP configuration
+│   │   │
+│   │   ├── core/
+│   │   │   ├── config.py
+│   │   │   └── websocket.py
+│   │   │
+│   │   ├── db/
+│   │   │   └── session.py
+│   │   │
+│   │   ├── models/               # SQLAlchemy ORM models
+│   │   │   ├── user.py
+│   │   │   ├── chat_log.py
+│   │   │   ├── chat_session.py
+│   │   │   ├── chat_topic.py
+│   │   │   ├── feedback_log.py
+│   │   │   ├── rag_document.py
+│   │   │   ├── email_setting.py
+│   │   │   └── user_activity.py
+│   │   │
+│   │   ├── prompts/              # LLM prompt templates
+│   │   │
+│   │   ├── rag/
+│   │   │   ├── rag_service.py    # Main RAG orchestration
+│   │   │   ├── retriever.py      # Hybrid BM25 + dense retrieval
+│   │   │   ├── evidence_selector.py
+│   │   │   ├── embedder.py
+│   │   │   ├── chunker.py
+│   │   │   ├── build_index.py
+│   │   │   ├── data/             # Source PDF documents
+│   │   │   └── vector_store/     # FAISS index, BM25, metadata
+│   │   │
+│   │   ├── schemas/              # Pydantic request/response models
+│   │   │
+│   │   ├── services/
+│   │   │   ├── llm_service.py
+│   │   │   ├── model_clients.py  # Unified LLM/vision client factory
+│   │   │   ├── stt_service.py
+│   │   │   ├── tts_service.py
+│   │   │   ├── voice_correction_service.py
+│   │   │   ├── answer_postprocessor.py
+│   │   │   ├── auth_service.py
+│   │   │   ├── email_service.py
+│   │   │   ├── report_service.py
+│   │   │   └── topic_service.py
+│   │   │
+│   │   └── main.py               # FastAPI app, routers, purge scheduler
+│   │
+│   ├── migrations/               # SQL migration scripts (001 → 002 → 003)
+│   ├── tests/                    # pytest test suite
+│   ├── pyproject.toml
+│   ├── requirements.txt
+│   ├── requirements-windows.txt
+│   └── .env.example
 │
-├── frontend
-│ ├── public
-│ ├── src
-│ │ ├── components
-│ │ ├── context
-│ │ ├── hooks
-│ │ ├── lib
-│ │ ├── pages
-│ │ └── test
-│ │
-│ ├── package.json
-│ ├── tailwind.config.ts
-│ └── vite.config.ts
-│
+├── frontend/
+│   └── src/
+│       ├── components/
+│       │   ├── chat/             # ChatInput, ChatMessage, VoiceModeOverlay, …
+│       │   ├── admin/            # AdminLayout, AdminProtectedRoute
+│       │   └── ui/               # Radix-based design system components
+│       │
+│       ├── context/
+│       │   ├── AuthContext.tsx
+│       │   └── auth.ts           # Auth contract / token helpers
+│       │
+│       ├── lib/
+│       │   ├── api.ts
+│       │   └── api-errors.ts
+│       │
+│       ├── pages/
+│       │   ├── Login.tsx / Register.tsx / ForgotPassword.tsx
+│       │   ├── ResetPassword.tsx / VerifyEmail.tsx
+│       │   └── admin/
+│       │       ├── AdminDashboard.tsx
+│       │       ├── UsersManagement.tsx
+│       │       ├── ChatbotData.tsx
+│       │       ├── FeedbackManagement.tsx
+│       │       ├── Reports.tsx
+│       │       └── AdminSettings.tsx
+│       │
+│       └── test/
+├── VERSION_COMPARISON_REPORT.md  # v2 → v3 diff report
 └── README.md
-
 ```
 
 ---
 
 ## Installation Guide
 
-Follow these steps to run the project locally.
+### Prerequisites
+
+- Python **3.12** + [`uv`](https://github.com/astral-sh/uv)
+- Node.js **≥ 18** + npm
+- PostgreSQL
 
 ---
 
-## 1 Clone Repository
+### 1. Clone Repository
 
-```
-git clone https://github.com/YOUR_GITHUB/FPT-Exam-Assistant.git
-
-cd FPT-Exam-Assistant
+```bash
+git clone https://github.com/dinhkhoi124/FPT-Assistant-v3.git
+cd FPT-Assistant-v3
 ```
 
 ---
 
-## 2 Backend Setup
+### 2. Backend Setup
 
-Navigate to backend directory:
-
-```
+```bash
 cd backend
+cp .env.example .env
+uv sync
 ```
 
-Create virtual environment:
+Edit `.env` and fill in your database URL, JWT secret, and model configuration (see section below).
 
-```
-python -m venv .venv
-```
+---
 
-Activate environment:
+### 3. Configure Environment Variables
 
-### Windows
+Key variables in `backend/.env`:
 
-```
-.venv\Scripts\activate
-```
+```dotenv
+# ── LLM (local vLLM — default) ──────────────────────────────
+LLM_BASE_URL=http://127.0.0.1:8001/v1
+LLM_API_KEY=local
+LLM_MODEL=qwen3-exam-assist
 
-Install dependencies:
+# ── LLM (switch to OpenAI — clear BASE_URL) ─────────────────
+# LLM_BASE_URL=
+# LLM_API_KEY=sk-...
+# LLM_MODEL=gpt-4o-mini
 
-```
-pip install -r requirements.txt
+# ── STT (local Faster-Whisper) ───────────────────────────────
+STT_BASE_URL=http://127.0.0.1:8002/v1
+STT_API_KEY=local
+STT_MODEL=faster-whisper-medium
+
+# ── STT (switch to OpenAI STT — clear BASE_URL) ─────────────
+# STT_BASE_URL=
+# OPENAI_API_KEY=sk-...
+
+# ── Database ─────────────────────────────────────────────────
+DATABASE_URL=postgresql+psycopg2://user:password@localhost:5432/fpt_exam_support
+
+# ── Auth ─────────────────────────────────────────────────────
+JWT_SECRET=your-secret
+JWT_ALGORITHM=HS256
+ACCESS_TOKEN_EXPIRE_MINUTES=60
+
+# ── Frontend CORS ─────────────────────────────────────────────
+FRONTEND_URL=http://localhost:8080
+FRONTEND_ORIGINS=http://localhost:8080
+
+# ── RAG thresholds ───────────────────────────────────────────
+RAG_MIN_DENSE_SCORE=0.83
+RAG_MIN_BM25_SCORE=20.0
 ```
 
 ---
 
-## 3 Configure Environment Variables
+### 4. Run Database Migrations
 
-Create `.env` file inside backend folder.
+Apply the three backend migrations in order:
 
-Example:
-```
-
-OPENAI_API_KEY= enter-your-API-Keys
-
-DATABASE_URL= enter-your-Keys
-
-JWT_SECRET= enter-your-Keys
-JWT_ALGORITHM= enter-your-Keys
-ACCESS_TOKEN_EXPIRE_MINUTES= enter-your-Keys
-
-RESET_TOKEN_EXPIRE_MINUTES= enter-your-Keys
-
-MAIL_USERNAME= enter-your-Keys
-
-MAIL_PASSWORD= enter-your-Keys
-MAIL_FROM= enter-your-Keys
-
-MAIL_PORT= enter-your-Keys
-MAIL_SERVER= enter-your-Keys
-
-MAIL_TLS=True
-MAIL_SSL=False
+```bash
+psql -d fpt_exam_support -f backend/migrations/001_admin_retention_vn_timezone.sql
+psql -d fpt_exam_support -f backend/migrations/002_trash_batches.sql
+psql -d fpt_exam_support -f backend/migrations/003_case_insensitive_user_identity.sql
 ```
 
 ---
 
-## 4 Setup PostgreSQL
+### 5. (Optional) Start Local LLM Server
 
-Create a PostgreSQL database and update:
+From the `Chatbot_Module` directory, run the fine-tuned Qwen3 model via vLLM:
 
-```
-DATABASE_URL= enter-your-Keys
-```
----
-
-## 5 Run Backend Server
-
-```
-uvicorn app.main:app --reload
+```bash
+./scripts/run_qwen_vllm.sh
 ```
 
-Backend will run at:
-
-```
-http://localhost:8000
-```
-
-API docs available at:
-
-```
-http://localhost:8000/docs
-```
+Served at `http://127.0.0.1:8001/v1` as model `qwen3-exam-assist`.
 
 ---
 
-## 6 Frontend Setup
+### 6. (Optional) Start Local STT Server
 
-Navigate to frontend directory:
-
+```bash
+./scripts/run_faster_whisper_cpu.sh
 ```
+
+Served at `http://127.0.0.1:8002/v1`. Uses WebRTC VAD to skip silent audio. Model lazy-loads on the first voiced request.
+
+---
+
+### 7. Run Backend Server
+
+```bash
+cd backend
+uv run uvicorn app.main:app --reload --host 127.0.0.1 --port 8000
+```
+
+- API: `http://localhost:8000`
+- Swagger docs: `http://localhost:8000/docs`
+
+---
+
+### 8. Run Frontend
+
+```bash
 cd frontend
-```
-
-Install dependencies:
-
-```
 npm install
-```
-
-Run development server:
-
-```
 npm run dev
 ```
 
-Frontend will run at:
+Frontend at: `http://localhost:5173`
 
+---
+
+### 9. Rebuild RAG Index (when source documents change)
+
+```bash
+cd backend
+uv run python -m app.rag.build_index
 ```
-http://localhost:5173
-```
+
+> **Note:** `index.faiss`, `bm25.pkl`, `bm25_corpus.json`, and `metadata.json` must always be kept in sync with each other and with the source PDFs in `app/rag/data/`.
 
 ---
 
-# Future Improvements
+## Related Repositories
 
-Potential improvements for production deployment:
+### 🔬 Benchmark Repository
 
-- Deploy App
-- Document upload interface for administrators
-- Advanced RAG ranking
-- Multi-language support
-- Role-based access control
-- Conversation memory with long-term context
+Evaluates pretrained vs. fine-tuned models using automatic metrics (Exact Match, F1, ROUGE-L, Containment Accuracy) and LLM-as-a-Judge (Correct Refusal Rate, Hallucination Rate, Faithfulness).
 
----
+➡️ [https://github.com/dmt171004/Exam-Assist-Benchmark](https://github.com/dmt171004/Exam-Assist-Benchmark)
 
-# Authors
+### 🧪 Fine-tuning Repository
 
-**Dinh Van Anh Khoi | Duong Minh Tri | Tran Song Toan | Truong Loi Vi** 
+Contains the QLoRA training pipeline (`scripts/`), dataset preparation (`data/`), and fine-tuning outputs (`outputs/`) for adapting Qwen3-VL to the exam-support domain.
+
+➡️ [https://github.com/dmt171004/Exam-Assist-Finetuning](https://github.com/dmt171004/Exam-Assist-Finetuning)
 
 ---
 
-# License
+## Authors
+
+**Dinh Van Anh Khoi · Duong Minh Tri · Tran Song Toan · Truong Loi Vi**
+
+---
+
+## License
 
 This project is developed for **educational and research purposes**.
