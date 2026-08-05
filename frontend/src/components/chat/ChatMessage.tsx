@@ -1,6 +1,8 @@
 import { useState } from "react";
 import { cn } from "@/lib/utils";
-import { Bot, User, Image as ImageIcon, Mic, FileSearch } from "lucide-react";
+import { Bot, User, Image as ImageIcon, Mic, FileSearch, ThumbsUp, ThumbsDown } from "lucide-react";
+import { api } from "@/lib/api";
+import { toast } from "sonner";
 
 // Cấu trúc cho từng trang ảnh hướng dẫn
 interface PageImage {
@@ -10,6 +12,7 @@ interface PageImage {
 
 export interface Message {
   id: string;
+  chatLogId?: string; // ID lưu trữ trong DB để đánh giá phản hồi
   role: "user" | "assistant";
   content: string;
   timestamp: Date;
@@ -26,6 +29,13 @@ export function ChatMessage({ message }: ChatMessageProps) {
   const isUser = message.role === "user";
   const [showImages, setShowImages] = useState(false);
 
+  // States cho Feedback
+  const [feedbackRating, setFeedbackRating] = useState<"like" | "dislike" | null>(null);
+  const [showCommentForm, setShowCommentForm] = useState(false);
+  const [commentText, setCommentText] = useState("");
+  const [isSubmitted, setIsSubmitted] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
   const getRenderableImageUrl = (url: string) => {
     if (url && !url.startsWith("data:") && !url.startsWith("http")) {
       return `data:image/jpeg;base64,${url}`;
@@ -33,10 +43,55 @@ export function ChatMessage({ message }: ChatMessageProps) {
     return url;
   };
 
+  const handleLike = async () => {
+    if (!message.chatLogId) return;
+    setIsSubmitting(true);
+    try {
+      await api.post("/api/v1/feedback", {
+        chat_id: message.chatLogId,
+        rating: "like",
+        comment: null
+      });
+      setFeedbackRating("like");
+      setIsSubmitted(true);
+      toast.success("Cảm ơn bạn đã phản hồi!");
+    } catch (error) {
+      console.error("Failed to submit feedback", error);
+      toast.error("Không thể gửi phản hồi. Vui lòng thử lại.");
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const handleDislike = () => {
+    setFeedbackRating("dislike");
+    setShowCommentForm(true);
+  };
+
+  const handleSubmitComment = async () => {
+    if (!message.chatLogId || !commentText.trim()) return;
+    setIsSubmitting(true);
+    try {
+      await api.post("/api/v1/feedback", {
+        chat_id: message.chatLogId,
+        rating: "dislike",
+        comment: commentText.trim()
+      });
+      setIsSubmitted(true);
+      setShowCommentForm(false);
+      toast.success("Cảm ơn ý kiến đóng góp của bạn!");
+    } catch (error) {
+      console.error("Failed to submit feedback comment", error);
+      toast.error("Không thể gửi góp ý. Vui lòng thử lại.");
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
   return (
     <div
       className={cn(
-        "flex gap-3 animate-fade-in-up",
+        "flex min-w-0 gap-2 animate-fade-in-up sm:gap-3",
         isUser ? "flex-row-reverse" : "flex-row",
       )}
     >
@@ -55,7 +110,7 @@ export function ChatMessage({ message }: ChatMessageProps) {
       {/* Message Content */}
       <div
         className={cn(
-          "max-w-[85%] rounded-2xl px-4 py-3 shadow-chat",
+          "min-w-0 max-w-[calc(100%-2.75rem)] overflow-hidden rounded-2xl px-3 py-3 shadow-chat sm:max-w-[85%] sm:px-4",
           isUser
             ? "bg-primary text-primary-foreground rounded-tr-md"
             : "bg-card text-card-foreground border border-border rounded-tl-md",
@@ -98,15 +153,17 @@ export function ChatMessage({ message }: ChatMessageProps) {
         {/* Text content */}
         <div
           className={cn(
-            "prose prose-sm max-w-none",
-            isUser ? "prose-invert" : "prose-gray",
+            "prose prose-sm max-w-none break-words [overflow-wrap:anywhere]",
+            isUser
+              ? "prose-invert [&_p]:text-white [&_strong]:text-white"
+              : "prose-gray",
           )}
         >
           {message.content.split("\n").map((line, i) => {
             if (line.startsWith("**") && line.endsWith("**")) {
               return (
                 <p key={i} className="font-semibold mb-2">
-                  {line.replace(/\*\*/g, "")}
+                  {line.replace(/\*\/g/g, "").replace(/\*\*/g, "")}
                 </p>
               );
             }
@@ -127,17 +184,6 @@ export function ChatMessage({ message }: ChatMessageProps) {
             return <br key={i} />;
           })}
         </div>
-
-        {/* Button toggle hiển thị slide */}
-        {!isUser && message.pageImages && message.pageImages.length > 0 && (
-          <button
-            onClick={() => setShowImages(!showImages)}
-            className="mt-3 text-xs font-semibold text-orange-600 hover:text-orange-700 flex items-center gap-1"
-          >
-            <FileSearch className="h-3.5 w-3.5" />
-            {showImages ? "Ẩn slide hướng dẫn" : "Xem slide hướng dẫn"}
-          </button>
-        )}
 
         {/* Danh sách ảnh trích xuất từ PDF */}
         {!isUser &&
@@ -180,18 +226,102 @@ export function ChatMessage({ message }: ChatMessageProps) {
             </div>
           )}
 
-        {/* Timestamp */}
-        <div
-          className={cn(
-            "mt-2 text-[10px]",
-            isUser ? "text-primary-foreground/60" : "text-muted-foreground",
+        {/* Actions row: Source slide, Timestamp, and Feedback */}
+        <div className="mt-2.5 flex flex-wrap items-center justify-between gap-2 border-t border-slate-100/60 pt-1.5">
+          <div className="flex min-w-0 items-center gap-3">
+            {/* Timestamp */}
+            <span
+              className={cn(
+                "text-[10px]",
+                isUser ? "text-primary-foreground/60" : "text-muted-foreground",
+              )}
+            >
+              {message.timestamp.toLocaleTimeString([], {
+                hour: "2-digit",
+                minute: "2-digit",
+              })}
+            </span>
+
+            {/* Button toggle hiển thị slide */}
+            {!isUser && message.pageImages && message.pageImages.length > 0 && (
+              <button
+                onClick={() => setShowImages(!showImages)}
+                className="text-[10px] font-semibold text-orange-600 hover:text-orange-700 flex items-center gap-1"
+              >
+                <FileSearch className="h-3 w-3" />
+                {showImages ? "Ẩn slide" : "Xem slide"}
+              </button>
+            )}
+          </div>
+
+          {/* Thumbs Up / Down feedback for Assistant replies */}
+          {!isUser && message.chatLogId && (
+            <div className="flex items-center gap-1.5 shrink-0">
+              <button
+                disabled={isSubmitted || isSubmitting}
+                onClick={handleLike}
+                className={cn(
+                  "p-1 rounded hover:bg-slate-100 transition-colors",
+                  feedbackRating === "like" ? "text-green-600 bg-green-50 hover:bg-green-50" : "text-slate-400 hover:text-slate-600"
+                )}
+                title="Hài lòng với câu trả lời"
+              >
+                <ThumbsUp className="h-3.5 w-3.5" />
+              </button>
+              <button
+                disabled={isSubmitted || isSubmitting}
+                onClick={handleDislike}
+                className={cn(
+                  "p-1 rounded hover:bg-slate-100 transition-colors",
+                  feedbackRating === "dislike" ? "text-red-600 bg-red-50 hover:bg-red-50" : "text-slate-400 hover:text-slate-600"
+                )}
+                title="Chưa hài lòng với câu trả lời"
+              >
+                <ThumbsDown className="h-3.5 w-3.5" />
+              </button>
+            </div>
           )}
-        >
-          {message.timestamp.toLocaleTimeString([], {
-            hour: "2-digit",
-            minute: "2-digit",
-          })}
         </div>
+
+        {/* Comment input form for dislike */}
+        {showCommentForm && (
+          <div className="mt-3 p-2 border border-slate-100 rounded-lg bg-slate-50/50 space-y-2">
+            <div className="text-[10px] font-semibold text-slate-500">
+              Hãy giúp chúng tôi cải thiện câu trả lời:
+            </div>
+            <textarea
+              value={commentText}
+              onChange={(e) => setCommentText(e.target.value)}
+              placeholder="Nhập ý kiến đóng góp của bạn tại đây..."
+              rows={2}
+              className="w-full p-1.5 text-xs border rounded-lg focus:outline-none focus:ring-1 focus:ring-orange-500 text-slate-800 bg-white"
+            />
+            <div className="flex justify-end gap-1.5">
+              <button
+                onClick={() => {
+                  setShowCommentForm(false);
+                  setFeedbackRating(null);
+                }}
+                className="px-2 py-1 text-[10px] font-semibold text-slate-500 hover:bg-slate-100 rounded"
+              >
+                Hủy
+              </button>
+              <button
+                disabled={isSubmitting || !commentText.trim()}
+                onClick={handleSubmitComment}
+                className="px-2.5 py-1 text-[10px] font-semibold bg-orange-600 text-white hover:bg-orange-700 disabled:opacity-50 rounded"
+              >
+                {isSubmitting ? "Đang gửi..." : "Gửi góp ý"}
+              </button>
+            </div>
+          </div>
+        )}
+
+        {isSubmitted && feedbackRating === "dislike" && (
+          <div className="mt-2 text-[10px] text-green-700 font-medium bg-green-50/80 px-2 py-1 rounded border border-green-100">
+            ✓ Đã gửi góp ý cải thiện. Cảm ơn bạn!
+          </div>
+        )}
       </div>
     </div>
   );

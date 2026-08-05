@@ -1,10 +1,13 @@
 import fitz  # PyMuPDF
 import base64
+import logging
 import os
 import io
 import imagehash
 from PIL import Image
 from app.core.config import RAG_DATA_DIR
+
+logger = logging.getLogger(__name__)
 
 def get_page_image(file_name: str, page_number: int):
     """Trích xuất một trang PDF thành ảnh Base64 chất lượng cao"""
@@ -21,8 +24,12 @@ def get_page_image(file_name: str, page_number: int):
         doc.close() 
         
         return base64.b64encode(img_data).decode("utf-8")
-    except Exception as e:
-        print(f"Error extracting PDF page: {e}")
+    except Exception:
+        logger.exception(
+            "Failed to extract PDF page (file=%s, page=%s)",
+            file_name,
+            page_number,
+        )
         return None
 
 def get_unique_pages(retrieved_results: list):
@@ -76,10 +83,18 @@ def get_unique_pages(retrieved_results: list):
                 unique_results.append(res)
                 seen_hashes.append(current_hash)
             else:
-                print(f"📌 Đã chặn trang trùng: {file_name} trang {page_num}")
+                logger.debug(
+                    "Skipped duplicate PDF page (file=%s, page=%s)",
+                    file_name,
+                    page_num,
+                )
         
-        except Exception as e:
-            print(f"Error processing unique page: {e}")
+        except Exception:
+            logger.exception(
+                "Failed to process PDF page for deduplication (file=%s, page=%s)",
+                file_name,
+                page_num,
+            )
             continue
 
     return unique_results

@@ -1,122 +1,126 @@
-from fastapi_mail import FastMail, MessageSchema, ConnectionConfig
-from app.core.config import (
-    MAIL_USERNAME,
-    MAIL_PASSWORD,
-    MAIL_FROM,
-    MAIL_PORT,
-    MAIL_SERVER,
-)
+import smtplib
 
-conf = ConnectionConfig(
-    MAIL_USERNAME=MAIL_USERNAME,
-    MAIL_PASSWORD=MAIL_PASSWORD,
-    MAIL_FROM=MAIL_FROM,
-    MAIL_PORT=MAIL_PORT,
-    MAIL_SERVER=MAIL_SERVER,
-    MAIL_STARTTLS=True,     
-    MAIL_SSL_TLS=False,     
-    USE_CREDENTIALS=True,
-    VALIDATE_CERTS=True
-)
+from email.mime.text import MIMEText
 
+from app.models.email_setting import EmailSetting
+from app.core.encryption import decrypt_password
+from app.core.config import FRONTEND_URL
 
 # =========================
 # RESET PASSWORD EMAIL
 # =========================
-async def send_reset_email(email: str, token: str):
-    reset_link = f"http://localhost:8080/reset-password?token={token}"
+async def send_reset_email(db, email: str, token: str):
+    reset_link = f"{FRONTEND_URL}/reset-password?token={token}"
 
-    message = MessageSchema(
+    body = f"""
+    Click the link below to reset your password:
+
+    {reset_link}
+
+    This link will expire in 10 minutes.
+    """
+
+    send_custom_email(
+        db=db,
+        to_email=email,
         subject="Password Reset",
-        recipients=[email],
-        body=f"""
-Click the link below to reset your password:
-
-{reset_link}
-
-This link will expire in 10 minutes.
-""",
-        subtype="plain"
+        body=body
     )
 
-    fm = FastMail(conf)
-    await fm.send_message(message)
 
 # =========================
 # EMAIL VERIFICATION
 # =========================
-async def send_verification_email(email: str, token: str):
+async def send_verification_email(db, email: str, token: str):
+    verification_link = f"{FRONTEND_URL}/verify-email?token={token}"
 
-    verification_link = f"http://localhost:8080/verify-email?token={token}"
+    body = f"""
+    <p>Hello,</p>
 
-    print("\n====== EMAIL VERIFICATION DEBUG ======")
-    print("Sending verification email to:", email)
-    print("Verification link:", verification_link)
+    <p>Please verify your email by clicking
+    the button below:</p>
 
-    message = MessageSchema(
+    <a href="{verification_link}"
+    style="background:#2563eb;
+    color:white;
+    padding:10px 16px;
+    text-decoration:none;
+    border-radius:6px;
+    display:inline-block;">
+    Verify Email
+    </a>
+
+    <p>Or copy this link:</p>
+
+    <p>{verification_link}</p>
+    """
+
+    send_custom_email(
+        db=db,
+        to_email=email,
         subject="FPT Assistant Email Verification",
-        recipients=[email],
-        body=f"""
-        <p>Hello,</p>
+        body=body,
+        is_html=True
+    )
 
-        <p>Please verify your email by clicking the button below:</p>
 
-        <a href="{verification_link}" 
-        style="background:#2563eb;color:white;padding:10px 16px;
-        text-decoration:none;border-radius:6px;display:inline-block;">
-        Verify Email
-        </a>
+def send_custom_email(db, to_email: str, subject: str, body: str, is_html: bool = False):
+    setting = get_active_email_setting(db)
 
-        <p>Or copy this link:</p>
+    password = decrypt_password(
+        setting.encrypted_password
+    )
+    subtype = "html" if is_html else "plain"
 
-        <p>{verification_link}</p>
-        """,
-        subtype="html"
+    msg = MIMEText(
+        body,
+        subtype,
+        "utf-8"
+    )
+
+    msg["Subject"] = subject
+    if setting.sender_name:
+        msg["From"] = (
+            f"{setting.sender_name} "
+            f"<{setting.sender_email}>"
+        )
+    else:
+        msg["From"] = setting.sender_email
+    msg["To"] = to_email
+
+    server = smtplib.SMTP(
+        setting.smtp_server,
+        setting.smtp_port
     )
 
     try:
-        fm = FastMail(conf)
-        await fm.send_message(message)
 
-        print("✅ Verification email sent successfully!")
+        if setting.use_tls:
+            server.starttls()
 
-    except Exception as e:
-        print("❌ EMAIL SENDING FAILED")
-        print("Error:", str(e))
-        raise e
-    
-# =========================
-# # EMAIL VERIFICATION
-# # =========================
-# async def send_verification_email(email: str, token: str):
+        server.login(
+            setting.sender_email,
+            password
+        )
 
-#     verification_link = f"http://localhost:8080/verify-email?token={token}"
+        server.send_message(msg)
 
-#     print("Sending verification email to:", email)
-#     print("Verification link:", verification_link)
+    finally:
+        server.quit()
 
-#     message = MessageSchema(
-#         subject="FPT Assistant Email Verification",
-#         recipients=[email],
-#         body=f"""
-#         <p>Hello,</p>
 
-#         <p>Please verify your email by clicking the button below:</p>
+def get_active_email_setting(db):
+    setting = (
+        db.query(EmailSetting)
+        .filter(
+            EmailSetting.is_active == True
+        )
+        .first()
+    )
 
-#         <a href="{verification_link}" 
-#         style="background:#2563eb;color:white;padding:10px 16px;
-#         text-decoration:none;border-radius:6px;">
-#         Verify Email
-#         </a>
+    if not setting:
+        raise Exception(
+            "SMTP configuration not found"
+        )
 
-#         <p>Or copy this link:</p>
-
-#         <p>{verification_link}</p>
-#         """,
-#         subtype="html"
-#     )
-
-#     fm = FastMail(conf)
-#     await fm.send_message(message)
-
-#     print("Verification email sent!")
+    return setting

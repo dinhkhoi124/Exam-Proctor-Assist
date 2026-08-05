@@ -1,6 +1,9 @@
 # app/rag/parser.py
+import logging
 import pdfplumber
 import os
+
+logger = logging.getLogger(__name__)
 
 def load_pdf(path: str):
     """
@@ -35,7 +38,7 @@ def load_pdf(path: str):
                         "page": i + 1,
                         "source": file_name  # Lưu tên file để retriever.py sử dụng
                     })
-        except Exception as e:
-            print(f"Lỗi khi xử lý file {file_name}: {e}")
+        except Exception:
+            logger.exception("Failed to parse PDF file %s", file_name)
 
     return documents

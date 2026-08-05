@@ -3,6 +3,7 @@ import { X, Mic, MicOff, Volume2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { AudioVisualizer } from "./AudioVisualizer";
 import { cn } from "@/lib/utils";
+import { buildApiUrl } from "@/lib/api";
 
 interface VoiceModeOverlayProps {
   isOpen: boolean;
@@ -22,51 +23,67 @@ export function VoiceModeOverlay({
 
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
   const audioChunksRef = useRef<Blob[]>([]);
-  const stoppedRef = useRef(false);
+  const discardRecordingRef = useRef(false);
   const lastSentTextRef = useRef<string>("");
 
   const startListening = useCallback(async () => {
     try {
-      stoppedRef.current = false;
+      discardRecordingRef.current = false;
       audioChunksRef.current = [];
 
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
       const recorder = new MediaRecorder(stream);
 
       recorder.ondataavailable = (e) => {
-        if (e.data.size > 0 && !stoppedRef.current) {
+        if (e.data.size > 0) {
           audioChunksRef.current.push(e.data);
         }
       };
 
       recorder.onstop = async () => {
-        if (stoppedRef.current) return;
-        stoppedRef.current = true;
+        stream.getTracks().forEach((track) => track.stop());
+
+        if (discardRecordingRef.current) {
+          audioChunksRef.current = [];
+          return;
+        }
 
         setVoiceState("processing");
 
+        const mimeType =
+          recorder.mimeType || audioChunksRef.current[0]?.type || "audio/webm";
         const audioBlob = new Blob(audioChunksRef.current, {
-          type: "audio/wav",
+          type: mimeType,
         });
 
         console.log("🎧 AUDIO SIZE:", audioBlob.size);
 
-        if (audioBlob.size < 12000) {
-          setTranscript("Giọng nói quá ngắn, vui lòng thử lại.");
+        if (audioBlob.size === 0) {
+          setTranscript("Không thu được âm thanh, vui lòng thử lại.");
           setVoiceState("idle");
           return;
         }
 
         const formData = new FormData();
-        formData.append("file", audioBlob, "voice.wav");
+        const extension = mimeType.includes("ogg")
+          ? "ogg"
+          : mimeType.includes("mp4")
+            ? "m4a"
+            : mimeType.includes("wav")
+              ? "wav"
+              : "webm";
+        formData.append("file", audioBlob, `voice.${extension}`);
 
         try {
-          const res = await fetch("http://127.0.0.1:8000/api/v1/speech/stt", {
+          const res = await fetch(buildApiUrl("/api/v1/speech/stt"), {
             method: "POST",
             body: formData,
           });
 
-          if (!res.ok) throw new Error("STT failed");
+          if (!res.ok) {
+            const errorBody = await res.json().catch(() => null);
+            throw new Error(errorBody?.detail || `STT failed (${res.status})`);
+          }
 
           const data = await res.json();
           console.log("🎤 STT TEXT:", data.text);
@@ -88,7 +105,9 @@ export function VoiceModeOverlay({
           onTranscript(cleanText);
         } catch (err) {
           console.error("STT error:", err);
-          setTranscript("Lỗi nhận dạng giọng nói.");
+          setTranscript(
+            err instanceof Error ? err.message : "Lỗi nhận dạng giọng nói.",
+          );
         } finally {
           setVoiceState("idle");
         }
@@ -104,18 +123,17 @@ export function VoiceModeOverlay({
     }
   }, [onTranscript]);
 
-  const stopListening = useCallback(() => {
+  const stopListening = useCallback((discard = false) => {
     if (mediaRecorderRef.current && mediaRecorderRef.current.state !== "inactive") {
-      stoppedRef.current = true;
+      discardRecordingRef.current = discard;
       mediaRecorderRef.current.stop();
-      mediaRecorderRef.current.stream.getTracks().forEach((t) => t.stop());
       mediaRecorderRef.current = null;
     }
   }, []);
 
   useEffect(() => {
     if (!isOpen) {
-      stopListening();
+      stopListening(true);
       setVoiceState("idle");
       setTranscript("");
     }
@@ -124,7 +142,7 @@ export function VoiceModeOverlay({
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-background/95 backdrop-blur-sm">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-background/95 p-4 backdrop-blur-sm">
       <Button variant="ghost" size="icon" className="absolute right-4 top-4" onClick={onClose}>
         <X className="h-6 w-6" />
       </Button>
@@ -137,7 +155,7 @@ export function VoiceModeOverlay({
         </h2>
 
         <button
-          onClick={voiceState === "idle" ? startListening : stopListening}
+          onClick={voiceState === "idle" ? startListening : () => stopListening()}
           disabled={voiceState === "processing"}
           className={cn(
             "flex h-36 w-36 items-center justify-center rounded-full transition",
@@ -154,7 +172,7 @@ export function VoiceModeOverlay({
         </button>
 
         {voiceState === "listening" && (
-          <Button variant="outline" onClick={stopListening}>
+          <Button variant="outline" onClick={() => stopListening()}>
             <MicOff className="h-4 w-4 mr-2" />
             Dừng thu âm
           </Button>

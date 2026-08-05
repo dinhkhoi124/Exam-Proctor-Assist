@@ -1,10 +1,11 @@
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 import secrets
 import re
 
-from jose import jwt
+from jose import JWTError, jwt
 from passlib.context import CryptContext
 from sqlalchemy.orm import Session
+from sqlalchemy.exc import IntegrityError
 from fastapi import HTTPException, status, Depends
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 
@@ -47,13 +48,21 @@ def validate_fpt_domain(email: str):
         )
 
 
+def normalize_email(email: str) -> str:
+    return str(email).strip().lower()
+
+
+def normalize_username(username: str) -> str:
+    return username.strip()
+
+
 # =========================
 # JWT LOGIN TOKEN
 # =========================
 
 def create_access_token(data: dict) -> str:
     to_encode = data.copy()
-    expire = datetime.utcnow() + timedelta(
+    expire = datetime.now(timezone.utc) + timedelta(
         minutes=ACCESS_TOKEN_EXPIRE_MINUTES
     )
     to_encode.update({"exp": expire})
@@ -70,11 +79,17 @@ def create_access_token(data: dict) -> str:
 # =========================
 
 def get_user_by_username(db: Session, username: str):
-    return db.query(User).filter(User.username == username).first()
+    normalized_username = normalize_username(username)
+    return db.query(User).filter(
+        func.lower(User.username) == normalized_username.lower()
+    ).first()
 
 
 def get_user_by_email(db: Session, email: str):
-    return db.query(User).filter(User.email == email).first()
+    normalized_email = normalize_email(email)
+    return db.query(User).filter(
+        func.lower(User.email) == normalized_email
+    ).first()
 
 
 # =========================
@@ -88,11 +103,26 @@ def register_user(db: Session, username: str, email: str, password: str):
             detail="Password must be at least 6 characters"
         )
 
+    username = normalize_username(username)
+    email = normalize_email(email)
+
+    if not username:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Username is required"
+        )
+
     # Validate domain
     validate_fpt_domain(email)
 
     # Check email exists
-    if get_user_by_email(db, email):
+    existing_user = get_user_by_email(db, email)
+    if existing_user:
+        if existing_user.is_deleted:
+            raise HTTPException(
+                status_code=status.HTTP_409_CONFLICT,
+                detail="Tài khoản này đang trong thời gian chờ xóa và có thể được khôi phục.",
+            )
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="Email already registered"
@@ -115,7 +145,14 @@ def register_user(db: Session, username: str, email: str, password: str):
     )
 
     db.add(user)
-    db.commit()
+    try:
+        db.commit()
+    except IntegrityError as exc:
+        db.rollback()
+        raise HTTPException(
+            status_code=status.HTTP_409_CONFLICT,
+            detail="Email or username already registered"
+        ) from exc
     db.refresh(user)
 
     return user
@@ -126,6 +163,7 @@ def register_user(db: Session, username: str, email: str, password: str):
 # =========================
 
 def login_user(db: Session, identifier: str, password: str):
+    identifier = identifier.strip()
 
     if "@" in identifier:
         user = get_user_by_email(db, identifier)
@@ -144,10 +182,26 @@ def login_user(db: Session, identifier: str, password: str):
             detail="Incorrect password"
         )
     
+    if user.is_deleted:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Tài khoản đang trong thời gian chờ xóa.",
+        )
+
+    if not user.is_active:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Tài khoản đã bị khóa. Vui lòng liên hệ quản trị viên.",
+        )
+
     if not user.is_verified:
         raise HTTPException(
             status_code=403,
-            detail="Please verify your email before logging in"
+            detail={
+                "error": "EMAIL_NOT_VERIFIED",
+                "message": "Account is not verified",
+                "can_resend_verification": True
+            }
         )
 
     token = create_access_token({"sub": str(user.id)})
@@ -158,8 +212,17 @@ def get_current_user(db: Session, user_id: str):
     return user
 
 def require_admin(user: User):
-    if user.role != "admin":
-        raise HTTPException(status_code=403, detail="Admin privileges required")
+    require_roles(user, ["admin"])
+    
+def require_roles(user: User, allowed_roles: list):
+    if user.role not in allowed_roles:
+        raise HTTPException(
+            status_code=403,
+            detail="Insufficient permissions"
+        )
+
+def require_manager_or_admin(user: User):
+    require_roles(user, ["manager", "admin"])
 
 # =========================
 # RESET TOKEN (DB-BASED)
@@ -168,7 +231,7 @@ def require_admin(user: User):
 def create_reset_token(db: Session, user: User):
     token = secrets.token_urlsafe(32)
 
-    expiry = datetime.utcnow() + timedelta(
+    expiry = datetime.now(timezone.utc) + timedelta(
         minutes=RESET_TOKEN_EXPIRE_MINUTES
     )
 
@@ -189,7 +252,10 @@ def verify_reset_token(db: Session, token: str):
     if not user.token_expiry:
         return None
 
-    if datetime.utcnow() > user.token_expiry:
+    if user.is_deleted or not user.is_active:
+        return None
+
+    if datetime.now(timezone.utc) > user.token_expiry:
         return None
 
     return user
@@ -198,7 +264,7 @@ def verify_reset_token(db: Session, token: str):
 def create_verification_token(db: Session, user: User):
     token = secrets.token_urlsafe(32)
 
-    expiry = datetime.utcnow() + timedelta(hours=24)
+    expiry = datetime.now(timezone.utc) + timedelta(hours=24)
 
     user.verification_token = token
     user.verification_expiry = expiry
@@ -214,10 +280,16 @@ def verify_email_token(db: Session, token: str):
     ).first()
 
     if not user:
-        return None
+        return None, "invalid"
 
-    if datetime.utcnow() > user.verification_expiry:
-        return None
+    if not user.verification_expiry:
+        return None, "expired"
+
+    if user.is_deleted or not user.is_active:
+        return None, "invalid"
+
+    if datetime.now(timezone.utc) > user.verification_expiry:
+        return None, "expired"
 
     user.is_verified = True
     user.verification_token = None
@@ -225,22 +297,25 @@ def verify_email_token(db: Session, token: str):
 
     db.commit()
 
-    return user
+    return user, None
 
 # =========================
 # ADMIN STATISTICS
 # =========================
 
 def get_total_users(db: Session):
-    return db.query(func.count(User.id)).scalar()
+    return db.query(func.count(User.id)).filter(User.is_deleted.is_(False)).scalar()
 
 
 def get_total_questions(db: Session):
-    return db.query(func.count(ChatLog.id)).scalar()
+    return db.query(func.count(ChatLog.id)).filter(ChatLog.is_deleted.is_(False)).scalar()
 
 
 def get_active_users(db: Session):
-    return db.query(func.count(User.id)).filter(User.is_active == True).scalar()
+    return db.query(func.count(User.id)).filter(
+        User.is_active.is_(True),
+        User.is_deleted.is_(False),
+    ).scalar()
 
 
 def get_user_question_count(db: Session):
@@ -248,6 +323,7 @@ def get_user_question_count(db: Session):
         db.query(User.username, func.count(ChatLog.id))
         .join(ChatLog, ChatLog.user_id == User.id)
         .group_by(User.username)
+        .filter(ChatLog.is_deleted.is_(False), User.is_deleted.is_(False))
         .all()
     )
 
@@ -267,12 +343,25 @@ def get_current_user_from_token(
     try:
         payload = jwt.decode(token, JWT_SECRET, algorithms=[JWT_ALGORITHM])
         user_id = payload.get("sub")
-    except:
+        if not user_id:
+            raise HTTPException(status_code=401, detail="Invalid token")
+    except JWTError:
         raise HTTPException(status_code=401, detail="Invalid token")
 
     user = db.query(User).filter(User.id == user_id).first()
-
     if not user:
         raise HTTPException(status_code=404, detail="User not found")
+
+    if user.is_deleted:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Tài khoản đang trong thời gian chờ xóa.",
+        )
+
+    if not user.is_active:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Tài khoản đã bị khóa.",
+        )
 
     return user

@@ -1,18 +1,39 @@
 import { useEffect, useState } from "react";
 import { useSearchParams, useNavigate } from "react-router-dom";
 import { api } from "@/lib/api";
+import { getApiErrorMessage } from "@/lib/api-errors";
 import { toast } from "sonner";
 
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 
 import heroImage from "@/assets/exam-proctoring-hero.jpg";
-import logoImage from "@/assets/Logo-Dai-hoc-FPT.jpg"; // Import logo mới
+import logoImage from "@/assets/Logo-Dai-hoc-FPT.webp";
 
 type VerifyResponse = {
   message: string;
   username: string;
   email: string;
+};
+
+const EXPIRED_VERIFICATION_MESSAGE =
+  "Email verification link has expired and verification failed. Please verify using the latest email.";
+
+const getVerificationErrorMessage = (error: unknown) => {
+  const message = getApiErrorMessage(
+    error,
+    "Verification failed or token expired",
+  );
+
+  if (
+    typeof message === "string" &&
+    (message.toLowerCase().includes("expired") ||
+      message.toLowerCase().includes("no longer valid"))
+  ) {
+    return EXPIRED_VERIFICATION_MESSAGE;
+  }
+
+  return message;
 };
 
 export default function VerifyEmail() {
@@ -39,8 +60,7 @@ export default function VerifyEmail() {
         toast.success("Email verified successfully!");
       })
       .catch((err) => {
-        const msg =
-          err.response?.data?.detail || "Verification failed or token expired";
+        const msg = getVerificationErrorMessage(err);
 
         setError(msg);
         toast.error(msg);
@@ -68,7 +88,7 @@ export default function VerifyEmail() {
             <div className="flex items-center gap-3">
               <div className="bg-white p-2 rounded-lg shadow-md">
                 <img
-                  src={logoImage} // Sử dụng logo mới
+                  src={logoImage}
                   alt="FPT University Logo"
                   className="h-11 w-auto"
                 />
@@ -97,7 +117,7 @@ export default function VerifyEmail() {
           <div className="mb-8 flex items-center gap-3 lg:hidden">
             <div className="bg-white p-2 rounded-lg shadow-md">
               <img
-                src={logoImage} // Sử dụng logo mới
+                src={logoImage}
                 alt="FPT University Logo"
                 className="h-12 w-auto"
               />

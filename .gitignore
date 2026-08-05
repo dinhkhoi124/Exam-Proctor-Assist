@@ -33,6 +33,10 @@ env/
 # ======================
 backend/app/rag/vector_store/
 backend/app/rag/chunks/
+backend/app/rag/data/
+backend/app/rag_old/
+*.faiss
+*.pkl
 
 # ======================
 # Node / Frontend
@@ -45,6 +49,7 @@ frontend/node_modules/
 dist/
 build/
 *.tsbuildinfo
+*.zip
 
 # ======================
 # IDE
@@ -65,9 +70,6 @@ Thumbs.db
 coverage/
 
 # ======================
-backend/app/rag/data/
-
-# ======================
 demo.mp4
 
 # ======================
@@ -75,3 +77,24 @@ demo.mp4
 *_v5.py
 *_v6.py
 tai lieu/
+
+# ======================
+# Local upgrade/deployment workspaces
+# ======================
+deploy_packages/
+Old/
+_git_worktrees/
+
+# ======================
+# Database dumps & backups
+# ======================
+Database_Structure.sql
+ChatbotDB.sql
+backup.sql
+# ======================
+# Local working documents
+# ======================
+document-antigravity/
+ASR/
+database/
+DBTest_New
