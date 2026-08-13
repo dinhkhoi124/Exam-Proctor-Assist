@@ -1,5 +1,4 @@
 import hashlib
-import json
 import os
 import shutil
 import tempfile
@@ -20,6 +19,10 @@ from app.models.rag_document import RagDocument
 from app.models.user import User
 from app.rag.build_index import build_index
 from app.rag.rag_service import activate_resources
+from app.services.rag_document_sync import (
+    sync_rag_documents,
+    sync_rag_documents_from_index,
+)
 from app.services.auth_service import get_current_user_from_token, require_manager_or_admin
 
 
@@ -68,7 +71,7 @@ def _get_index_progress() -> dict:
         return dict(_index_progress)
 
 
-def _rebuild_and_reload() -> int:
+def _rebuild_and_reload(db: Session) -> int:
     chunk_count, vector_store, bm25_retriever = build_index(
         return_resources=True,
         progress_callback=lambda progress, stage: _set_index_progress(
@@ -77,6 +80,7 @@ def _rebuild_and_reload() -> int:
         ),
     )
     activate_resources(vector_store, bm25_retriever)
+    sync_rag_documents(db, vector_store.metadata)
     return chunk_count
 
 
@@ -116,61 +120,6 @@ def _document_update_lock():
         _index_lock.release()
 
 
-def _indexed_chunk_counts() -> dict[str, int]:
-    metadata_path = os.path.join(VECTOR_STORE_DIR, "metadata.json")
-    try:
-        with open(metadata_path, "r", encoding="utf-8") as file:
-            metadata = json.load(file)
-    except (FileNotFoundError, json.JSONDecodeError):
-        return {}
-
-    counts: dict[str, int] = {}
-    for item in metadata:
-        source = item.get("source")
-        if source:
-            counts[source] = counts.get(source, 0) + 1
-    return counts
-
-
-def _sync_existing_documents(db: Session, chunk_counts: dict[str, int]) -> None:
-    os.makedirs(RAG_DATA_DIR, exist_ok=True)
-    existing = {document.file_name: document for document in db.query(RagDocument).all()}
-    changed = False
-
-    for entry in os.scandir(RAG_DATA_DIR):
-        if not entry.is_file() or Path(entry.name).suffix.lower() != ".pdf":
-            continue
-
-        document = existing.get(entry.name)
-        if document is None:
-            db.add(
-                RagDocument(
-                    file_name=entry.name,
-                    storage_path=entry.path,
-                    file_size=entry.stat().st_size,
-                    status="ready",
-                    chunk_count=chunk_counts.get(entry.name, 0),
-                    indexed_at=datetime.now(timezone.utc),
-                )
-            )
-            changed = True
-
-    if changed:
-        db.commit()
-
-
-def _mark_document_ready(
-    db: Session,
-    document: RagDocument,
-    chunk_counts: dict[str, int],
-) -> None:
-    document.status = "ready"
-    document.chunk_count = chunk_counts.get(document.file_name, 0)
-    document.indexed_at = datetime.now(timezone.utc)
-    document.error_message = None
-    db.commit()
-
-
 def _serialize_document(document: RagDocument, uploader_name: str | None = None) -> dict:
     return {
         "id": str(document.id),
@@ -192,7 +141,7 @@ def list_documents(
     current_user: User = Depends(get_current_user_from_token),
 ):
     _require_document_access(current_user)
-    _sync_existing_documents(db, _indexed_chunk_counts())
+    sync_rag_documents_from_index(db, refresh_existing=False)
     documents = (
         db.query(RagDocument, User.username)
         .outerjoin(User, RagDocument.uploaded_by == User.id)
@@ -266,8 +215,7 @@ def upload_document(
             db.commit()
 
             try:
-                total_chunks = _rebuild_and_reload()
-                _mark_document_ready(db, document, _indexed_chunk_counts())
+                total_chunks = _rebuild_and_reload(db)
             except Exception as exc:
                 if os.path.exists(target_path):
                     os.remove(target_path)
@@ -334,7 +282,7 @@ def delete_document(
             document.error_message = None
             db.commit()
             try:
-                total_chunks = _rebuild_and_reload()
+                total_chunks = _rebuild_and_reload(db)
                 document.status = "deleted"
                 document.deleted_at = datetime.now(timezone.utc)
                 document.chunk_count = 0

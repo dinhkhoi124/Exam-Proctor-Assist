@@ -20,3 +20,5 @@ app/rag/vector_store/
 app/rag_old/
 *.faiss
 *.pkl
+
+app/rag/temporal_manifest.generated.json

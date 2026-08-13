@@ -48,6 +48,8 @@ packaging==26.0
 passlib==1.7.4
 pdfminer-six==20251230
 pdfplumber==0.11.9
+paddleocr>=3.3,<4
+paddlepaddle>=3.2,<4
 pillow==12.1.0
 psycopg2-binary==2.9.11
 pycparser==3.0

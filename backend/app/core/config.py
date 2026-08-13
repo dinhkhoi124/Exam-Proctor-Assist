@@ -44,6 +44,9 @@ VISION_API_KEY = (
 VISION_MODEL = os.getenv("VISION_MODEL", LLM_MODEL)
 VISION_MAX_TOKENS = int(os.getenv("VISION_MAX_TOKENS", "160"))
 EMBEDDING_DEVICE = os.getenv("EMBEDDING_DEVICE", "cpu")
+EMBEDDING_LOCAL_FILES_ONLY = os.getenv(
+    "EMBEDDING_LOCAL_FILES_ONLY", "true"
+).lower() in {"1", "true", "yes"}
 
 if not LLM_API_KEY:
     raise RuntimeError(

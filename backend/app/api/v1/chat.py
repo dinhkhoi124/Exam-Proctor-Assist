@@ -5,7 +5,11 @@ import time
 
 from app.schemas.chat import ChatRequest, ChatResponse
 from app.rag.rag_service import retrieve_context
-from app.rag.evidence_selector import select_primary_evidence_source
+from app.rag.evidence_selector import (
+    is_procedural_overview,
+    select_page_image_references,
+    select_primary_evidence_source,
+)
 from app.services.llm_service import extract_image_text, generate_answer
 from app.services.answer_postprocessor import (
     extract_evidence_ids,
@@ -122,6 +126,8 @@ Nếu bảng bị mất cấu trúc, không tự suy diễn quan hệ giữa cá
 Đặt trích dẫn ở cuối câu hoặc đoạn liên quan, đúng dạng [E1]. Không viết các biến thể như
 “[Sử dụng E1]”, “[Nguồn E1]” hoặc giải thích evidence ID bằng lời.
 Chỉ sử dụng các evidence ID đã xuất hiện trong phần tài liệu ở trên.
+Nếu evidence có trường "Product release date", dùng ngày đó khi người dùng hỏi phiên bản
+phần mềm/gói cài đặt mới nhất; không nhầm ngày trong tên Source với ngày phiên bản sản phẩm.
 """
 
     start_time = time.time()
@@ -130,23 +136,19 @@ Chỉ sử dụng các evidence ID đã xuất hiện trong phần tài liệu �
     latency = int((time.time() - start_time) * 1000)
 
     page_images_data = []
-    seen_references: set[tuple[str, int]] = set()
     cited_evidence_ids = extract_evidence_ids(answer)
     primary_image_source = select_primary_evidence_source(
         cited_evidence_ids,
         evidence_by_id,
     )
+    image_references = select_page_image_references(
+        cited_evidence_ids,
+        evidence_by_id,
+        primary_image_source,
+        expand_procedure=is_procedural_overview(query_text, answer),
+    )
 
-    for evidence_id in cited_evidence_ids:
-        evidence = evidence_by_id.get(evidence_id.upper())
-        if not evidence or evidence.get("file_name") != primary_image_source:
-            continue
-
-        file_name = evidence["file_name"]
-        page_num = int(evidence["page"])
-        ref_key = (file_name, page_num)
-        if ref_key in seen_references:
-            continue
+    for file_name, page_num in image_references:
 
         img_b64 = get_page_image(file_name, page_num)
         if img_b64:
@@ -155,7 +157,6 @@ Chỉ sử dụng các evidence ID đã xuất hiện trong phần tài liệu �
                 "file_name": file_name,
                 "base64": img_b64
             })
-            seen_references.add(ref_key)
 
     clean_answer = strip_evidence_citations(answer)
 
