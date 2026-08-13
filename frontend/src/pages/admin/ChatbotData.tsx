@@ -1,8 +1,9 @@
 import { useEffect, useMemo, useRef, useState } from "react";
-import { AlertCircle, ArrowUpDown, CheckCircle2, FileText, Loader2, Plus, Trash2 } from "lucide-react";
+import { AlertCircle, ArrowUpDown, CheckCircle2, FileText, Loader2, Plus, Search, Trash2, X } from "lucide-react";
 import { toast } from "sonner";
 
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import { Progress } from "@/components/ui/progress";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { api } from "@/lib/api";
@@ -58,6 +59,15 @@ function getErrorMessage(error: unknown) {
   );
 }
 
+function normalizeSearchText(value: string) {
+  return value
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .replace(/đ/g, "d")
+    .replace(/Đ/g, "D")
+    .toLocaleLowerCase("vi");
+}
+
 export default function ChatbotData() {
   const inputRef = useRef<HTMLInputElement>(null);
   const [documents, setDocuments] = useState<RagDocument[]>([]);
@@ -65,6 +75,7 @@ export default function ChatbotData() {
   const [isUpdating, setIsUpdating] = useState(false);
   const [deletingName, setDeletingName] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [searchQuery, setSearchQuery] = useState("");
   const [sortOption, setSortOption] = useState<SortOption>("updated_desc");
   const [indexProgress, setIndexProgress] = useState<IndexProgress>({
     active: false,
@@ -110,7 +121,14 @@ export default function ChatbotData() {
   }, [isUpdating]);
 
   const sortedDocuments = useMemo(() => {
-    return [...documents].sort((a, b) => {
+    const normalizedQuery = normalizeSearchText(searchQuery.trim());
+    const filteredDocuments = normalizedQuery
+      ? documents.filter((document) =>
+          normalizeSearchText(document.name).includes(normalizedQuery),
+        )
+      : documents;
+
+    return [...filteredDocuments].sort((a, b) => {
       switch (sortOption) {
         case "updated_asc":
           return a.updated_at - b.updated_at;
@@ -126,7 +144,7 @@ export default function ChatbotData() {
           return b.updated_at - a.updated_at;
       }
     });
-  }, [documents, sortOption]);
+  }, [documents, searchQuery, sortOption]);
 
   const handleUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -241,12 +259,40 @@ export default function ChatbotData() {
       )}
 
       <div className="bg-white rounded-xl border shadow-sm overflow-hidden">
-        <div className="flex flex-col gap-3 border-b bg-slate-50/60 px-5 py-3 sm:flex-row sm:items-center sm:justify-between">
-          <p className="text-sm text-slate-500">{documents.length} tài liệu</p>
-          <div className="flex items-center gap-2">
-            <ArrowUpDown className="h-4 w-4 text-slate-400" />
+        <div className="flex flex-col gap-3 border-b bg-slate-50/60 px-4 py-3 sm:px-5 lg:flex-row lg:items-center lg:justify-between">
+          <p className="shrink-0 text-sm text-slate-500">
+            {searchQuery.trim()
+              ? `${sortedDocuments.length}/${documents.length} tài liệu`
+              : `${documents.length} tài liệu`}
+          </p>
+          <div className="flex w-full flex-col gap-2 sm:flex-row lg:w-auto">
+            <div className="relative w-full sm:w-72">
+              <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
+              <Input
+                type="text"
+                role="searchbox"
+                spellCheck={false}
+                value={searchQuery}
+                onChange={(event) => setSearchQuery(event.target.value)}
+                placeholder="Tìm theo tên tài liệu..."
+                aria-label="Tìm kiếm tài liệu theo tên"
+                className="h-10 bg-white pl-9 pr-10 sm:h-9"
+              />
+              {searchQuery && (
+                <button
+                  type="button"
+                  onClick={() => setSearchQuery("")}
+                  aria-label="Xóa nội dung tìm kiếm"
+                  className="absolute right-1 top-1/2 flex h-8 w-8 -translate-y-1/2 items-center justify-center rounded text-slate-400 transition-colors hover:bg-slate-100 hover:text-slate-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-orange-500"
+                >
+                  <X className="h-4 w-4" />
+                </button>
+              )}
+            </div>
+            <div className="flex w-full items-center gap-2 sm:w-auto">
+              <ArrowUpDown className="h-4 w-4 shrink-0 text-slate-400" />
             <Select value={sortOption} onValueChange={(value) => setSortOption(value as SortOption)}>
-              <SelectTrigger className="h-9 w-[210px] bg-white">
+              <SelectTrigger className="h-10 flex-1 bg-white sm:h-9 sm:w-[210px] sm:flex-none">
                 <SelectValue placeholder="Sắp xếp tài liệu" />
               </SelectTrigger>
               <SelectContent>
@@ -258,6 +304,7 @@ export default function ChatbotData() {
                 <SelectItem value="chunks_desc">Nhiều chunks trước</SelectItem>
               </SelectContent>
             </Select>
+            </div>
           </div>
         </div>
         <div className="overflow-x-auto">
@@ -286,6 +333,25 @@ export default function ChatbotData() {
                     <FileText className="mx-auto mb-3 h-10 w-10 text-slate-300" />
                     <h4 className="font-semibold text-slate-800">Chưa có tài liệu nào</h4>
                     <p className="mt-1 text-xs text-slate-400">Tải PDF lên để bổ sung nguồn kiến thức cho chatbot.</p>
+                  </td>
+                </tr>
+              ) : sortedDocuments.length === 0 ? (
+                <tr>
+                  <td colSpan={6} className="px-6 py-16 text-center">
+                    <Search className="mx-auto mb-3 h-10 w-10 text-slate-300" />
+                    <h4 className="font-semibold text-slate-800">Không tìm thấy tài liệu</h4>
+                    <p className="mt-1 text-xs text-slate-400">
+                      Không có tên tài liệu nào khớp với “{searchQuery.trim()}”.
+                    </p>
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => setSearchQuery("")}
+                      className="mt-3 text-orange-600 hover:bg-orange-50 hover:text-orange-700"
+                    >
+                      Xóa tìm kiếm
+                    </Button>
                   </td>
                 </tr>
               ) : (

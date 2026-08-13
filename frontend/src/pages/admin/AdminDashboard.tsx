@@ -3,6 +3,7 @@ import { Users, Activity, MessageSquare, FileText, AlertCircle } from "lucide-re
 import { api, getAdminWebSocketUrl } from "@/lib/api";
 import { StatCard } from "@/components/admin/StatCard";
 import { Button } from "@/components/ui/button";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import {
   LineChart, Line, BarChart, Bar, Cell, XAxis, YAxis, CartesianGrid, Tooltip as RechartsTooltip, ResponsiveContainer, Legend
 } from 'recharts';
@@ -31,21 +32,41 @@ interface MetricItem {
   users: number;
 }
 
+type QuestionScope = "user" | "all" | "admin" | "manager";
+
+const QUESTION_SCOPE_STORAGE_KEY = "admin-dashboard-question-scope";
+const questionScopeLabels: Record<QuestionScope, string> = {
+  user: "Người dùng",
+  all: "Tất cả tài khoản",
+  admin: "Admin",
+  manager: "Management",
+};
+
 export default function AdminDashboard() {
   const [stats, setStats] = useState<AdminStatsResponse | null>(null);
   const [metrics, setMetrics] = useState<MetricItem[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [timeRange, setTimeRange] = useState<"day" | "month" | "year">("day");
+  const [questionScope, setQuestionScope] = useState<QuestionScope>(() => {
+    const storedScope = window.localStorage.getItem(QUESTION_SCOPE_STORAGE_KEY);
+    return storedScope && storedScope in questionScopeLabels
+      ? (storedScope as QuestionScope)
+      : "user";
+  });
   
   const isInitialLoad = useRef(true);
   const fetchTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
-  const fetchAllData = useCallback(async (range: string = timeRange) => {
+  const fetchAllData = useCallback(async (
+    range: string = timeRange,
+    scope: QuestionScope = questionScope,
+  ) => {
     try {
+      const query = new URLSearchParams({ range, question_scope: scope });
       const [statsRes, metricsRes] = await Promise.all([
-        api.get<AdminStatsResponse>("/api/v1/admin/stats"),
-        api.get<MetricItem[]>(`/api/v1/admin/metrics?range=${range}`)
+        api.get<AdminStatsResponse>(`/api/v1/admin/stats?question_scope=${scope}`),
+        api.get<MetricItem[]>(`/api/v1/admin/metrics?${query.toString()}`)
       ]);
       
       const formattedMetrics = metricsRes.data.map(m => {
@@ -77,10 +98,15 @@ export default function AdminDashboard() {
         isInitialLoad.current = false;
       }
     }
-  }, [timeRange]);
+  }, [questionScope, timeRange]);
 
   const handleRangeChange = (newRange: "day" | "month" | "year") => {
     setTimeRange(newRange);
+  };
+
+  const handleQuestionScopeChange = (scope: QuestionScope) => {
+    setQuestionScope(scope);
+    window.localStorage.setItem(QUESTION_SCOPE_STORAGE_KEY, scope);
   };
 
   useEffect(() => {
@@ -175,9 +201,30 @@ export default function AdminDashboard() {
 
   return (
     <div className="space-y-6 animate-in fade-in duration-500 pb-10">
-      <div>
-        <h1 className="text-2xl font-bold tracking-tight text-slate-900 sm:text-3xl">Bảng điều khiển</h1>
-        <p className="text-slate-500 mt-1">Tổng quan hệ thống AI Proctor.</p>
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
+        <div>
+          <h1 className="text-2xl font-bold tracking-tight text-slate-900 sm:text-3xl">Bảng điều khiển</h1>
+          <p className="text-slate-500 mt-1">Tổng quan hệ thống AI Proctor.</p>
+        </div>
+        <div className="w-full sm:w-[220px]">
+          <label className="mb-1 block text-xs font-medium text-slate-500" htmlFor="question-scope">
+            Phạm vi câu hỏi
+          </label>
+          <Select
+            value={questionScope}
+            onValueChange={(value) => handleQuestionScopeChange(value as QuestionScope)}
+          >
+            <SelectTrigger id="question-scope" className="h-10 w-full bg-white">
+              <SelectValue placeholder="Chọn phạm vi" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="user">Người dùng</SelectItem>
+              <SelectItem value="all">Tất cả tài khoản</SelectItem>
+              <SelectItem value="admin">Admin</SelectItem>
+              <SelectItem value="manager">Management</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
       </div>
 
       {/* STAT CARDS */}
@@ -188,7 +235,7 @@ export default function AdminDashboard() {
           icon={<Users className="text-orange-500 h-5 w-5" />}
         />
         <StatCard
-          title="Lượt hỏi (ngày)"
+          title={`Câu hỏi · ${questionScopeLabels[questionScope]}`}
           value={stats.total_questions}
           icon={<Activity className="text-orange-500 h-5 w-5" />}
         />

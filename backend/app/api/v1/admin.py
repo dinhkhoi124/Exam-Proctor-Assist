@@ -20,6 +20,13 @@ from app.schemas.auth import UpdateRoleRequest
 
 VN_TZ = ZoneInfo("Asia/Ho_Chi_Minh")
 VALID_LOG_RANGES = {"day", "week", "month", "year"}
+VALID_QUESTION_SCOPES = {"user", "manager", "admin", "all"}
+
+
+def _validate_question_scope(question_scope: str) -> str:
+    if question_scope not in VALID_QUESTION_SCOPES:
+        raise HTTPException(status_code=400, detail="Phạm vi thống kê câu hỏi không hợp lệ")
+    return question_scope
 
 
 def _vn_time_bounds(range_name: str) -> tuple[datetime, datetime]:
@@ -50,6 +57,7 @@ router = APIRouter(prefix="/admin", tags=["Admin"])
 # =========================
 @router.get("/stats")
 def get_stats(
+    question_scope: str = Query("user"),
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user_from_token)
 ):
@@ -62,13 +70,17 @@ def get_stats(
         User.is_deleted.is_(False),
     ).scalar()
 
-    # TOTAL QUESTIONS
-    total_questions = db.query(func.count(ChatLog.id)).join(
-        User, ChatLog.user_id == User.id
-    ).filter(
-        User.role == 'user',
+    # Keep test traffic from admin/manager accounts separable from end-user
+    # traffic. The same scope is also applied to the metrics chart below.
+    question_scope = _validate_question_scope(question_scope)
+    total_questions_query = db.query(func.count(ChatLog.id)).filter(
         ChatLog.is_deleted.is_(False),
-    ).scalar()
+    )
+    if question_scope != "all":
+        total_questions_query = total_questions_query.join(
+            User, ChatLog.user_id == User.id
+        ).filter(User.role == question_scope)
+    total_questions = total_questions_query.scalar()
 
     # ONLINE USERS (5 phút)
     five_minutes_ago = datetime.now(timezone.utc) - timedelta(minutes=5)
@@ -151,10 +163,12 @@ def get_stats(
 @router.get("/metrics")
 def get_metrics(
     range: str = "day",
+    question_scope: str = Query("user"),
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user_from_token)
 ):
     require_manager_or_admin(current_user)
+    question_scope = _validate_question_scope(question_scope)
 
     if range == "day":
         group = func.date(ChatLog.created_at)
@@ -167,17 +181,20 @@ def get_metrics(
     else:
         raise HTTPException(status_code=400, detail="Invalid range")
 
-    data = (
+    metrics_query = (
         db.query(
             group.label("time"),
             func.count(ChatLog.id).label("questions"),
             func.count(func.distinct(ChatLog.user_id)).label("users")
         )
         .filter(ChatLog.is_deleted.is_(False))
-        .group_by(group)
-        .order_by(group)
-        .all()
     )
+    if question_scope != "all":
+        metrics_query = metrics_query.join(
+            User, ChatLog.user_id == User.id
+        ).filter(User.role == question_scope)
+
+    data = metrics_query.group_by(group).order_by(group).all()
 
     return [
         {

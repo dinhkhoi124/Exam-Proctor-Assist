@@ -366,6 +366,46 @@ http://localhost:5173
 
 ---
 
+# Recent Updates (2026-08-14)
+
+## Admin dashboard and reports
+
+- Dashboard question totals and charts now support four account scopes: `user`, `admin`, `manager`, and `all`.
+- End-user traffic remains the default scope so admin/management test prompts do not inflate production usage statistics.
+- The selected scope is shared between Dashboard and Reports through browser local storage.
+- Report previews refresh immediately when the scope changes; a manual page refresh is no longer required.
+- Excel and PDF exports apply the selected account scope, include it in the report metadata, and add it to the downloaded filename.
+- The report layout is responsive: filters stack on phones, export buttons become full-width, summary cards adapt by breakpoint, and charts avoid horizontal overflow.
+
+API query parameters:
+
+```text
+GET /api/v1/admin/stats?question_scope=user
+GET /api/v1/admin/metrics?range=day&question_scope=user
+GET /api/v1/admin/reports/preview?...&question_scope=user
+GET /api/v1/admin/reports/export?...&question_scope=user&format=xlsx
+```
+
+## Document management
+
+- Added client-side PDF filename search that is case-insensitive and Vietnamese accent-insensitive.
+- Search results continue to support every existing sort option.
+- Added a correctly aligned clear button, match counter, empty-result state, and responsive mobile controls.
+
+## Chat citation images
+
+- Replaced the browser `about:blank` image-opening flow with an in-app lightbox.
+- Citation images can be enlarged without leaving the conversation.
+- The lightbox supports Escape, backdrop close, keyboard focus, body-scroll locking, and touch-friendly responsive sizing.
+
+## Verification
+
+- Backend test suite: `pytest -q`
+- Frontend static checks: `npm run lint`
+- Frontend production bundle: `npm run build`
+
+---
+
 # Future Improvements
 
 Potential improvements for production deployment:
