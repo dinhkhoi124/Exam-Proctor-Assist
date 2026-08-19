@@ -33,6 +33,11 @@ interface IndexProgress {
 
 type SortOption = "updated_desc" | "updated_asc" | "name_asc" | "name_desc" | "size_desc" | "chunks_desc";
 
+const MAX_BATCH_FILES = 20;
+const MAX_PDF_SIZE = 25 * 1024 * 1024;
+const MAX_BATCH_TOTAL_SIZE = 90 * 1024 * 1024;
+const MAX_BATCH_DELETE_FILES = 100;
+
 const stageLabels: Record<string, string> = {
   idle: "Sẵn sàng",
   preparing_document: "Đang chuẩn bị tài liệu",
@@ -74,6 +79,7 @@ export default function ChatbotData() {
   const [isLoading, setIsLoading] = useState(true);
   const [isUpdating, setIsUpdating] = useState(false);
   const [deletingName, setDeletingName] = useState<string | null>(null);
+  const [selectedNames, setSelectedNames] = useState<Set<string>>(new Set());
   const [error, setError] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
   const [sortOption, setSortOption] = useState<SortOption>("updated_desc");
@@ -91,6 +97,10 @@ export default function ChatbotData() {
     try {
       const response = await api.get<RagDocument[]>("/api/v1/admin/documents");
       setDocuments(response.data);
+      const availableNames = new Set(response.data.map((document) => document.name));
+      setSelectedNames((previous) => new Set(
+        [...previous].filter((name) => availableNames.has(name)),
+      ));
       setError(null);
     } catch (err) {
       setError(getErrorMessage(err));
@@ -146,18 +156,73 @@ export default function ChatbotData() {
     });
   }, [documents, searchQuery, sortOption]);
 
-  const handleUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0];
-    event.target.value = "";
-    if (!file) return;
+  const visibleNames = sortedDocuments.map((document) => document.name);
+  const allVisibleSelected = visibleNames.length > 0
+    && visibleNames.every((name) => selectedNames.has(name));
+  const someVisibleSelected = visibleNames.some((name) => selectedNames.has(name));
 
-    if (!file.name.toLowerCase().endsWith(".pdf")) {
+  const handleUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const files = Array.from(event.target.files || []);
+    event.target.value = "";
+    if (files.length === 0) return;
+
+    if (files.length > MAX_BATCH_FILES) {
+      toast.error(`Mỗi lần chỉ được chọn tối đa ${MAX_BATCH_FILES} tài liệu.`);
+      return;
+    }
+
+    if (files.some((file) => !file.name.toLowerCase().endsWith(".pdf"))) {
       toast.error("Chỉ hỗ trợ tài liệu PDF.");
       return;
     }
 
-    const replacing = documents.some((document) => document.name === file.name);
-    if (replacing && !window.confirm(`Tài liệu "${file.name}" đã tồn tại. Bạn muốn thay thế tài liệu này?`)) {
+    const oversizedFile = files.find((file) => file.size > MAX_PDF_SIZE);
+    if (oversizedFile) {
+      toast.error(`“${oversizedFile.name}” vượt quá giới hạn 25 MB.`);
+      return;
+    }
+
+    const totalSize = files.reduce((sum, file) => sum + file.size, 0);
+    if (totalSize > MAX_BATCH_TOTAL_SIZE) {
+      toast.error("Tổng dung lượng tài liệu không được vượt quá 90 MB.");
+      return;
+    }
+
+    const foldedNames = files.map((file) => file.name.toLocaleLowerCase("vi"));
+    if (new Set(foldedNames).size !== foldedNames.length) {
+      toast.error("Danh sách đã chọn có tên file bị trùng.");
+      return;
+    }
+
+    const existingNames = new Map(
+      documents.map((document) => [
+        document.name.toLocaleLowerCase("vi"),
+        document.name,
+      ]),
+    );
+    const caseVariantCollision = files
+      .map((file) => ({
+        requested: file.name,
+        existing: existingNames.get(file.name.toLocaleLowerCase("vi")),
+      }))
+      .find(({ requested, existing }) => existing && existing !== requested);
+    if (caseVariantCollision) {
+      toast.error(
+        `Tên “${caseVariantCollision.requested}” chỉ khác hoa/thường với “${caseVariantCollision.existing}”. `
+        + "Hãy dùng đúng tên hiện có khi thay thế tài liệu.",
+      );
+      return;
+    }
+
+    const replacementNames = files
+      .map((file) => file.name)
+      .filter((name) => existingNames.get(name.toLocaleLowerCase("vi")) === name);
+    if (
+      replacementNames.length > 0
+      && !window.confirm(
+        `${replacementNames.length} tài liệu đã tồn tại và sẽ được thay thế:\n\n${replacementNames.join("\n")}`,
+      )
+    ) {
       return;
     }
 
@@ -167,14 +232,14 @@ export default function ChatbotData() {
       progress: 5,
       stage: "preparing_document",
       operation: "upload",
-      file_name: file.name,
+      file_name: `${files.length} tài liệu`,
       error: null,
     });
     const formData = new FormData();
-    formData.append("file", file);
+    files.forEach((file) => formData.append("files", file));
     try {
-      await api.post("/api/v1/admin/documents", formData);
-      toast.success(replacing ? "Đã thay thế và lập chỉ mục lại tài liệu." : "Đã tải lên và lập chỉ mục tài liệu.");
+      await api.post("/api/v1/admin/documents/batch-upload", formData);
+      toast.success(`Đã xử lý ${files.length} tài liệu và lập chỉ mục lại một lần.`);
       await fetchDocuments();
     } catch (err) {
       toast.error(getErrorMessage(err));
@@ -199,11 +264,67 @@ export default function ChatbotData() {
     try {
       await api.delete(`/api/v1/admin/documents/${encodeURIComponent(document.name)}`);
       toast.success("Đã xóa tài liệu và lập chỉ mục lại.");
+      setSelectedNames((previous) => {
+        const next = new Set(previous);
+        next.delete(document.name);
+        return next;
+      });
       await fetchDocuments();
     } catch (err) {
       toast.error(getErrorMessage(err));
     } finally {
       setDeletingName(null);
+      setIsUpdating(false);
+    }
+  };
+
+  const toggleDocument = (name: string) => {
+    setSelectedNames((previous) => {
+      const next = new Set(previous);
+      if (next.has(name)) next.delete(name);
+      else next.add(name);
+      return next;
+    });
+  };
+
+  const toggleAllVisible = () => {
+    setSelectedNames((previous) => {
+      const next = new Set(previous);
+      if (allVisibleSelected) {
+        visibleNames.forEach((name) => next.delete(name));
+      } else {
+        visibleNames.forEach((name) => next.add(name));
+      }
+      return next;
+    });
+  };
+
+  const handleBatchDelete = async () => {
+    const fileNames = [...selectedNames];
+    if (fileNames.length === 0) return;
+    if (fileNames.length > MAX_BATCH_DELETE_FILES) {
+      toast.error(`Mỗi lần chỉ được xóa tối đa ${MAX_BATCH_DELETE_FILES} tài liệu.`);
+      return;
+    }
+    if (!window.confirm(`Xóa ${fileNames.length} tài liệu đã chọn và chỉ lập chỉ mục lại một lần?`)) return;
+
+    setIsUpdating(true);
+    setIndexProgress({
+      active: true,
+      progress: 5,
+      stage: "preparing_document",
+      operation: "delete",
+      file_name: `${fileNames.length} tài liệu`,
+      error: null,
+    });
+    try {
+      await api.post("/api/v1/admin/documents/batch-delete", { file_names: fileNames });
+      toast.success(`Đã xóa ${fileNames.length} tài liệu và lập chỉ mục lại một lần.`);
+      setSelectedNames(new Set());
+      await fetchDocuments();
+    } catch (err) {
+      toast.error(getErrorMessage(err));
+    } finally {
       setIsUpdating(false);
     }
   };
@@ -223,7 +344,7 @@ export default function ChatbotData() {
           </p>
         </div>
 
-        <input ref={inputRef} type="file" accept="application/pdf,.pdf" className="hidden" onChange={handleUpload} />
+        <input ref={inputRef} type="file" accept="application/pdf,.pdf" multiple className="hidden" onChange={handleUpload} />
         <Button
           disabled={isUpdating}
           onClick={() => inputRef.current?.click()}
@@ -266,6 +387,18 @@ export default function ChatbotData() {
               : `${documents.length} tài liệu`}
           </p>
           <div className="flex w-full flex-col gap-2 sm:flex-row lg:w-auto">
+            {selectedNames.size > 0 && (
+              <Button
+                type="button"
+                variant="outline"
+                disabled={isUpdating}
+                onClick={handleBatchDelete}
+                className="h-10 border-red-200 text-red-600 hover:bg-red-50 hover:text-red-700 sm:h-9"
+              >
+                <Trash2 className="mr-2 h-4 w-4" />
+                Xóa {selectedNames.size} mục
+              </Button>
+            )}
             <div className="relative w-full sm:w-72">
               <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
               <Input
@@ -308,9 +441,22 @@ export default function ChatbotData() {
           </div>
         </div>
         <div className="overflow-x-auto">
-          <table className="min-w-[800px] w-full text-sm text-left">
+          <table className="min-w-[860px] w-full text-sm text-left">
             <thead className="bg-slate-50 text-slate-500 border-b">
               <tr>
+                <th className="w-12 px-4 py-4 text-center font-semibold">
+                  <input
+                    ref={(input) => {
+                      if (input) input.indeterminate = someVisibleSelected && !allVisibleSelected;
+                    }}
+                    type="checkbox"
+                    checked={allVisibleSelected}
+                    disabled={isUpdating || visibleNames.length === 0}
+                    onChange={toggleAllVisible}
+                    aria-label="Chọn tất cả tài liệu đang hiển thị"
+                    className="h-4 w-4 cursor-pointer accent-orange-600 disabled:cursor-not-allowed"
+                  />
+                </th>
                 <th className="px-6 py-4 font-semibold">Tên tài liệu</th>
                 <th className="px-6 py-4 font-semibold">Dung lượng</th>
                 <th className="px-6 py-4 font-semibold">Người tải</th>
@@ -322,14 +468,14 @@ export default function ChatbotData() {
             <tbody className="divide-y">
               {isLoading ? (
                 <tr>
-                  <td colSpan={6} className="px-6 py-16 text-center text-slate-500">
+                  <td colSpan={7} className="px-6 py-16 text-center text-slate-500">
                     <Loader2 className="mx-auto mb-2 h-6 w-6 animate-spin" />
                     Đang tải danh sách tài liệu...
                   </td>
                 </tr>
               ) : documents.length === 0 ? (
                 <tr>
-                  <td colSpan={6} className="px-6 py-16 text-center">
+                  <td colSpan={7} className="px-6 py-16 text-center">
                     <FileText className="mx-auto mb-3 h-10 w-10 text-slate-300" />
                     <h4 className="font-semibold text-slate-800">Chưa có tài liệu nào</h4>
                     <p className="mt-1 text-xs text-slate-400">Tải PDF lên để bổ sung nguồn kiến thức cho chatbot.</p>
@@ -337,7 +483,7 @@ export default function ChatbotData() {
                 </tr>
               ) : sortedDocuments.length === 0 ? (
                 <tr>
-                  <td colSpan={6} className="px-6 py-16 text-center">
+                  <td colSpan={7} className="px-6 py-16 text-center">
                     <Search className="mx-auto mb-3 h-10 w-10 text-slate-300" />
                     <h4 className="font-semibold text-slate-800">Không tìm thấy tài liệu</h4>
                     <p className="mt-1 text-xs text-slate-400">
@@ -357,6 +503,16 @@ export default function ChatbotData() {
               ) : (
                 sortedDocuments.map((document) => (
                   <tr key={document.name} className="hover:bg-slate-50/70">
+                    <td className="px-4 py-4 text-center">
+                      <input
+                        type="checkbox"
+                        checked={selectedNames.has(document.name)}
+                        disabled={isUpdating}
+                        onChange={() => toggleDocument(document.name)}
+                        aria-label={`Chọn ${document.name}`}
+                        className="h-4 w-4 cursor-pointer accent-orange-600 disabled:cursor-not-allowed"
+                      />
+                    </td>
                     <td className="px-6 py-4">
                       <div className="flex items-center gap-3">
                         <FileText className="h-5 w-5 shrink-0 text-orange-600" />

@@ -57,7 +57,11 @@ def load_pdf(path: str):
     
     # Kiểm tra xem path là thư mục hay file đơn lẻ
     if os.path.isdir(path):
-        pdf_files = [os.path.join(path, f) for f in os.listdir(path) if f.endswith('.pdf')]
+        pdf_files = [
+            os.path.join(path, file_name)
+            for file_name in os.listdir(path)
+            if file_name.lower().endswith(".pdf")
+        ]
     else:
         pdf_files = [path]
 

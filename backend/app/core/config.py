@@ -26,6 +26,7 @@ LLM_API_KEY = (
 LLM_MODEL = os.getenv("LLM_MODEL", "gpt-4o-mini")
 LLM_TIMEOUT_SECONDS = float(os.getenv("LLM_TIMEOUT_SECONDS", "120"))
 LLM_MAX_TOKENS = int(os.getenv("LLM_MAX_TOKENS", "512"))
+LLM_MAX_CONCURRENCY = int(os.getenv("LLM_MAX_CONCURRENCY", "2"))
 LLM_TEMPERATURE = float(os.getenv("LLM_TEMPERATURE", "0.2"))
 LLM_FREQUENCY_PENALTY = float(os.getenv("LLM_FREQUENCY_PENALTY", "0.25"))
 # vLLM supports repetition_penalty as an OpenAI-compatible extension. Keep it
@@ -43,10 +44,20 @@ VISION_API_KEY = (
 )
 VISION_MODEL = os.getenv("VISION_MODEL", LLM_MODEL)
 VISION_MAX_TOKENS = int(os.getenv("VISION_MAX_TOKENS", "160"))
+VISION_IMAGE_MAX_DIMENSION = int(os.getenv("VISION_IMAGE_MAX_DIMENSION", "1280"))
+VISION_IMAGE_JPEG_QUALITY = int(os.getenv("VISION_IMAGE_JPEG_QUALITY", "85"))
 EMBEDDING_DEVICE = os.getenv("EMBEDDING_DEVICE", "cpu")
+RAG_MAX_CONCURRENCY = int(os.getenv("RAG_MAX_CONCURRENCY", "2"))
 EMBEDDING_LOCAL_FILES_ONLY = os.getenv(
     "EMBEDDING_LOCAL_FILES_ONLY", "true"
 ).lower() in {"1", "true", "yes"}
+
+if LLM_MAX_CONCURRENCY < 1:
+    raise RuntimeError("LLM_MAX_CONCURRENCY must be at least 1")
+if RAG_MAX_CONCURRENCY < 1:
+    raise RuntimeError("RAG_MAX_CONCURRENCY must be at least 1")
+if VISION_IMAGE_MAX_DIMENSION < 64:
+    raise RuntimeError("VISION_IMAGE_MAX_DIMENSION must be at least 64")
 
 if not LLM_API_KEY:
     raise RuntimeError(

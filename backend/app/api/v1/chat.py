@@ -1,3 +1,7 @@
+import asyncio
+from concurrent.futures import ThreadPoolExecutor
+from functools import lru_cache
+
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 from datetime import datetime, timezone
@@ -10,7 +14,7 @@ from app.rag.evidence_selector import (
     select_page_image_references,
     select_primary_evidence_source,
 )
-from app.services.llm_service import extract_image_text, generate_answer
+from app.services.llm_service import InvalidImageDataError, extract_image_text, generate_answer
 from app.services.answer_postprocessor import (
     extract_evidence_ids,
     normalize_evidence_citations,
@@ -23,11 +27,22 @@ from app.models.chat_session import ChatSession
 from app.models.user import User
 from app.services.auth_service import get_current_user_from_token
 from app.core.websocket import manager
+from app.core.config import RAG_MAX_CONCURRENCY
 
 from app.services.logging_service import log_user_activity, save_chat_log
 from app.services.topic_service import classify_topic
 
 router = APIRouter()
+
+
+@lru_cache(maxsize=1)
+def _get_rag_executor() -> ThreadPoolExecutor:
+    return ThreadPoolExecutor(max_workers=RAG_MAX_CONCURRENCY, thread_name_prefix="rag-query")
+
+
+async def _retrieve_context_without_blocking(query_text: str):
+    loop = asyncio.get_running_loop()
+    return await loop.run_in_executor(_get_rag_executor(), retrieve_context, query_text)
 
 
 @router.post("/chat", response_model=ChatResponse)
@@ -67,7 +82,10 @@ async def chat(
         session_title = session.title
 
     if req.image:
-        image_description = extract_image_text(req.image)
+        try:
+            image_description = await asyncio.to_thread(extract_image_text, req.image)
+        except InvalidImageDataError as exc:
+            raise HTTPException(status_code=400, detail=str(exc)) from exc
         if image_description.casefold() != "none":
             query_text = f"{query_text} {image_description}".strip()
         else:
@@ -81,7 +99,7 @@ async def chat(
 
     # Deterministic normalization in retrieval preserves exact error codes and
     # avoids an extra Qwen query-rewrite inference on the request path.
-    context, source_docs = retrieve_context(query_text)
+    context, source_docs = await _retrieve_context_without_blocking(query_text)
 
     if not context:
         return ChatResponse(
@@ -131,7 +149,9 @@ phần mềm/gói cài đặt mới nhất; không nhầm ngày trong tên Sourc
 """
 
     start_time = time.time()
-    answer = generate_answer(final_prompt, image_base64=req.image)
+    # The image is used once for OCR; sending it again increases API cost and
+    # can crowd out retrieved evidence in a Vision model context window.
+    answer = await asyncio.to_thread(generate_answer, final_prompt)
     answer = normalize_evidence_citations(answer)
     latency = int((time.time() - start_time) * 1000)
 

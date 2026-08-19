@@ -1,23 +1,35 @@
 import base64
 import binascii
 from collections import Counter
+from io import BytesIO
 import logging
 import re
+from threading import BoundedSemaphore
+
+from PIL import Image, ImageOps, UnidentifiedImageError
 
 from app.core.config import (
     LLM_FREQUENCY_PENALTY,
     LLM_MAX_TOKENS,
+    LLM_MAX_CONCURRENCY,
     LLM_MODEL,
     LLM_REPETITION_PENALTY,
     LLM_TEMPERATURE,
     QUERY_REWRITE_MODEL,
     VISION_MAX_TOKENS,
+    VISION_IMAGE_JPEG_QUALITY,
+    VISION_IMAGE_MAX_DIMENSION,
     VISION_MODEL,
 )
 from app.prompts.exam_support import SYSTEM_PROMPT
 from app.services.model_clients import get_llm_client, get_vision_client
 
 logger = logging.getLogger(__name__)
+_model_inference_semaphore = BoundedSemaphore(LLM_MAX_CONCURRENCY)
+
+
+class InvalidImageDataError(ValueError):
+    """Raised when an uploaded image cannot be decoded safely."""
 
 _QUERY_PROTECTED_TERMS = (
     "khảo thí",
@@ -93,34 +105,54 @@ def _create_answer_completion(
             "repetition_penalty": repetition_penalty,
         }
 
-    return get_llm_client().chat.completions.create(**request_options)
+    with _model_inference_semaphore:
+        return get_llm_client().chat.completions.create(**request_options)
 
 
 def _image_data_url(image_base64: str) -> str:
-    if image_base64.startswith("data:"):
-        return image_base64
+    """Normalize images before sending them to a metered Vision API."""
+    encoded = str(image_base64 or "").strip()
+    if encoded.startswith("data:"):
+        header, separator, encoded = encoded.partition(",")
+        if not separator or ";base64" not in header.casefold():
+            raise InvalidImageDataError("Ảnh gửi lên không sử dụng định dạng base64 hợp lệ.")
 
-    clean_base64 = image_base64.strip()
-    mime_type = "image/jpeg"
     try:
-        header = base64.b64decode(clean_base64[:64], validate=False)
-        if header.startswith(b"\x89PNG\r\n\x1a\n"):
-            mime_type = "image/png"
-        elif header.startswith(b"RIFF") and header[8:12] == b"WEBP":
-            mime_type = "image/webp"
-        elif header.startswith((b"GIF87a", b"GIF89a")):
-            mime_type = "image/gif"
-    except (binascii.Error, ValueError):
-        pass
+        raw = base64.b64decode(encoded, validate=True)
+        with Image.open(BytesIO(raw)) as source:
+            source.load()
+            image = ImageOps.exif_transpose(source).convert("RGBA")
+            if image.mode == "RGBA":
+                background = Image.new("RGBA", image.size, "white")
+                image = Image.alpha_composite(background, image).convert("RGB")
+            else:
+                image = image.convert("RGB")
+    except (binascii.Error, ValueError, UnidentifiedImageError, OSError) as exc:
+        raise InvalidImageDataError("Tệp gửi lên không phải là ảnh base64 hợp lệ.") from exc
 
-    return f"data:{mime_type};base64,{clean_base64}"
+    original_size = image.size
+    image.thumbnail(
+        (VISION_IMAGE_MAX_DIMENSION, VISION_IMAGE_MAX_DIMENSION),
+        Image.Resampling.LANCZOS,
+    )
+    if image.size != original_size:
+        logger.info("Normalized Vision image from %sx%s to %sx%s", *original_size, *image.size)
+    output = BytesIO()
+    image.save(
+        output,
+        format="JPEG",
+        quality=max(50, min(VISION_IMAGE_JPEG_QUALITY, 95)),
+        optimize=True,
+    )
+    return f"data:image/jpeg;base64,{base64.b64encode(output.getvalue()).decode('ascii')}"
 
 
 def extract_image_text(image_base64: str) -> str:
     """Extract only visible error codes/messages for retrieval query creation."""
-    response = get_vision_client().chat.completions.create(
-        model=VISION_MODEL,
-        messages=[
+    with _model_inference_semaphore:
+        response = get_vision_client().chat.completions.create(
+            model=VISION_MODEL,
+            messages=[
             {
                 "role": "system",
                 "content": (
@@ -142,10 +174,10 @@ def extract_image_text(image_base64: str) -> str:
                     },
                 ],
             },
-        ],
-        temperature=0,
-        max_tokens=VISION_MAX_TOKENS,
-    )
+            ],
+            temperature=0,
+            max_tokens=VISION_MAX_TOKENS,
+        )
     return _response_text(response)
 
 

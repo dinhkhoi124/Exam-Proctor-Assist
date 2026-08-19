@@ -1,7 +1,7 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { useAuth } from "@/context/auth";
-import { api } from "@/lib/api";
+import { api, AUTH_NOTICE_STORAGE_KEY } from "@/lib/api";
 import { getApiErrorMessage, getApiErrorPayload, isRecord } from "@/lib/api-errors";
 import { toast } from "sonner";
 
@@ -28,6 +28,13 @@ export default function Login() {
     message: string;
     canResendVerification: boolean;
   } | null>(null);
+
+  useEffect(() => {
+    const notice = sessionStorage.getItem(AUTH_NOTICE_STORAGE_KEY);
+    if (!notice) return;
+    sessionStorage.removeItem(AUTH_NOTICE_STORAGE_KEY);
+    toast.error(notice);
+  }, []);
 
   const handleResendVerification = async () => {
     const email = identifier.trim();

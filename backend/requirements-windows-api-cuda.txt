@@ -1,0 +1,45 @@
+# Windows x64 / API-model runtime with CUDA embeddings. Python 3.12 is recommended.
+# This does not install vLLM, Faster-Whisper, or local LLM/Vision/STT model weights.
+# Use only on a machine whose NVIDIA driver supports the CUDA 12.8 PyTorch wheel.
+# Install in a fresh venv with:
+#   .\.venv\Scripts\python.exe -m pip install --upgrade pip setuptools wheel
+#   .\.venv\Scripts\python.exe -m pip install -r requirements-windows-api-cuda.txt
+--extra-index-url https://download.pytorch.org/whl/cu128
+
+fastapi==0.128.0
+uvicorn[standard]==0.40.0
+sqlalchemy==2.0.48
+psycopg2-binary==2.9.11
+python-dotenv==1.2.1
+python-jose[cryptography]==3.5.0
+passlib==1.7.4
+bcrypt==4.0.1
+pydantic[email]==2.12.5
+python-multipart==0.0.22
+cryptography==46.0.4
+
+# OpenAI and other OpenAI-compatible LLM/Vision/STT APIs.
+openai==2.16.0
+httpx==0.28.1
+
+# Local PDF ingestion and retrieval; embeddings use the NVIDIA GPU.
+sentence-transformers==5.2.2
+torch==2.10.0+cu128
+faiss-cpu==1.13.2
+rank-bm25==0.2.2
+underthesea==9.5.0
+scikit-learn==1.8.0
+pdfplumber==0.11.9
+pymupdf==1.27.1
+pypdfium2==5.3.0
+pillow==12.1.0
+imagehash==4.3.2
+paddleocr==3.4.1
+paddlepaddle==3.3.1
+
+# Reporting and support services.
+openpyxl==3.1.5
+matplotlib==3.10.8
+rapidfuzz==3.14.3
+websockets==16.0
+pytest==9.1.1

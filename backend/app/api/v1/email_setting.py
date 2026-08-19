@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 from app.models.email_setting import EmailSetting
 from app.schemas.email import EmailSettingCreate, TestEmailRequest  
@@ -45,15 +45,16 @@ def save_email_setting(
 ):
     require_admin(current_user)
 
-    encrypted = encrypt_password(
-        payload.app_password
-    )
-
     setting = db.query(
         EmailSetting
     ).first()
 
     if not setting:
+        if not payload.app_password:
+            raise HTTPException(
+                status_code=400,
+                detail="App password is required for the initial SMTP configuration",
+            )
         setting = EmailSetting()
         db.add(setting)
 
@@ -61,7 +62,13 @@ def save_email_setting(
     setting.smtp_port = payload.smtp_port
     setting.sender_email = payload.sender_email
     setting.sender_name = payload.sender_name
-    setting.encrypted_password = encrypted
+    if payload.app_password:
+        setting.encrypted_password = encrypt_password(payload.app_password)
+    elif not setting.encrypted_password:
+        raise HTTPException(
+            status_code=400,
+            detail="App password is required for the SMTP configuration",
+        )
     setting.use_tls = payload.use_tls
     setting.is_active = True  # Make it active upon saving
 

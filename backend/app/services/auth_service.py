@@ -16,7 +16,7 @@ from app.core.config import (
     ACCESS_TOKEN_EXPIRE_MINUTES,
     RESET_TOKEN_EXPIRE_MINUTES
 )
-from sqlalchemy import func
+from sqlalchemy import func, update
 from app.models.chat_log import ChatLog
 from app.db.deps import get_db
 
@@ -71,6 +71,19 @@ def create_access_token(data: dict) -> str:
         to_encode,
         JWT_SECRET,
         algorithm=JWT_ALGORITHM
+    )
+
+
+def invalidate_user_sessions(user: User) -> None:
+    """Invalidate every access token previously issued for this user."""
+    user.session_version += 1
+
+
+def _session_unauthorized(code: str, message: str) -> HTTPException:
+    return HTTPException(
+        status_code=status.HTTP_401_UNAUTHORIZED,
+        detail={"code": code, "message": message},
+        headers={"WWW-Authenticate": "Bearer"},
     )
 
 
@@ -204,7 +217,14 @@ def login_user(db: Session, identifier: str, password: str):
             }
         )
 
-    token = create_access_token({"sub": str(user.id)})
+    session_version = db.execute(
+        update(User)
+        .where(User.id == user.id)
+        .values(session_version=User.session_version + 1)
+        .returning(User.session_version)
+        .execution_options(synchronize_session=False)
+    ).scalar_one()
+    token = create_access_token({"sub": str(user.id), "sv": session_version})
     return token, user
 
 def get_current_user(db: Session, user_id: str):
@@ -343,14 +363,30 @@ def get_current_user_from_token(
     try:
         payload = jwt.decode(token, JWT_SECRET, algorithms=[JWT_ALGORITHM])
         user_id = payload.get("sub")
-        if not user_id:
-            raise HTTPException(status_code=401, detail="Invalid token")
-    except JWTError:
-        raise HTTPException(status_code=401, detail="Invalid token")
+        token_session_version = payload.get("sv")
+    except JWTError as exc:
+        raise _session_unauthorized(
+            "INVALID_TOKEN", "Phiên đăng nhập không hợp lệ hoặc đã hết hạn."
+        ) from exc
+
+    if not user_id or isinstance(token_session_version, bool) or not isinstance(
+        token_session_version, int
+    ):
+        raise _session_unauthorized(
+            "INVALID_TOKEN", "Phiên đăng nhập không hợp lệ hoặc đã hết hạn."
+        )
 
     user = db.query(User).filter(User.id == user_id).first()
     if not user:
-        raise HTTPException(status_code=404, detail="User not found")
+        raise _session_unauthorized(
+            "INVALID_TOKEN", "Phiên đăng nhập không hợp lệ hoặc đã hết hạn."
+        )
+
+    if token_session_version != user.session_version:
+        raise _session_unauthorized(
+            "SESSION_REPLACED",
+            "Tài khoản đã được đăng nhập trên một trình duyệt hoặc thiết bị khác.",
+        )
 
     if user.is_deleted:
         raise HTTPException(
