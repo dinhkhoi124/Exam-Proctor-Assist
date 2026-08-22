@@ -1,4 +1,4 @@
-import { Wifi, LogIn, Globe, Clock, Upload, Laptop, Phone } from "lucide-react";
+import { Wifi, LogIn, Globe, Clock, Download, Laptop, Phone } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 interface QuickActionsProps {
@@ -7,12 +7,12 @@ interface QuickActionsProps {
 
 const quickActions = [
   { icon: Wifi, label: "Sự cố WiFi phòng thi", query: "Thí sinh không kết nối được WiFi phòng thi" },
-  { icon: LogIn, label: "Lỗi đăng nhập portal", query: "Thí sinh không đăng nhập được cổng thi portal" },
-  { icon: Globe, label: "Lỗi trình duyệt", query: "Trang thi không tải được hoặc hiển thị sai trên trình duyệt" },
-  { icon: Clock, label: "Lỗi đồng hồ đếm", query: "Đồng hồ tính giờ thi không hiển thị hoặc bị đóng băng" },
-  { icon: Upload, label: "Lỗi nộp bài thi", query: "Thí sinh không bấm nộp được bài thi EOS/PEA" },
-  { icon: Laptop, label: "Sự cố thiết bị", query: "Máy tính của thí sinh bị sập nguồn hoặc hỏng phần cứng" },
-  { icon: Phone, label: "Liên hệ hỗ trợ", query: "Cần liên hệ bộ phận hỗ trợ kỹ thuật hoặc trưởng ban coi thi như thế nào?" },
+  { icon: LogIn, label: "Kết nối WiFi thi", query: "Hướng dẫn kết nối wifi phòng thi" },
+  { icon: Globe, label: "Ký tên điện tử", query: "Hướng dẫn sinh viên ký tên điện tử" },
+  { icon: Clock, label: "Sinh viên đi muộn", query: "Sinh viên đi muộn" },
+  { icon: Download, label: "Tải EOS", query: "Hướng dẫn tải EOS" },
+  { icon: Laptop, label: "Sự cố thiết bị", query: "Máy tính của sinh viên bị treo" },
+  { icon: Phone, label: "Email phòng đào tạo", query: "Email của phòng đào tạo là gì?" },
 ];
 
 export function QuickActions({ onSelect }: QuickActionsProps) {

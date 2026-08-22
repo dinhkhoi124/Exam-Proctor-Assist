@@ -14,7 +14,12 @@ from app.rag.evidence_selector import (
     select_page_image_references,
     select_primary_evidence_source,
 )
-from app.services.llm_service import InvalidImageDataError, extract_image_text, generate_answer
+from app.services.llm_service import (
+    InvalidImageDataError,
+    analyze_uploaded_image,
+    build_image_aware_query,
+    generate_answer,
+)
 from app.services.answer_postprocessor import (
     extract_evidence_ids,
     normalize_evidence_citations,
@@ -83,18 +88,22 @@ async def chat(
 
     if req.image:
         try:
-            image_description = await asyncio.to_thread(extract_image_text, req.image)
+            image_analysis = await asyncio.to_thread(analyze_uploaded_image, req.image)
         except InvalidImageDataError as exc:
             raise HTTPException(status_code=400, detail=str(exc)) from exc
-        if image_description.casefold() != "none":
-            query_text = f"{query_text} {image_description}".strip()
-        else:
-            image_description = ""
+        if image_analysis.relevant:
+            image_description = image_analysis.error_text
+        query_text = build_image_aware_query(query_text, image_analysis)
 
     if not query_text:
         return ChatResponse(
-            answer="Vui lòng nhập câu hỏi hoặc gửi ảnh lỗi để tôi hỗ trợ.",
-            page_images=[]
+            answer=(
+                "Không phát hiện mã hoặc thông báo lỗi rõ ràng trong ảnh, nên không tìm thấy "
+                "thông tin tương ứng trong tài liệu. Vui lòng gửi ảnh chụp màn hình lỗi rõ hơn."
+            ) if req.image else "Vui lòng nhập câu hỏi hoặc gửi ảnh lỗi để tôi hỗ trợ.",
+            page_images=[],
+            session_id=str(session_id),
+            session_title=session_title,
         )
 
     # Deterministic normalization in retrieval preserves exact error codes and
