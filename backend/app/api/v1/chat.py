@@ -1,3 +1,7 @@
+import asyncio
+from concurrent.futures import ThreadPoolExecutor
+from functools import lru_cache
+
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 from datetime import datetime, timezone
@@ -5,8 +9,17 @@ import time
 
 from app.schemas.chat import ChatRequest, ChatResponse
 from app.rag.rag_service import retrieve_context
-from app.rag.evidence_selector import select_primary_evidence_source
-from app.services.llm_service import extract_image_text, generate_answer
+from app.rag.evidence_selector import (
+    is_procedural_overview,
+    select_page_image_references,
+    select_primary_evidence_source,
+)
+from app.services.llm_service import (
+    InvalidImageDataError,
+    analyze_uploaded_image,
+    build_image_aware_query,
+    generate_answer,
+)
 from app.services.answer_postprocessor import (
     extract_evidence_ids,
     normalize_evidence_citations,
@@ -19,11 +32,22 @@ from app.models.chat_session import ChatSession
 from app.models.user import User
 from app.services.auth_service import get_current_user_from_token
 from app.core.websocket import manager
+from app.core.config import RAG_MAX_CONCURRENCY
 
 from app.services.logging_service import log_user_activity, save_chat_log
 from app.services.topic_service import classify_topic
 
 router = APIRouter()
+
+
+@lru_cache(maxsize=1)
+def _get_rag_executor() -> ThreadPoolExecutor:
+    return ThreadPoolExecutor(max_workers=RAG_MAX_CONCURRENCY, thread_name_prefix="rag-query")
+
+
+async def _retrieve_context_without_blocking(query_text: str):
+    loop = asyncio.get_running_loop()
+    return await loop.run_in_executor(_get_rag_executor(), retrieve_context, query_text)
 
 
 @router.post("/chat", response_model=ChatResponse)
@@ -63,21 +87,28 @@ async def chat(
         session_title = session.title
 
     if req.image:
-        image_description = extract_image_text(req.image)
-        if image_description.casefold() != "none":
-            query_text = f"{query_text} {image_description}".strip()
-        else:
-            image_description = ""
+        try:
+            image_analysis = await asyncio.to_thread(analyze_uploaded_image, req.image)
+        except InvalidImageDataError as exc:
+            raise HTTPException(status_code=400, detail=str(exc)) from exc
+        if image_analysis.relevant:
+            image_description = image_analysis.error_text
+        query_text = build_image_aware_query(query_text, image_analysis)
 
     if not query_text:
         return ChatResponse(
-            answer="Vui lòng nhập câu hỏi hoặc gửi ảnh lỗi để tôi hỗ trợ.",
-            page_images=[]
+            answer=(
+                "Không phát hiện mã hoặc thông báo lỗi rõ ràng trong ảnh, nên không tìm thấy "
+                "thông tin tương ứng trong tài liệu. Vui lòng gửi ảnh chụp màn hình lỗi rõ hơn."
+            ) if req.image else "Vui lòng nhập câu hỏi hoặc gửi ảnh lỗi để tôi hỗ trợ.",
+            page_images=[],
+            session_id=str(session_id),
+            session_title=session_title,
         )
 
     # Deterministic normalization in retrieval preserves exact error codes and
     # avoids an extra Qwen query-rewrite inference on the request path.
-    context, source_docs = retrieve_context(query_text)
+    context, source_docs = await _retrieve_context_without_blocking(query_text)
 
     if not context:
         return ChatResponse(
@@ -122,31 +153,31 @@ Nếu bảng bị mất cấu trúc, không tự suy diễn quan hệ giữa cá
 Đặt trích dẫn ở cuối câu hoặc đoạn liên quan, đúng dạng [E1]. Không viết các biến thể như
 “[Sử dụng E1]”, “[Nguồn E1]” hoặc giải thích evidence ID bằng lời.
 Chỉ sử dụng các evidence ID đã xuất hiện trong phần tài liệu ở trên.
+Nếu evidence có trường "Product release date", dùng ngày đó khi người dùng hỏi phiên bản
+phần mềm/gói cài đặt mới nhất; không nhầm ngày trong tên Source với ngày phiên bản sản phẩm.
 """
 
     start_time = time.time()
-    answer = generate_answer(final_prompt, image_base64=req.image)
+    # The image is used once for OCR; sending it again increases API cost and
+    # can crowd out retrieved evidence in a Vision model context window.
+    answer = await asyncio.to_thread(generate_answer, final_prompt)
     answer = normalize_evidence_citations(answer)
     latency = int((time.time() - start_time) * 1000)
 
     page_images_data = []
-    seen_references: set[tuple[str, int]] = set()
     cited_evidence_ids = extract_evidence_ids(answer)
     primary_image_source = select_primary_evidence_source(
         cited_evidence_ids,
         evidence_by_id,
     )
+    image_references = select_page_image_references(
+        cited_evidence_ids,
+        evidence_by_id,
+        primary_image_source,
+        expand_procedure=is_procedural_overview(query_text, answer),
+    )
 
-    for evidence_id in cited_evidence_ids:
-        evidence = evidence_by_id.get(evidence_id.upper())
-        if not evidence or evidence.get("file_name") != primary_image_source:
-            continue
-
-        file_name = evidence["file_name"]
-        page_num = int(evidence["page"])
-        ref_key = (file_name, page_num)
-        if ref_key in seen_references:
-            continue
+    for file_name, page_num in image_references:
 
         img_b64 = get_page_image(file_name, page_num)
         if img_b64:
@@ -155,7 +186,6 @@ Chỉ sử dụng các evidence ID đã xuất hiện trong phần tài liệu �
                 "file_name": file_name,
                 "base64": img_b64
             })
-            seen_references.add(ref_key)
 
     clean_answer = strip_evidence_citations(answer)
 

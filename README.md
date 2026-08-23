@@ -414,6 +414,168 @@ uv run python -m app.rag.build_index
 
 ---
 
+# Recent Updates (2026-08-14)
+
+## Admin dashboard and reports
+
+- Dashboard question totals and charts now support four account scopes: `user`, `admin`, `manager`, and `all`.
+- End-user traffic remains the default scope so admin/management test prompts do not inflate production usage statistics.
+- The selected scope is shared between Dashboard and Reports through browser local storage.
+- Report previews refresh immediately when the scope changes; a manual page refresh is no longer required.
+- Excel and PDF exports apply the selected account scope, include it in the report metadata, and add it to the downloaded filename.
+- The report layout is responsive: filters stack on phones, export buttons become full-width, summary cards adapt by breakpoint, and charts avoid horizontal overflow.
+
+API query parameters:
+
+```text
+GET /api/v1/admin/stats?question_scope=user
+GET /api/v1/admin/metrics?range=day&question_scope=user
+GET /api/v1/admin/reports/preview?...&question_scope=user
+GET /api/v1/admin/reports/export?...&question_scope=user&format=xlsx
+```
+
+## Document management
+
+- Added client-side PDF filename search that is case-insensitive and Vietnamese accent-insensitive.
+- Search results continue to support every existing sort option.
+- Added a correctly aligned clear button, match counter, empty-result state, and responsive mobile controls.
+
+## Chat citation images
+
+- Replaced the browser `about:blank` image-opening flow with an in-app lightbox.
+- Citation images can be enlarged without leaving the conversation.
+- The lightbox supports Escape, backdrop close, keyboard focus, body-scroll locking, and touch-friendly responsive sizing.
+
+## Verification
+
+- Backend test suite: `pytest -q`
+- Frontend static checks: `npm run lint`
+- Frontend production bundle: `npm run build`
+
+---
+
+# Deployment profiles and API configuration
+
+The backend supports two model-provider profiles without changing application
+code:
+
+- **API models on Windows/Linux:** FastAPI, PDF/OCR, embeddings and FAISS run on
+  the host; LLM, Vision and STT use OpenAI or another OpenAI-compatible API.
+- **Local models on Ubuntu:** LLM/Vision can point to a local vLLM endpoint and
+  STT can point to the local PhoWhisper/Faster-Whisper service.
+
+Never commit a real `.env`, API key, database password, `JWT_SECRET`,
+`EMAIL_ENCRYPT_KEY`, internal PDF, FAISS index or model weight.
+
+## Windows with API models
+
+Use Python 3.12 and choose exactly one dependency profile:
+
+```powershell
+cd backend
+py -3.12 -m venv .venv
+.\.venv\Scripts\python.exe -m pip install --upgrade pip setuptools wheel
+
+# CPU embeddings
+.\.venv\Scripts\python.exe -m pip install -r requirements-windows-api.txt
+
+# Or NVIDIA/CUDA 12.8 embeddings
+# .\.venv\Scripts\python.exe -m pip install -r requirements-windows-api-cuda.txt
+```
+
+Copy `backend/.env.api.example` to `backend/.env`, then configure secrets and
+provider values locally. Important API variables:
+
+```dotenv
+OPENAI_API_KEY=<secret>
+LLM_BASE_URL=
+LLM_API_KEY=
+LLM_MODEL=gpt-4o-mini
+VISION_BASE_URL=
+VISION_API_KEY=
+VISION_MODEL=gpt-4o-mini
+STT_BASE_URL=
+STT_API_KEY=
+STT_MODEL=gpt-4o-mini-transcribe
+STT_FALLBACK_MODEL=whisper-1
+EMBEDDING_DEVICE=cpu
+```
+
+Leave a `*_BASE_URL` blank for OpenAI. For another OpenAI-compatible provider,
+set its `/v1` endpoint, API key and published model name. Set
+`EMBEDDING_DEVICE=cuda` only with the CUDA requirements file and a working
+NVIDIA runtime.
+
+For each server/domain, also change:
+
+```dotenv
+DATABASE_URL=<that server's database>
+JWT_SECRET=<unique random secret>
+EMAIL_ENCRYPT_KEY=<key matching that database's encrypted SMTP data>
+FRONTEND_URL=https://<frontend-domain>
+FRONTEND_ORIGINS=https://<frontend-domain>
+```
+
+Before building the frontend for each deployment, set:
+
+```dotenv
+VITE_API_URL=https://<public-backend-domain>
+```
+
+For `https://examsupport.visionlab.ai.vn/`, use that deployment's public backend
+origin in `VITE_API_URL` and the frontend origin in `FRONTEND_URL` and
+`FRONTEND_ORIGINS`. WebSocket `/ws/admin` must be proxied with upgrade headers.
+
+## Database and document-management update
+
+Run migration 004 once on every deployment database:
+
+```powershell
+psql "$env:DATABASE_URL" -v ON_ERROR_STOP=1 -f backend\migrations\004_single_active_session.sql
+```
+
+Document management supports:
+
+- upload/replace up to 20 PDFs per batch;
+- maximum 25 MB per PDF and 90 MB per upload batch;
+- delete up to 100 selected PDFs per operation;
+- rollback of PDF files, PostgreSQL metadata, FAISS/BM25 files and in-memory RAG
+  resources if rebuilding fails;
+- rejection of corrupt PDFs, documents producing no usable chunks, and Windows
+  filename collisions that differ only by letter case.
+
+Image-only PDFs require `RAG_OCR_SCAN_EMPTY_PAGES=true`; this makes indexing
+slower. The complete API/local-model deployment matrix and operational notes are
+in [API_DEPLOYMENT_NOTES.md](API_DEPLOYMENT_NOTES.md).
+
+## Verification
+
+```powershell
+cd backend
+.\.venv\Scripts\python.exe -m pytest tests -q
+
+cd ..\frontend
+npm test -- --run
+npm run build
+```
+
+The regression tests were used locally before commit, but this update does not
+add new files under `backend/tests`.
+
+---
+
+# Future Improvements
+
+Potential improvements for production deployment:
+
+- Deploy App
+- Advanced RAG ranking
+- Multi-language support
+- Role-based access control
+- Conversation memory with long-term context
+
+---
+
 ## Related Repositories
 
 ### 🔬 Benchmark Repository

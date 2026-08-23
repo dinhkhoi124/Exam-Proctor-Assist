@@ -1,6 +1,7 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { createPortal } from "react-dom";
 import { cn } from "@/lib/utils";
-import { Bot, User, Image as ImageIcon, Mic, FileSearch, ThumbsUp, ThumbsDown } from "lucide-react";
+import { Bot, User, Image as ImageIcon, Mic, FileSearch, ThumbsUp, ThumbsDown, X, ZoomIn } from "lucide-react";
 import { api } from "@/lib/api";
 import { toast } from "sonner";
 
@@ -28,6 +29,7 @@ interface ChatMessageProps {
 export function ChatMessage({ message }: ChatMessageProps) {
   const isUser = message.role === "user";
   const [showImages, setShowImages] = useState(false);
+  const [enlargedImage, setEnlargedImage] = useState<PageImage | null>(null);
 
   // States cho Feedback
   const [feedbackRating, setFeedbackRating] = useState<"like" | "dislike" | null>(null);
@@ -42,6 +44,22 @@ export function ChatMessage({ message }: ChatMessageProps) {
     }
     return url;
   };
+
+  useEffect(() => {
+    if (!enlargedImage) return;
+
+    const previousOverflow = document.body.style.overflow;
+    const closeOnEscape = (event: KeyboardEvent) => {
+      if (event.key === "Escape") setEnlargedImage(null);
+    };
+
+    document.body.style.overflow = "hidden";
+    window.addEventListener("keydown", closeOnEscape);
+    return () => {
+      document.body.style.overflow = previousOverflow;
+      window.removeEventListener("keydown", closeOnEscape);
+    };
+  }, [enlargedImage]);
 
   const handleLike = async () => {
     if (!message.chatLogId) return;
@@ -200,27 +218,25 @@ export function ChatMessage({ message }: ChatMessageProps) {
                   </div>
 
                   {/* Image Container */}
-                  <div
-                    className="overflow-hidden rounded-xl border border-orange-200 bg-white shadow-sm cursor-zoom-in relative"
-                    onClick={() =>
-                      window.open(
-                        `data:image/png;base64,${imgObj.base64}`,
-                        "_blank",
-                      )
-                    }
+                  <button
+                    type="button"
+                    className="group/image relative block w-full cursor-zoom-in overflow-hidden rounded-xl border border-orange-200 bg-white text-left shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-orange-500 focus-visible:ring-offset-2"
+                    onClick={() => setEnlargedImage(imgObj)}
+                    aria-label={`Phóng to ảnh hướng dẫn trang ${imgObj.page}`}
                   >
                     <img
                       src={`data:image/png;base64,${imgObj.base64}`}
                       alt={`Hướng dẫn trang ${imgObj.page}`}
-                      className="w-full h-auto object-contain transition-transform duration-300 group-hover:scale-[1.01]"
+                      className="h-auto w-full object-contain transition-transform duration-300 group-hover/image:scale-[1.01]"
                     />
 
-                    <div className="absolute inset-0 bg-orange-900/0 group-hover:bg-orange-900/5 transition-colors flex items-center justify-center opacity-0 group-hover:opacity-100">
-                      <span className="bg-white/90 text-[10px] px-2 py-1 rounded-md shadow-sm text-orange-700 font-bold border border-orange-100">
-                        Click to enlarge
+                    <div className="absolute inset-0 flex items-center justify-center bg-orange-900/0 opacity-100 transition-colors group-hover/image:bg-orange-900/5 group-focus-visible/image:opacity-100 sm:opacity-0 sm:group-hover/image:opacity-100">
+                      <span className="flex items-center gap-1 rounded-md border border-orange-100 bg-white/90 px-2 py-1 text-[10px] font-bold text-orange-700 shadow-sm">
+                        <ZoomIn className="h-3 w-3" />
+                        Nhấn để phóng to
                       </span>
                     </div>
-                  </div>
+                  </button>
                 </div>
               ))}
             </div>
@@ -322,6 +338,45 @@ export function ChatMessage({ message }: ChatMessageProps) {
             ✓ Đã gửi góp ý cải thiện. Cảm ơn bạn!
           </div>
         )}
+
+        {enlargedImage &&
+          createPortal(
+            <div
+              className="fixed inset-0 z-[100] flex h-[100dvh] items-center justify-center bg-slate-950/85 p-2 backdrop-blur-sm sm:p-6"
+              role="dialog"
+              aria-modal="true"
+              aria-label={`Ảnh hướng dẫn trang ${enlargedImage.page}`}
+              onMouseDown={(event) => {
+                if (event.target === event.currentTarget) setEnlargedImage(null);
+              }}
+            >
+              <div className="relative flex max-h-full w-full max-w-full flex-col overflow-hidden rounded-xl bg-white shadow-2xl sm:w-auto">
+                <div className="flex items-center justify-between border-b px-4 py-2.5">
+                  <div className="flex items-center gap-2 text-sm font-semibold text-slate-800">
+                    <FileSearch className="h-4 w-4 text-orange-600" />
+                    Trang {enlargedImage.page}
+                  </div>
+                  <button
+                    type="button"
+                    autoFocus
+                    onClick={() => setEnlargedImage(null)}
+                    className="flex h-10 w-10 items-center justify-center rounded-md text-slate-500 transition-colors hover:bg-slate-100 hover:text-slate-900 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-orange-500"
+                    aria-label="Đóng ảnh phóng to"
+                  >
+                    <X className="h-5 w-5" />
+                  </button>
+                </div>
+                <div className="min-h-0 overflow-auto bg-slate-100 p-2">
+                  <img
+                    src={`data:image/png;base64,${enlargedImage.base64}`}
+                    alt={`Hướng dẫn trang ${enlargedImage.page}`}
+                    className="mx-auto max-h-[calc(100dvh-6rem)] max-w-full object-contain sm:max-h-[calc(100dvh-7rem)] sm:max-w-[calc(100vw-6rem)]"
+                  />
+                </div>
+              </div>
+            </div>,
+            document.body,
+          )}
       </div>
     </div>
   );

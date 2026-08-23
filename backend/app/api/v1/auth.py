@@ -24,6 +24,7 @@ from app.services.auth_service import (
     login_user,
     create_verification_token,
     get_current_user_from_token,
+    invalidate_user_sessions,
     verify_reset_token
 )
 
@@ -241,6 +242,7 @@ async def logout(req: Request, db: Session = Depends(get_db), current_user: User
     ip = req.client.host
     
     current_user.last_active = None
+    invalidate_user_sessions(current_user)
     db.commit()
 
     logger.info(f"LOGOUT - User {current_user.email} - IP: {ip}")
@@ -319,6 +321,8 @@ def reset_password(
     user.password_hash = hash_password(request.new_password)
     user.reset_token = None
     user.token_expiry = None
+    user.last_active = None
+    invalidate_user_sessions(user)
 
     db.commit()
 

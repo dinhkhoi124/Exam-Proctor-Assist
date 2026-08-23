@@ -6,6 +6,7 @@ from difflib import SequenceMatcher
 
 from app.core.config import VECTOR_STORE_DIR
 from app.rag.embedder import BM25Retriever, VectorStore
+from app.rag.temporal_resolver import build_temporal_catalog, resolve_temporal_evidence
 
 
 DENSE_TOP_K = 30
@@ -20,8 +21,13 @@ MIN_DENSE_SCORE = float(
 )
 MIN_BM25_SCORE = float(os.getenv("RAG_MIN_BM25_SCORE", "20.0"))
 MAX_CONTEXT_CHARACTERS = 6500
+TEMPORAL_RESOLVER_ENABLED = os.getenv("RAG_TEMPORAL_RESOLVER_ENABLED", "true").lower() in {
+    "1", "true", "yes",
+}
 
 _resources = None
+_temporal_catalog = {}
+_procedural_page_catalog: dict[tuple[str, str, int], tuple[int, ...]] = {}
 _DOMAIN_TERMS = {
     "eos", "eosclient", "pea", "pealogin", "e360",
     "usb", "fu-exam", "wifi", "wi-fi",
@@ -33,9 +39,97 @@ _STOPWORDS = {
 }
 
 
+def _procedure_section_key(section: str) -> str:
+    """Collapse step headings to their stable parent section."""
+    parts = [part.strip() for part in str(section or "").split(" > ") if part.strip()]
+    for index, part in enumerate(parts):
+        if re.match(r"^\s*(?:buoc|step)\s*\d+\b", _fold(part)):
+            # A step heading can itself contain the ">" character. Drop it and
+            # every fragment after it, retaining only the stable parent path.
+            parts = parts[:index]
+            break
+
+    normalized_parts = []
+    for part in parts:
+        normalized = _fold(part)
+        if not normalized:
+            continue
+        if normalized_parts and SequenceMatcher(
+            None, normalized, normalized_parts[-1]
+        ).ratio() >= 0.82:
+            continue
+        normalized_parts.append(normalized)
+    return " > ".join(normalized_parts)
+
+
+def _build_procedural_page_catalog(
+    metadata: list[dict],
+) -> dict[tuple[str, str, int], tuple[int, ...]]:
+    steps_by_section_page: dict[tuple[str, str], dict[int, set[int]]] = {}
+    for item in metadata:
+        source = str(item.get("source") or "").strip()
+        section = _procedure_section_key(
+            item.get("section_path") or item.get("heading") or ""
+        )
+        content = str(
+            item.get("parent_text") or item.get("display_text") or item.get("text") or ""
+        )
+        step_numbers = {
+            int(number)
+            for number in re.findall(r"\b(?:buoc|step)\s*(\d+)\b", _fold(content))
+        }
+        if not source or not section or not step_numbers:
+            continue
+        try:
+            page = int(item.get("page"))
+        except (TypeError, ValueError):
+            continue
+        page_steps = steps_by_section_page.setdefault((source, section), {})
+        page_steps.setdefault(page, set()).update(step_numbers)
+
+    catalog: dict[tuple[str, str, int], tuple[int, ...]] = {}
+    for (source, section), steps_by_page in steps_by_section_page.items():
+        groups: list[list[int]] = []
+        current_group: list[int] = []
+        previous_page: int | None = None
+        previous_max_step: int | None = None
+
+        for page in sorted(steps_by_page):
+            page_steps = steps_by_page[page]
+            starts_new_sequence = (
+                previous_page is not None
+                and (
+                    page - previous_page > 2
+                    or (
+                        previous_max_step is not None
+                        and min(page_steps) <= previous_max_step
+                    )
+                )
+            )
+            if starts_new_sequence and current_group:
+                groups.append(current_group)
+                current_group = []
+
+            current_group.append(page)
+            previous_page = page
+            previous_max_step = max(page_steps)
+
+        if current_group:
+            groups.append(current_group)
+
+        for group in groups:
+            ordered_group = tuple(group)
+            for page in group:
+                catalog[(source, section, page)] = ordered_group
+
+    return catalog
+
+
 def activate_resources(vector_store: VectorStore, bm25_retriever: BM25Retriever):
-    global _resources
+    global _resources, _temporal_catalog, _procedural_page_catalog
     _resources = (vector_store, bm25_retriever)
+    _temporal_catalog = build_temporal_catalog(vector_store.metadata)
+    _procedural_page_catalog = _build_procedural_page_catalog(vector_store.metadata)
 
 
 def load_resources():
@@ -50,9 +144,6 @@ def load_resources():
         pass
 
     activate_resources(vector_store, bm25_retriever)
-
-
-load_resources()
 
 
 def _normalize_query(query: str) -> str:
@@ -72,6 +163,9 @@ def _strip_accents(text: str) -> str:
 
 def _fold(text: str) -> str:
     return re.sub(r"\s+", " ", _strip_accents(text).casefold()).strip()
+
+
+load_resources()
 
 
 def _detect_exam_intent(query: str) -> str | None:
@@ -241,6 +335,12 @@ def _aggregate_parents(children: list) -> list:
                 "best_child_rank": rank,
                 "matched_children": [],
             }
+            for field in (
+                "family_id", "document_date", "date_source", "version_rank",
+                "subtype", "temporal_status",
+            ):
+                if child.get(field) is not None:
+                    parents[parent_id][field] = child.get(field)
 
         parent = parents[parent_id]
         parent["matched_children"].append(child)
@@ -357,18 +457,41 @@ def retrieve_context(query: str, top_k: int = FINAL_CONTEXT_TOP_K):
 
     child_candidates = boosted[:FUSION_TOP_K]
     parent_candidates = _aggregate_parents(child_candidates)
+    parent_candidates = resolve_temporal_evidence(
+        parent_candidates,
+        search_query,
+        _temporal_catalog,
+        enabled=TEMPORAL_RESOLVER_ENABLED,
+    )
     final_parents = _select_context_parents(parent_candidates, top_k=top_k)
 
     context_parts = []
     source_documents = []
+    explicit_latest_context = any(
+        item.get("temporal_action") == "current_explicit_latest_query"
+        for item in final_parents
+    )
     for position, item in enumerate(final_parents, start=1):
         evidence_id = f"E{position}"
-        section = item.get("section_path") or item.get("heading") or "Không có"
+        if explicit_latest_context:
+            source_label = "Supporting PDF (filename is not product version metadata)"
+            section = item.get("heading") or "Không có"
+        else:
+            source_label = item["source"]
+            section = item.get("section_path") or item.get("heading") or "Không có"
+        release_metadata = ""
+        if item.get("subtype") == "release_notice" and item.get("document_date"):
+            release_metadata = (
+                f"Product release date: {item['document_date']}\n"
+                "Date semantics: this is the product/package version date; "
+                "a date in Source may only be the document publication date.\n"
+            )
         context_parts.append(
             f"[{evidence_id}]\n"
-            f"Source: {item['source']}\n"
+            f"Source: {source_label}\n"
             f"Page: {item['page']}\n"
             f"Section: {section}\n"
+            f"{release_metadata}"
             f"Content:\n{item['content']}"
         )
         source_documents.append(
@@ -380,6 +503,24 @@ def retrieve_context(query: str, top_k: int = FINAL_CONTEXT_TOP_K):
                 "parent_id": item["parent_id"],
                 "score": item.get("combined_score", 0.0),
                 "matched_child_count": len(item.get("matched_children", [])),
+                "family_id": item.get("family_id"),
+                "document_date": item.get("document_date"),
+                "version_rank": item.get("version_rank"),
+                "subtype": item.get("subtype"),
+                "temporal_action": item.get("temporal_action"),
+                "historical": item.get("historical", False),
+                "procedural_pages": list(
+                    _procedural_page_catalog.get(
+                        (
+                            item["source"],
+                            _procedure_section_key(
+                                item.get("section_path") or item.get("heading") or ""
+                            ),
+                            int(item["page"]),
+                        ),
+                        (),
+                    )
+                ),
             }
         )
 

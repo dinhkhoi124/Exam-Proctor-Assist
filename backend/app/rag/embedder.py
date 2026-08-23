@@ -1,16 +1,23 @@
+import os
 import faiss
 import pickle
 import json
 import logging
-from sentence_transformers import SentenceTransformer
-import numpy as np
-import os
-from rank_bm25 import BM25Okapi
 import re
 import unicodedata
 from typing import List, Tuple
 
-from app.core.config import EMBEDDING_DEVICE
+from app.core.config import EMBEDDING_DEVICE, EMBEDDING_LOCAL_FILES_ONLY
+
+if EMBEDDING_LOCAL_FILES_ONLY:
+    # Some tokenizer code paths still probe the Hub with local_files_only=True.
+    # Set offline mode before model-library imports to make cached startup safe.
+    os.environ.setdefault("HF_HUB_OFFLINE", "1")
+    os.environ.setdefault("TRANSFORMERS_OFFLINE", "1")
+
+import numpy as np
+from rank_bm25 import BM25Okapi
+from sentence_transformers import SentenceTransformer
 
 logger = logging.getLogger(__name__)
 
@@ -20,7 +27,11 @@ MODEL_NAME = "intfloat/multilingual-e5-base"
 class VectorStore:
     def __init__(self, dim=768):
         # Load model một lần duy nhất
-        self.model = SentenceTransformer(MODEL_NAME, device=EMBEDDING_DEVICE)
+        self.model = SentenceTransformer(
+            MODEL_NAME,
+            device=EMBEDDING_DEVICE,
+            local_files_only=EMBEDDING_LOCAL_FILES_ONLY,
+        )
         # Sử dụng IndexFlatIP cho Inner Product (tương đồng Cosine khi đã normalize)
         self.index = faiss.IndexFlatIP(dim)
         self.metadata = []

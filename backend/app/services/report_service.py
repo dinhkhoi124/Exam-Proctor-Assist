@@ -8,7 +8,7 @@ from zoneinfo import ZoneInfo
 from openpyxl import Workbook
 from openpyxl.styles import Alignment, Font, PatternFill
 from openpyxl.utils import get_column_letter
-from sqlalchemy import func
+from sqlalchemy import func, select
 from sqlalchemy.orm import Session
 
 from app.models.chat_log import ChatLog
@@ -27,6 +27,12 @@ GROUP_FORMATS = {
 }
 
 VN_TZ = ZoneInfo("Asia/Ho_Chi_Minh")
+QUESTION_SCOPE_LABELS = {
+    "user": "Người dùng",
+    "all": "Tất cả tài khoản",
+    "admin": "Admin",
+    "manager": "Management",
+}
 
 
 def _date_bounds(start_date: date, end_date: date) -> tuple[datetime, datetime]:
@@ -36,7 +42,13 @@ def _date_bounds(start_date: date, end_date: date) -> tuple[datetime, datetime]:
     )
 
 
-def _apply_chat_filters(query, start_at: datetime, end_at: datetime, topic_id: int | None):
+def _apply_chat_filters(
+    query,
+    start_at: datetime,
+    end_at: datetime,
+    topic_id: int | None,
+    question_scope: str,
+):
     query = query.filter(
         ChatLog.is_deleted.is_(False),
         ChatLog.created_at >= start_at,
@@ -44,6 +56,9 @@ def _apply_chat_filters(query, start_at: datetime, end_at: datetime, topic_id: i
     )
     if topic_id is not None:
         query = query.filter(ChatLog.topic_id == topic_id)
+    if question_scope != "all":
+        scoped_user_ids = select(User.id).where(User.role == question_scope)
+        query = query.filter(ChatLog.user_id.in_(scoped_user_ids))
     return query
 
 
@@ -54,6 +69,7 @@ def collect_report_data(
     group_by: str,
     topic_id: int | None = None,
     include_details: bool = False,
+    question_scope: str = "user",
 ) -> dict[str, Any]:
     start_at, end_at = _date_bounds(start_date, end_date)
     period = func.date_trunc(group_by, ChatLog.created_at)
@@ -67,6 +83,7 @@ def collect_report_data(
         start_at,
         end_at,
         topic_id,
+        question_scope,
     ).one()
 
     feedback_query = (
@@ -74,7 +91,9 @@ def collect_report_data(
         .join(ChatLog, FeedbackLog.chat_id == ChatLog.id)
         .filter(FeedbackLog.is_deleted.is_(False))
     )
-    feedback_query = _apply_chat_filters(feedback_query, start_at, end_at, topic_id)
+    feedback_query = _apply_chat_filters(
+        feedback_query, start_at, end_at, topic_id, question_scope
+    )
     feedback_rows = feedback_query.group_by(FeedbackLog.rating).all()
     feedback = {"like": 0, "dislike": 0}
     for rating, count in feedback_rows:
@@ -91,6 +110,7 @@ def collect_report_data(
         start_at,
         end_at,
         topic_id,
+        question_scope,
     )
     timeline_rows = timeline_query.group_by(period).order_by(period).all()
 
@@ -102,6 +122,7 @@ def collect_report_data(
         start_at,
         end_at,
         topic_id,
+        question_scope,
     )
     topic_rows = topic_query.group_by(ChatTopic.name).order_by(func.count(ChatLog.id).desc()).all()
 
@@ -114,6 +135,7 @@ def collect_report_data(
         start_at,
         end_at,
         topic_id,
+        question_scope,
     )
     user_rows = (
         user_query.group_by(User.id, User.username, User.email)
@@ -129,6 +151,7 @@ def collect_report_data(
             "end_date": end_date.isoformat(),
             "group_by": group_by,
             "topic_id": topic_id,
+            "question_scope": question_scope,
         },
         "summary": {
             "total_questions": summary_row.questions or 0,
@@ -169,6 +192,7 @@ def collect_report_data(
             start_at,
             end_at,
             topic_id,
+            question_scope,
         )
         detail_rows = detail_query.order_by(ChatLog.created_at.desc()).limit(MAX_DETAIL_ROWS + 1).all()
         result["details_truncated"] = len(detail_rows) > MAX_DETAIL_ROWS
@@ -199,6 +223,10 @@ def build_excel_report(data: dict[str, Any]) -> BytesIO:
     overview.append(["BAO CAO HOAT DONG CHATBOT"])
     overview.append(["Tu ngay", filters["start_date"]])
     overview.append(["Den ngay", filters["end_date"]])
+    overview.append([
+        "Pham vi tai khoan",
+        QUESTION_SCOPE_LABELS.get(filters.get("question_scope", "user"), "Người dùng"),
+    ])
     overview.append([])
     overview.append(["Chi so", "Gia tri"])
     overview.append(["Tong cau hoi", summary["total_questions"]])
@@ -317,7 +345,10 @@ def build_pdf_report(data: dict[str, Any]) -> BytesIO:
         figure.text(
             0.5,
             0.91,
-            f"Từ {filters['start_date']} đến {filters['end_date']}",
+            (
+                f"Từ {filters['start_date']} đến {filters['end_date']} · "
+                f"Phạm vi: {QUESTION_SCOPE_LABELS.get(filters.get('question_scope', 'user'), 'Người dùng')}"
+            ),
             ha="center",
             fontsize=10,
             color="#475569",

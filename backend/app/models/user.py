@@ -1,5 +1,5 @@
 import uuid
-from sqlalchemy import Column, String, Boolean, Text, DateTime, ForeignKey
+from sqlalchemy import BigInteger, Boolean, Column, DateTime, ForeignKey, String, Text, text
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.sql import func
 from sqlalchemy.orm import relationship
@@ -50,6 +50,12 @@ class User(Base):
     )
     role = Column(String(20), default="user")
     last_active = Column(DateTime(timezone=True))
+    session_version = Column(
+        BigInteger,
+        nullable=False,
+        default=0,
+        server_default=text("0"),
+    )
 
     # Relationships
     feedbacks = relationship("FeedbackLog", back_populates="user", foreign_keys="[FeedbackLog.user_id]")

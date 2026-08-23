@@ -1,9 +1,24 @@
 import axios from "axios";
 
+export const AUTH_NOTICE_STORAGE_KEY = "auth_notice";
+
+export function getAuthenticationNotice(data: unknown): string | null {
+  if (typeof data !== "object" || data === null || !("detail" in data)) return null;
+  const detail = data.detail;
+  if (typeof detail !== "object" || detail === null) return null;
+  if (
+    "code" in detail && detail.code === "SESSION_REPLACED" &&
+    "message" in detail && typeof detail.message === "string"
+  ) {
+    return detail.message;
+  }
+  return null;
+}
+
 const configuredApiUrl = import.meta.env.VITE_API_URL?.trim();
 
 export const API_BASE_URL = (
-  configuredApiUrl || "http://127.0.0.1:8000"
+  configuredApiUrl || window.location.origin
 ).replace(/\/+$/, "");
 
 export function buildApiUrl(path: string) {
@@ -40,8 +55,12 @@ api.interceptors.response.use(
   (response) => response,
   (error) => {
     if (error.response && error.response.status === 401) {
-      // Clear expired token
+      const notice = getAuthenticationNotice(error.response.data);
+      if (notice) sessionStorage.setItem(AUTH_NOTICE_STORAGE_KEY, notice);
+
+      // Clear all locally cached authentication state.
       localStorage.removeItem("access_token");
+      localStorage.removeItem("auth_user");
       
       // Chuyển hướng về trang đăng nhập nếu chưa ở đó
       if (window.location.pathname !== "/login") {
