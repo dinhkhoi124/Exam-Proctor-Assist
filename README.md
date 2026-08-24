@@ -2,9 +2,9 @@
 
 AI-powered chatbot designed to support **exam proctors and students** in quickly accessing **exam regulations and academic policies**.
 
-The system combines **Hybrid Retrieval-Augmented Generation (RAG)** with a **domain fine-tuned language model** to deliver accurate, context-grounded answers from official university documents — with both text and voice interaction.
+The system combines **Hybrid Retrieval-Augmented Generation (RAG)** with a **domain-fine-tuned language model** to deliver accurate, context-grounded answers from official university documents — with both text and voice interaction.
 
-> **Demo:** `https://drive.google.com/file/d/1zOehgN_HM-6vAPCKc0fsHZJW_Eh9R4cd/view?usp=sharing`
+> **Demo:** [Watch the project demo](https://drive.google.com/file/d/1zOehgN_HM-6vAPCKc0fsHZJW_Eh9R4cd/view?usp=sharing)
 
 ---
 
@@ -14,6 +14,7 @@ The system combines **Hybrid Retrieval-Augmented Generation (RAG)** with a **dom
 |---|---|
 | 🔬 [Exam-Assist-Benchmark](https://github.com/dmt171004/Exam-Assist-Benchmark) | Benchmarking framework — automatic metrics, LLM-as-a-Judge, efficiency analysis |
 | 🧪 [Exam-Assist-Finetuning](https://github.com/dmt171004/Exam-Assist-Finetuning) | Fine-tuning pipeline for Qwen3-VL on exam-support domain data |
+| 📊 [ExamAssist RAG Research](https://github.com/ToanTS-0902/examassist-rag-research) | RAG evaluation suite — deduplication, temporal freshness, automatic document-family discovery, and ParentDocument baselines |
 
 ---
 
@@ -171,7 +172,7 @@ Switching between modes requires only `.env` changes — no code modifications n
 ## Project Structure
 
 ```
-FPT-Assistant-v3/
+Exam-Proctor-Assist/
 │
 ├── backend/
 │   ├── app/
@@ -284,8 +285,8 @@ FPT-Assistant-v3/
 ### 1. Clone Repository
 
 ```bash
-git clone https://github.com/dinhkhoi124/FPT-Assistant-v3.git
-cd FPT-Assistant-v3
+git clone https://github.com/dinhkhoi124/Exam-Proctor-Assist.git
+cd Exam-Proctor-Assist
 ```
 
 ---
@@ -296,6 +297,7 @@ cd FPT-Assistant-v3
 cd backend
 cp .env.example .env
 uv sync
+cd ..
 ```
 
 Edit `.env` and fill in your database URL, JWT secret, and model configuration (see section below).
@@ -347,35 +349,32 @@ RAG_MIN_BM25_SCORE=20.0
 
 ### 4. Run Database Migrations
 
-Apply the three backend migrations in order:
+From the repository root, apply the four backend migrations in order:
 
 ```bash
 psql -d fpt_exam_support -f backend/migrations/001_admin_retention_vn_timezone.sql
 psql -d fpt_exam_support -f backend/migrations/002_trash_batches.sql
 psql -d fpt_exam_support -f backend/migrations/003_case_insensitive_user_identity.sql
+psql -d fpt_exam_support -f backend/migrations/004_single_active_session.sql
 ```
 
 ---
 
 ### 5. (Optional) Start Local LLM Server
 
-From the `Chatbot_Module` directory, run the fine-tuned Qwen3 model via vLLM:
-
-```bash
-./scripts/run_qwen_vllm.sh
-```
-
-Served at `http://127.0.0.1:8001/v1` as model `qwen3-exam-assist`.
+Start a separate OpenAI-compatible vLLM service at `http://127.0.0.1:8001/v1`
+and expose the fine-tuned model as `qwen3-exam-assist`. Local model launchers and
+model weights are not bundled with this repository. See
+[API_DEPLOYMENT_NOTES.md](API_DEPLOYMENT_NOTES.md) for supported deployment profiles.
 
 ---
 
 ### 6. (Optional) Start Local STT Server
 
-```bash
-./scripts/run_faster_whisper_cpu.sh
-```
-
-Served at `http://127.0.0.1:8002/v1`. Uses WebRTC VAD to skip silent audio. Model lazy-loads on the first voiced request.
+Start a separate OpenAI-compatible Faster-Whisper service at
+`http://127.0.0.1:8002/v1`. The configured service should use WebRTC VAD to skip
+silent audio and may lazy-load the model on the first voiced request. See
+[API_DEPLOYMENT_NOTES.md](API_DEPLOYMENT_NOTES.md) for the API-based alternative.
 
 ---
 
@@ -399,7 +398,7 @@ npm install
 npm run dev
 ```
 
-Frontend at: `http://localhost:5173`
+Frontend at: `http://localhost:8080`
 
 ---
 
@@ -568,7 +567,7 @@ add new files under `backend/tests`.
 
 Potential improvements for production deployment:
 
-- Deploy App
+- Automated CI/CD and production monitoring
 - Advanced RAG ranking
 - Multi-language support
 - Role-based access control
@@ -576,28 +575,12 @@ Potential improvements for production deployment:
 
 ---
 
-## Related Repositories
-
-### 🔬 Benchmark Repository
-
-Evaluates pretrained vs. fine-tuned models using automatic metrics (Exact Match, F1, ROUGE-L, Containment Accuracy) and LLM-as-a-Judge (Correct Refusal Rate, Hallucination Rate, Faithfulness).
-
-➡️ [https://github.com/dmt171004/Exam-Assist-Benchmark](https://github.com/dmt171004/Exam-Assist-Benchmark)
-
-### 🧪 Fine-tuning Repository
-
-Contains the QLoRA training pipeline (`scripts/`), dataset preparation (`data/`), and fine-tuning outputs (`outputs/`) for adapting Qwen3-VL to the exam-support domain.
-
-➡️ [https://github.com/dmt171004/Exam-Assist-Finetuning](https://github.com/dmt171004/Exam-Assist-Finetuning)
-
----
-
 ## Authors
 
-**Dinh Van Anh Khoi · Duong Minh Tri · Tran Song Toan · Truong Loi Vi**
+**Tran Song Toan (Team Leader) · Dinh Van Anh Khoi · Duong Minh Tri · Truong Loi Vi**
 
 ---
 
-## License
+## Usage Notice
 
 This project is developed for **educational and research purposes**.
