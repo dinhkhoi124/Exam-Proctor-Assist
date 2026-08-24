@@ -306,43 +306,34 @@ Edit `.env` and fill in your database URL, JWT secret, and model configuration (
 
 ### 3. Configure Environment Variables
 
-Key variables in `backend/.env`:
+Key variables in `backend/.env` are shown below as placeholders only. Copy the
+repository's `.env.example` file and fill the values locally for your deployment.
 
 ```dotenv
-# ── LLM (local vLLM — default) ──────────────────────────────
-LLM_BASE_URL=http://127.0.0.1:8001/v1
-LLM_API_KEY=local
-LLM_MODEL=qwen3-exam-assist
+# LLM provider
+LLM_BASE_URL=<provider-base-url-or-empty>
+LLM_API_KEY=<provider-api-key-or-empty>
+LLM_MODEL=<model-name>
 
-# ── LLM (switch to OpenAI — clear BASE_URL) ─────────────────
-# LLM_BASE_URL=
-# LLM_API_KEY=sk-...
-# LLM_MODEL=gpt-4o-mini
+# Speech-to-Text provider
+STT_BASE_URL=<provider-base-url-or-empty>
+STT_API_KEY=<provider-api-key-or-empty>
+STT_MODEL=<model-name>
+STT_FALLBACK_MODEL=<fallback-model-name-or-empty>
 
-# ── STT (local Faster-Whisper) ───────────────────────────────
-STT_BASE_URL=http://127.0.0.1:8002/v1
-STT_API_KEY=local
-STT_MODEL=faster-whisper-medium
+# Database and authentication
+DATABASE_URL=<database-connection-url>
+JWT_SECRET=<unique-random-secret>
+JWT_ALGORITHM=<jwt-algorithm>
+ACCESS_TOKEN_EXPIRE_MINUTES=<minutes>
 
-# ── STT (switch to OpenAI STT — clear BASE_URL) ─────────────
-# STT_BASE_URL=
-# OPENAI_API_KEY=sk-...
+# Frontend and CORS
+FRONTEND_URL=<frontend-origin>
+FRONTEND_ORIGINS=<allowed-frontend-origins>
 
-# ── Database ─────────────────────────────────────────────────
-DATABASE_URL=postgresql+psycopg2://user:password@localhost:5432/fpt_exam_support
-
-# ── Auth ─────────────────────────────────────────────────────
-JWT_SECRET=your-secret
-JWT_ALGORITHM=HS256
-ACCESS_TOKEN_EXPIRE_MINUTES=60
-
-# ── Frontend CORS ─────────────────────────────────────────────
-FRONTEND_URL=http://localhost:8080
-FRONTEND_ORIGINS=http://localhost:8080
-
-# ── RAG thresholds ───────────────────────────────────────────
-RAG_MIN_DENSE_SCORE=0.83
-RAG_MIN_BM25_SCORE=20.0
+# RAG thresholds
+RAG_MIN_DENSE_SCORE=<tuned-dense-threshold>
+RAG_MIN_BM25_SCORE=<tuned-bm25-threshold>
 ```
 
 ---
@@ -413,7 +404,24 @@ uv run python -m app.rag.build_index
 
 ---
 
-# Recent Updates (2026-08-14)
+# Recent Updates (2026-08-24)
+
+This section summarizes the changes merged in
+[`b6803bbb`](https://github.com/dinhkhoi124/Exam-Proctor-Assist/commit/b6803bbb92e44d6bc9052331acf0470539d331cd).
+
+## Temporal RAG and visual evidence
+
+- Added deterministic document-date and family discovery from filenames and document content without requiring an LLM call.
+- Added a reviewable temporal manifest whose verified values override automatically discovered metadata.
+- Added conditional family-aware temporal resolution for multi-version documents, while preserving the original retrieval order when eligibility checks are not met.
+- Improved evidence selection, parent-context handling, deduplication, and source-image matching for cited answers.
+- Added optional OCR ingestion for image-only or low-text PDF pages.
+
+## Image-aware chat and Quick Actions
+
+- Image analysis now uses strict structured output and fails closed when a screenshot contains no clear exam-related error evidence.
+- Unrelated or invalid images are stopped before RAG retrieval instead of being converted into speculative queries.
+- Updated the student and proctor Quick Actions to send clearer domain-specific retrieval queries.
 
 ## Admin dashboard and reports
 
@@ -435,9 +443,21 @@ GET /api/v1/admin/reports/export?...&question_scope=user&format=xlsx
 
 ## Document management
 
+- Added transactional upload, replacement, and deletion flows that keep PDF files, PostgreSQL metadata, FAISS/BM25 files, and in-memory resources synchronized.
+- Added rollback when validation, index rebuilding, database synchronization, or resource reload fails.
+- Added batch operations with limits of 20 uploaded PDFs, 25 MB per PDF, 90 MB per upload batch, and 100 selected deletions.
+- Added rejection for corrupt PDFs, documents with no usable chunks, and Windows filename collisions that differ only by letter case.
 - Added client-side PDF filename search that is case-insensitive and Vietnamese accent-insensitive.
 - Search results continue to support every existing sort option.
 - Added a correctly aligned clear button, match counter, empty-result state, and responsive mobile controls.
+
+## Runtime, authentication, and deployment
+
+- Added separate Windows dependency profiles for CPU and CUDA embeddings while using API-hosted LLM, Vision, and STT models.
+- Kept support for local OpenAI-compatible LLM and speech services on Ubuntu.
+- Added provider configuration for LLM, Vision, STT, embedding device selection, and multi-server deployments.
+- Added migration 004 to enforce one active session per user and strengthened session/authentication handling.
+- Added deployment and operational guidance in [API_DEPLOYMENT_NOTES.md](API_DEPLOYMENT_NOTES.md).
 
 ## Chat citation images
 
@@ -483,21 +503,21 @@ py -3.12 -m venv .venv
 ```
 
 Copy `backend/.env.api.example` to `backend/.env`, then configure secrets and
-provider values locally. Important API variables:
+provider values locally. The following block is a placeholder-only reference:
 
 ```dotenv
-OPENAI_API_KEY=<secret>
-LLM_BASE_URL=
-LLM_API_KEY=
-LLM_MODEL=gpt-4o-mini
-VISION_BASE_URL=
-VISION_API_KEY=
-VISION_MODEL=gpt-4o-mini
-STT_BASE_URL=
-STT_API_KEY=
-STT_MODEL=gpt-4o-mini-transcribe
-STT_FALLBACK_MODEL=whisper-1
-EMBEDDING_DEVICE=cpu
+OPENAI_API_KEY=<provider-api-key-or-empty>
+LLM_BASE_URL=<provider-base-url-or-empty>
+LLM_API_KEY=<provider-api-key-or-empty>
+LLM_MODEL=<model-name>
+VISION_BASE_URL=<provider-base-url-or-empty>
+VISION_API_KEY=<provider-api-key-or-empty>
+VISION_MODEL=<model-name>
+STT_BASE_URL=<provider-base-url-or-empty>
+STT_API_KEY=<provider-api-key-or-empty>
+STT_MODEL=<model-name>
+STT_FALLBACK_MODEL=<fallback-model-name-or-empty>
+EMBEDDING_DEVICE=<cpu-or-cuda>
 ```
 
 Leave a `*_BASE_URL` blank for OpenAI. For another OpenAI-compatible provider,
@@ -508,22 +528,22 @@ NVIDIA runtime.
 For each server/domain, also change:
 
 ```dotenv
-DATABASE_URL=<that server's database>
-JWT_SECRET=<unique random secret>
-EMAIL_ENCRYPT_KEY=<key matching that database's encrypted SMTP data>
-FRONTEND_URL=https://<frontend-domain>
-FRONTEND_ORIGINS=https://<frontend-domain>
+DATABASE_URL=<database-connection-url>
+JWT_SECRET=<unique-random-secret>
+EMAIL_ENCRYPT_KEY=<database-matched-encryption-key>
+FRONTEND_URL=<frontend-origin>
+FRONTEND_ORIGINS=<allowed-frontend-origins>
 ```
 
 Before building the frontend for each deployment, set:
 
 ```dotenv
-VITE_API_URL=https://<public-backend-domain>
+VITE_API_URL=<public-backend-origin>
 ```
 
-For `https://examsupport.visionlab.ai.vn/`, use that deployment's public backend
-origin in `VITE_API_URL` and the frontend origin in `FRONTEND_URL` and
-`FRONTEND_ORIGINS`. WebSocket `/ws/admin` must be proxied with upgrade headers.
+For each deployment, use its public backend origin in `VITE_API_URL` and its
+frontend origin in `FRONTEND_URL` and `FRONTEND_ORIGINS`. WebSocket `/ws/admin`
+must be proxied with upgrade headers.
 
 ## Database and document-management update
 
