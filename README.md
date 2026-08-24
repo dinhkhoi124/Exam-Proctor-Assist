@@ -577,7 +577,7 @@ Potential improvements for production deployment:
 
 ## Authors
 
-**Dinh Van Anh Khoi · Duong Minh Tri · Tran Song Toan (Team Leader) · Truong Loi Vi**
+**Tran Song Toan (Team Leader) · Dinh Van Anh Khoi · Duong Minh Tri · Truong Loi Vi**
 
 ---
 
